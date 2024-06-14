@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ArchVizExplorer",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "Rushi Gandhi",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ArchVizExplorer",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
