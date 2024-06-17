@@ -3,20 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ArchVizModeEnum.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/ModesMenuWidget.h"
+#include "Widgets/RoadConstructionWidget.h"
+#include "Widgets/BuildingCreationWidget.h"
+#include "Widgets/InteriorDesignWidget.h"
 #include "ArchVizController.generated.h"
 
 class ARoadActor;
 class UInputAction;
 class UInputMappingContext;
-
-enum class EArchVizMode : uint8 {
-	ViewMode,
-	RoadConstruction,
-	BuildingCreation,
-	InteriorDesign
-};
 
 /**
  *
@@ -38,12 +35,36 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
 	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
+	TSubclassOf<URoadConstructionWidget> RoadConstructionWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
+	TSubclassOf<UBuildingCreationWidget> BuildingCreationWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
+	TSubclassOf<UInteriorDesignWidget> InteriorDesignWidgetRef;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Road")
 	TSubclassOf<ARoadActor> RoadActorRef;
 
 private:
+	UFUNCTION()
+	void HandleModeChange(EArchVizMode ArchVizMode);
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	EArchVizMode ArchVizMode;
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
 	UModesMenuWidget* ModesMenuWidget;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	URoadConstructionWidget* RoadConstructionWidget;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UBuildingCreationWidget* BuildingCreationWidget;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UInteriorDesignWidget* InteriorDesignWidget;
 
 	// Road Generator
 	void SetupRoadGeneratorInput();
@@ -61,4 +82,7 @@ private:
 
 	UPROPERTY()
 	UInputMappingContext* RoadGeneratorMappingContext;
+
+	void UpdateMappingContext();
+	void UpdateWidgets();
 };
