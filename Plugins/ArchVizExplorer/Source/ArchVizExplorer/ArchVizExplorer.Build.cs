@@ -10,6 +10,7 @@ public class ArchVizExplorer : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
+                "C:/Program Files/UE_5.2/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/"
 				// ... add public include paths required here ...
 			}
 			);
@@ -26,6 +27,7 @@ public class ArchVizExplorer : ModuleRules
 			new string[]
 			{
 				"Core",
+				"InputCore",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -39,6 +41,8 @@ public class ArchVizExplorer : ModuleRules
 				"Slate",
 				"SlateCore",
 				"EnhancedInput",
+				"ProceduralMeshComponent",
+				"UMG",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
