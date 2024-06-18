@@ -7,10 +7,9 @@
 class UProceduralMeshComponent;
 
 /**
- * 
+ *
  */
-class ARCHVIZEXPLORER_API ProceduralMeshGenerator
-{
+class ARCHVIZEXPLORER_API ProceduralMeshGenerator {
 public:
 	ProceduralMeshGenerator();
 	~ProceduralMeshGenerator();

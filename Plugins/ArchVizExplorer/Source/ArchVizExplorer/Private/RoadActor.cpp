@@ -13,7 +13,7 @@ ARoadActor::ARoadActor() : RoadMesh{ nullptr } {
 
 	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
-	
+
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
 	SplineComponent->SetupAttachment(SceneRoot);
 

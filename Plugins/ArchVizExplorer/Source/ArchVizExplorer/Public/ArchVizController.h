@@ -12,7 +12,7 @@
 #include "ArchVizController.generated.h"
 
 class ARoadActor;
-class UInputAction;
+class AWallActor;
 class UInputMappingContext;
 
 /**
@@ -25,12 +25,6 @@ class ARCHVIZEXPLORER_API AArchVizController : public APlayerController {
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
-	AArchVizController();
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	virtual void SetupInputComponent() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
 	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
@@ -47,9 +41,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Road")
 	TSubclassOf<ARoadActor> RoadActorRef;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
+	TSubclassOf<AWallActor> WallActorRef;
+
+public:
+	AArchVizController();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupInputComponent() override;
+
 private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
+
+	FHitResult GetHitResult() const;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
 	EArchVizMode ArchVizMode;
@@ -72,17 +77,31 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void HandleRoadGeneratorLeftClick();
 
-	FInputModeGameAndUI InputMode;
-
 	UPROPERTY(VisibleDefaultsOnly, Category = "Road")
 	ARoadActor* RoadActor;
 
 	UPROPERTY()
-	UInputAction* RoadGeneratorLeftClickAction;
+	UInputMappingContext* RoadGeneratorMappingContext;
+
+	// Wall Generator
+	void SetupWallGeneratorInput();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleWallGeneratorLeftClick();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleWallGeneratorRKeyPress();
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
+	AWallActor* WallActor;
 
 	UPROPERTY()
-	UInputMappingContext* RoadGeneratorMappingContext;
+	UInputMappingContext* WallGeneratorMappingContext;
 
 	void UpdateMappingContext();
 	void UpdateWidgets();
+
+	FVector SnapToGrid(const FVector& WorldLocation);
+
+	FInputModeGameAndUI InputMode;
 };

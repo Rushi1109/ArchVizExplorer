@@ -5,8 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FArchVizExplorerModule : public IModuleInterface
-{
+class FArchVizExplorerModule : public IModuleInterface {
 public:
 
 	/** IModuleInterface implementation */

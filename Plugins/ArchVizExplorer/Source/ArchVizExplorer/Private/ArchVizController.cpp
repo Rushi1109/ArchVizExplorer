@@ -7,9 +7,10 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "RoadActor.h"
+#include "WallActor.h"
 
-AArchVizController::AArchVizController() : RoadGeneratorLeftClickAction{ nullptr }, RoadGeneratorMappingContext{ nullptr } {
-
+AArchVizController::AArchVizController() : ArchVizMode{ EArchVizMode::ViewMode }, RoadGeneratorMappingContext{ nullptr }, WallGeneratorMappingContext{ nullptr } {
+	
 }
 
 void AArchVizController::BeginPlay() {
@@ -42,12 +43,37 @@ void AArchVizController::BeginPlay() {
 
 void AArchVizController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+
+	if (ArchVizMode == EArchVizMode::BuildingCreation) {
+		if (IsValid(WallActorRef) && !IsValid(WallActor)) {
+			WallActor = NewObject<AWallActor>(this, WallActorRef);
+			WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
+		}
+		FHitResult HitResult = GetHitResult();
+		HitResult.Location.Z = 0.0;
+
+		if (IsValid(WallActor->WallMesh)) {
+			WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
+
+			WallActor->PreviewWallSegment->SetWorldLocation(SnapToGrid(HitResult.Location));
+			WallActor->PreviewWallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
+		}
+	}
+}
+
+FVector AArchVizController::SnapToGrid(const FVector& WorldLocation) {
+	float GridSize = 100.0f;
+	float SnappedX = FMath::RoundToFloat(WorldLocation.X / GridSize) * GridSize;
+	float SnappedY = FMath::RoundToFloat(WorldLocation.Y / GridSize) * GridSize;
+	float SnappedZ = FMath::RoundToFloat(WorldLocation.Z / GridSize) * GridSize;
+	return FVector(SnappedX, SnappedY, SnappedZ);
 }
 
 void AArchVizController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
 	SetupRoadGeneratorInput();
+	SetupWallGeneratorInput();
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (Subsystem) {
@@ -62,22 +88,18 @@ void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
 	UpdateWidgets();
 }
 
-void AArchVizController::HandleRoadGeneratorLeftClick() {
+FHitResult AArchVizController::GetHitResult() const {
 	FHitResult MouseHitResult{};
 	GetHitResultUnderCursorByChannel(TraceTypeQuery1, true, MouseHitResult);
 
-	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
-		RoadActor = NewObject<ARoadActor>(this, RoadActorRef);
-	}
-
-	RoadActor->AddNewPoint(MouseHitResult.Location);
+	return MouseHitResult;
 }
 
 void AArchVizController::SetupRoadGeneratorInput() {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	check(EnhancedInputComponent);
 
-	RoadGeneratorLeftClickAction = NewObject<UInputAction>(this);
+	UInputAction* RoadGeneratorLeftClickAction = NewObject<UInputAction>(this);
 	RoadGeneratorLeftClickAction->ValueType = EInputActionValueType::Boolean;
 
 	RoadGeneratorMappingContext = NewObject<UInputMappingContext>(this);
@@ -86,8 +108,80 @@ void AArchVizController::SetupRoadGeneratorInput() {
 	EnhancedInputComponent->BindAction(RoadGeneratorLeftClickAction, ETriggerEvent::Completed, this, &AArchVizController::HandleRoadGeneratorLeftClick);
 }
 
+void AArchVizController::HandleRoadGeneratorLeftClick() {
+	FHitResult HitResult = GetHitResult();
+
+	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
+		RoadActor = NewObject<ARoadActor>(this, RoadActorRef);
+	}
+
+	RoadActor->AddNewPoint(HitResult.Location);
+}
+
+void AArchVizController::SetupWallGeneratorInput() {
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	check(EnhancedInputComponent);
+
+	UInputAction* WallGeneratorLeftClickAction = NewObject<UInputAction>(this);
+	WallGeneratorLeftClickAction->ValueType = EInputActionValueType::Boolean;
+
+	UInputAction* WallGeneratorRKeyPressAction = NewObject<UInputAction>(this);
+	WallGeneratorRKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
+	WallGeneratorMappingContext = NewObject<UInputMappingContext>(this);
+	WallGeneratorMappingContext->MapKey(WallGeneratorLeftClickAction, EKeys::LeftMouseButton);
+	WallGeneratorMappingContext->MapKey(WallGeneratorRKeyPressAction, EKeys::R);
+
+	EnhancedInputComponent->BindAction(WallGeneratorLeftClickAction, ETriggerEvent::Completed, this, &AArchVizController::HandleWallGeneratorLeftClick);
+	EnhancedInputComponent->BindAction(WallGeneratorRKeyPressAction, ETriggerEvent::Completed, this, &AArchVizController::HandleWallGeneratorRKeyPress);
+}
+
+void AArchVizController::HandleWallGeneratorLeftClick() {
+
+	auto WallSegment = NewObject<UStaticMeshComponent>();
+	
+	if (IsValid(WallActor->WallMesh)) {
+		WallSegment->SetStaticMesh(WallActor->WallMesh);
+
+		WallSegment->RegisterComponentWithWorld(GetWorld());
+		WallSegment->SetWorldLocation(WallActor->PreviewWallSegment->GetComponentLocation());
+		WallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
+
+		WallActor->WallSegments.Add(WallSegment);
+		WallActor->SetSegmentIndex(WallActor->GetSegmentIndex() + 1);
+	}
+}
+
+void AArchVizController::HandleWallGeneratorRKeyPress() {
+	if (IsValid(WallActor)) {
+		double NewRotationYaw = (WallActor->GetSegmentRotation().Yaw + 90);
+		if (NewRotationYaw >= 360) {
+			NewRotationYaw -= 360;
+		}
+		WallActor->SetSegmentRotation(FRotator{ 0.0, NewRotationYaw, 0.0 });
+	}
+}
+
 void AArchVizController::UpdateMappingContext() {
-	// TODO
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	check(Subsystem);
+
+	switch (ArchVizMode) {
+	case EArchVizMode::ViewMode:
+
+		break;
+	case EArchVizMode::RoadConstruction:
+		Subsystem->AddMappingContext(RoadGeneratorMappingContext, 0);
+		Subsystem->RemoveMappingContext(WallGeneratorMappingContext);
+		break;
+	case EArchVizMode::BuildingCreation:
+		Subsystem->AddMappingContext(WallGeneratorMappingContext, 0);
+		Subsystem->RemoveMappingContext(RoadGeneratorMappingContext);
+		break;
+	case EArchVizMode::InteriorDesign:
+
+		break;
+	}
 }
 
 void AArchVizController::UpdateWidgets() {
@@ -135,8 +229,6 @@ void AArchVizController::UpdateWidgets() {
 		if (IsValid(RoadConstructionWidget) && RoadConstructionWidget->IsInViewport()) {
 			RoadConstructionWidget->RemoveFromParent();
 		}
-		break;
-	default:
 		break;
 	}
 }

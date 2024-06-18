@@ -5,12 +5,10 @@
 #include "ProceduralMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-ProceduralMeshGenerator::ProceduralMeshGenerator()
-{
+ProceduralMeshGenerator::ProceduralMeshGenerator() {
 }
 
-ProceduralMeshGenerator::~ProceduralMeshGenerator()
-{
+ProceduralMeshGenerator::~ProceduralMeshGenerator() {
 }
 
 void ProceduralMeshGenerator::GenerateCube(UProceduralMeshComponent* ProceduralMeshComponent, int32 SectionIndex, double DimensionX, double DimensionY, double DimensionZ, double ZOffset /*= 0.f*/) {

@@ -18,7 +18,7 @@ void UModesMenuWidget::NativeConstruct() {
 	if (IsValid(BuildingCreationButton)) {
 		BuildingCreationButton->OnClicked.AddDynamic(this, &UModesMenuWidget::HandleBuildingModeButtonClick);
 	}
-	if(IsValid(InteriorDesignButton)) {
+	if (IsValid(InteriorDesignButton)) {
 		InteriorDesignButton->OnClicked.AddDynamic(this, &UModesMenuWidget::HandleInteriorModeButtonClick);
 	}
 }
