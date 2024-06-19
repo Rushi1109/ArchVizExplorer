@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ArchVizModeEnum.h"
+#include "Enums/ArchVizMode.h"
 #include "UMG/Public/Components/CanvasPanel.h"
 #include "UMG/Public/Components/TextBlock.h"
 #include "UMG/Public/Components/Button.h"

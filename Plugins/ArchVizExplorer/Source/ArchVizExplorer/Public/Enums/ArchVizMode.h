@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ArchVizModeEnum.generated.h"
+#include "ArchVizMode.generated.h"
 
 UENUM()
 enum class EArchVizMode : uint8 {

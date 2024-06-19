@@ -29,12 +29,13 @@ void AArchVizController::BeginPlay() {
 			RoadConstructionWidget->AddToViewport(0);
 		}
 
-		if (IsValid(RoadConstructionWidgetRef)) {
+		if (IsValid(BuildingCreationWidgetRef)) {
 			BuildingCreationWidget = CreateWidget<UBuildingCreationWidget>(this, BuildingCreationWidgetRef, TEXT("Building Creation Widget"));
 			BuildingCreationWidget->AddToViewport(0);
+			BuildingCreationWidget->OnBuildingModeEntityChange.AddUObject(this, &AArchVizController::HandleBuildingModeEntityChange);
 		}
 
-		if (IsValid(RoadConstructionWidgetRef)) {
+		if (IsValid(InteriorDesignWidgetRef)) {
 			InteriorDesignWidget = CreateWidget<UInteriorDesignWidget>(this, InteriorDesignWidgetRef, TEXT("Interior Design Widget"));
 			InteriorDesignWidget->AddToViewport(0);
 		}
@@ -45,18 +46,23 @@ void AArchVizController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (ArchVizMode == EArchVizMode::BuildingCreation) {
-		if (IsValid(WallActorRef) && !IsValid(WallActor)) {
-			WallActor = NewObject<AWallActor>(this, WallActorRef);
-			WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
-		}
-		FHitResult HitResult = GetHitResult();
-		HitResult.Location.Z = 0.0;
+		if (BuildingModeEntity == EBuildingModeEntity::WallPlacement) {
+			if (IsValid(WallActorRef) && !IsValid(WallActor)) {
+				WallActor = NewObject<AWallActor>(this, WallActorRef);
+			}
+			if (IsValid(WallActor) && !IsValid(WallActor->PreviewWallSegment)) {
+				WallActor->PreviewWallSegment = NewObject<UStaticMeshComponent>();
+				WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
+			}
+			FHitResult HitResult = GetHitResult();
+			//HitResult.Location.Z = 0.0;
 
-		if (IsValid(WallActor->WallMesh)) {
-			WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
+			if (IsValid(WallActor->WallMesh) && IsValid(WallActor->PreviewWallSegment)) {
+				WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
 
-			WallActor->PreviewWallSegment->SetWorldLocation(SnapToGrid(HitResult.Location));
-			WallActor->PreviewWallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
+				WallActor->PreviewWallSegment->SetWorldLocation(SnapToGrid(HitResult.Location));
+				WallActor->PreviewWallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
+			}
 		}
 	}
 }
@@ -84,13 +90,30 @@ void AArchVizController::SetupInputComponent() {
 void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
 	ArchVizMode = NewArchVizMode;
 
+	CleanBeforeChange();
 	UpdateMappingContext();
 	UpdateWidgets();
 }
 
+void AArchVizController::HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity) {
+	BuildingModeEntity = NewBuildingModeEntity;
+}
+
 FHitResult AArchVizController::GetHitResult() const {
 	FHitResult MouseHitResult{};
-	GetHitResultUnderCursorByChannel(TraceTypeQuery1, true, MouseHitResult);
+
+	FVector WorldLocation{}, WorldDirection{};
+
+	if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection)) {
+		FVector TraceStart = WorldLocation;
+		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0);
+
+		FCollisionQueryParams CollisionQueryParams;
+		CollisionQueryParams.bTraceComplex = true;
+		CollisionQueryParams.AddIgnoredActor(WallActor);
+
+		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);	
+	}
 
 	return MouseHitResult;
 }
@@ -146,6 +169,7 @@ void AArchVizController::HandleWallGeneratorLeftClick() {
 		WallSegment->RegisterComponentWithWorld(GetWorld());
 		WallSegment->SetWorldLocation(WallActor->PreviewWallSegment->GetComponentLocation());
 		WallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
+		WallSegment->SetWorldScale3D(FVector{ 1.0 + (WallActor->WallMesh->GetBoundingBox().GetSize().Y / WallActor->WallMesh->GetBoundingBox().GetSize().X), 1.0, 1.0});
 
 		WallActor->WallSegments.Add(WallSegment);
 		WallActor->SetSegmentIndex(WallActor->GetSegmentIndex() + 1);
@@ -160,6 +184,14 @@ void AArchVizController::HandleWallGeneratorRKeyPress() {
 		}
 		WallActor->SetSegmentRotation(FRotator{ 0.0, NewRotationYaw, 0.0 });
 	}
+}
+
+void AArchVizController::CleanBeforeChange() {
+	if (IsValid(WallActor)) {
+		WallActor->DestroyPreviewWallSegment();
+	}
+
+	BuildingModeEntity = EBuildingModeEntity::None;
 }
 
 void AArchVizController::UpdateMappingContext() {
@@ -179,7 +211,8 @@ void AArchVizController::UpdateMappingContext() {
 		Subsystem->RemoveMappingContext(RoadGeneratorMappingContext);
 		break;
 	case EArchVizMode::InteriorDesign:
-
+		Subsystem->RemoveMappingContext(WallGeneratorMappingContext);
+		Subsystem->RemoveMappingContext(RoadGeneratorMappingContext);
 		break;
 	}
 }

@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ArchVizModeEnum.h"
+#include "Enums/ArchVizMode.h"
+#include "Enums/BuildingModeEntity.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/ModesMenuWidget.h"
 #include "Widgets/RoadConstructionWidget.h"
@@ -54,10 +55,16 @@ private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
 
+	UFUNCTION()
+	void HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity);
+
 	FHitResult GetHitResult() const;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
 	EArchVizMode ArchVizMode;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode", meta = (EditCondition = "ArchVizMode == EArchVizMode::BuildingCreation"))
+	EBuildingModeEntity BuildingModeEntity;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
 	UModesMenuWidget* ModesMenuWidget;
@@ -98,6 +105,7 @@ private:
 	UPROPERTY()
 	UInputMappingContext* WallGeneratorMappingContext;
 
+	void CleanBeforeChange();
 	void UpdateMappingContext();
 	void UpdateWidgets();
 

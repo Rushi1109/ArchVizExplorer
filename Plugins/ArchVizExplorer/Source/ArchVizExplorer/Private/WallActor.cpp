@@ -14,6 +14,7 @@ AWallActor::AWallActor() : SegmentIndex{ -1 }, SegmentRotation{0.0} {
 
 	PreviewWallSegment = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewWallSegment"));
 	PreviewWallSegment->SetupAttachment(SceneRoot);
+	PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
 
 	//ProceduralWallGenerator = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralWallGenerator"));
 	//ProceduralWallGenerator->SetupAttachment(SceneRoot);
@@ -27,5 +28,12 @@ void AWallActor::BeginPlay() {
 // Called every frame
 void AWallActor::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+}
+
+void AWallActor::DestroyPreviewWallSegment() {
+	if(IsValid(PreviewWallSegment)){ 
+		PreviewWallSegment->DestroyComponent();
+	}
+	PreviewWallSegment = nullptr;
 }
 

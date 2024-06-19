@@ -50,6 +50,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
 	UStaticMeshComponent* PreviewWallSegment;
 
+	UFUNCTION()
+	void DestroyPreviewWallSegment();
+
 private:
 	int32 SegmentIndex;
 
