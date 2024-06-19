@@ -9,8 +9,8 @@
 #include "RoadActor.h"
 #include "WallActor.h"
 
-AArchVizController::AArchVizController() : ArchVizMode{ EArchVizMode::ViewMode }, RoadGeneratorMappingContext{ nullptr }, WallGeneratorMappingContext{ nullptr } {
-	
+AArchVizController::AArchVizController() : CurrentMode{ nullptr }, ArchVizMode{ EArchVizMode::ViewMode }, BuildingModeEntity{ EBuildingModeEntity::None } {
+
 }
 
 void AArchVizController::BeginPlay() {
@@ -26,19 +26,27 @@ void AArchVizController::BeginPlay() {
 
 		if (IsValid(RoadConstructionWidgetRef)) {
 			RoadConstructionWidget = CreateWidget<URoadConstructionWidget>(this, RoadConstructionWidgetRef, TEXT("Road Construction Widget"));
-			RoadConstructionWidget->AddToViewport(0);
 		}
 
 		if (IsValid(BuildingCreationWidgetRef)) {
 			BuildingCreationWidget = CreateWidget<UBuildingCreationWidget>(this, BuildingCreationWidgetRef, TEXT("Building Creation Widget"));
-			BuildingCreationWidget->AddToViewport(0);
 			BuildingCreationWidget->OnBuildingModeEntityChange.AddUObject(this, &AArchVizController::HandleBuildingModeEntityChange);
 		}
 
 		if (IsValid(InteriorDesignWidgetRef)) {
 			InteriorDesignWidget = CreateWidget<UInteriorDesignWidget>(this, InteriorDesignWidgetRef, TEXT("Interior Design Widget"));
-			InteriorDesignWidget->AddToViewport(0);
 		}
+	}
+
+	if (IsValid(RoadConstructionModeRef)) {
+		RoadConstructionMode = NewObject<URoadConstructionMode>(this, RoadConstructionModeRef);
+		RoadConstructionMode->InitParam(this);
+		RoadConstructionMode->SetupInputMapping();
+	}
+	if (IsValid(BuildingCreationModeRef)) {
+		BuildingCreationMode = NewObject<UBuildingCreationMode>(this, BuildingCreationModeRef);
+		BuildingCreationMode->InitParam(this);
+		BuildingCreationMode->SetBuildingModeEntity(BuildingModeEntity);
 	}
 }
 
@@ -78,21 +86,40 @@ FVector AArchVizController::SnapToGrid(const FVector& WorldLocation) {
 void AArchVizController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
-	SetupRoadGeneratorInput();
-	SetupWallGeneratorInput();
-
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if (Subsystem) {
-		Subsystem->AddMappingContext(RoadGeneratorMappingContext, 0);
-	}
 }
 
 void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
 	ArchVizMode = NewArchVizMode;
 
-	CleanBeforeChange();
-	UpdateMappingContext();
+	switch (ArchVizMode) {
+	case EArchVizMode::ViewMode:
+		break;
+	case EArchVizMode::RoadConstruction:
+		SetArchVizMode(RoadConstructionMode);
+		break;
+	case EArchVizMode::BuildingCreation:
+		SetArchVizMode(BuildingCreationMode);
+		break;
+	case EArchVizMode::InteriorDesign:
+		break;
+	default:
+		break;
+	}
+
+	//CleanBeforeChange();
 	UpdateWidgets();
+}
+
+void AArchVizController::SetArchVizMode(IArchVizMode* NewArchVizMode) {
+	if (CurrentMode) {
+		CurrentMode->ExitMode();
+	}
+
+	CurrentMode = NewArchVizMode;
+
+	if (CurrentMode) {
+		CurrentMode->EnterMode();
+	}
 }
 
 void AArchVizController::HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity) {
@@ -112,33 +139,10 @@ FHitResult AArchVizController::GetHitResult() const {
 		CollisionQueryParams.bTraceComplex = true;
 		CollisionQueryParams.AddIgnoredActor(WallActor);
 
-		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);	
+		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
 	}
 
 	return MouseHitResult;
-}
-
-void AArchVizController::SetupRoadGeneratorInput() {
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
-	check(EnhancedInputComponent);
-
-	UInputAction* RoadGeneratorLeftClickAction = NewObject<UInputAction>(this);
-	RoadGeneratorLeftClickAction->ValueType = EInputActionValueType::Boolean;
-
-	RoadGeneratorMappingContext = NewObject<UInputMappingContext>(this);
-	RoadGeneratorMappingContext->MapKey(RoadGeneratorLeftClickAction, EKeys::LeftMouseButton);
-
-	EnhancedInputComponent->BindAction(RoadGeneratorLeftClickAction, ETriggerEvent::Completed, this, &AArchVizController::HandleRoadGeneratorLeftClick);
-}
-
-void AArchVizController::HandleRoadGeneratorLeftClick() {
-	FHitResult HitResult = GetHitResult();
-
-	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
-		RoadActor = NewObject<ARoadActor>(this, RoadActorRef);
-	}
-
-	RoadActor->AddNewPoint(HitResult.Location);
 }
 
 void AArchVizController::SetupWallGeneratorInput() {
@@ -162,14 +166,14 @@ void AArchVizController::SetupWallGeneratorInput() {
 void AArchVizController::HandleWallGeneratorLeftClick() {
 
 	auto WallSegment = NewObject<UStaticMeshComponent>();
-	
+
 	if (IsValid(WallActor->WallMesh)) {
 		WallSegment->SetStaticMesh(WallActor->WallMesh);
 
 		WallSegment->RegisterComponentWithWorld(GetWorld());
 		WallSegment->SetWorldLocation(WallActor->PreviewWallSegment->GetComponentLocation());
 		WallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
-		WallSegment->SetWorldScale3D(FVector{ 1.0 + (WallActor->WallMesh->GetBoundingBox().GetSize().Y / WallActor->WallMesh->GetBoundingBox().GetSize().X), 1.0, 1.0});
+		WallSegment->SetWorldScale3D(FVector{ 1.0 + (WallActor->WallMesh->GetBoundingBox().GetSize().Y / WallActor->WallMesh->GetBoundingBox().GetSize().X), 1.0, 1.0 });
 
 		WallActor->WallSegments.Add(WallSegment);
 		WallActor->SetSegmentIndex(WallActor->GetSegmentIndex() + 1);
@@ -192,29 +196,6 @@ void AArchVizController::CleanBeforeChange() {
 	}
 
 	BuildingModeEntity = EBuildingModeEntity::None;
-}
-
-void AArchVizController::UpdateMappingContext() {
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-
-	switch (ArchVizMode) {
-	case EArchVizMode::ViewMode:
-
-		break;
-	case EArchVizMode::RoadConstruction:
-		Subsystem->AddMappingContext(RoadGeneratorMappingContext, 0);
-		Subsystem->RemoveMappingContext(WallGeneratorMappingContext);
-		break;
-	case EArchVizMode::BuildingCreation:
-		Subsystem->AddMappingContext(WallGeneratorMappingContext, 0);
-		Subsystem->RemoveMappingContext(RoadGeneratorMappingContext);
-		break;
-	case EArchVizMode::InteriorDesign:
-		Subsystem->RemoveMappingContext(WallGeneratorMappingContext);
-		Subsystem->RemoveMappingContext(RoadGeneratorMappingContext);
-		break;
-	}
 }
 
 void AArchVizController::UpdateWidgets() {

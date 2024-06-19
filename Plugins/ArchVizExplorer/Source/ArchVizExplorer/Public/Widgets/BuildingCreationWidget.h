@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Enums/BuildingModeEntity.h"
+#include "Enums/BuildingModeEntityEnum.h"
 #include "UMG/Public/Components/CanvasPanel.h"
 #include "UMG/Public/Components/Image.h"
 #include "BuildingCreationWidget.generated.h"

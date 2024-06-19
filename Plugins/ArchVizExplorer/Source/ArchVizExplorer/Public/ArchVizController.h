@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums/ArchVizMode.h"
-#include "Enums/BuildingModeEntity.h"
+#include "Enums/ArchVizModeEnum.h"
+#include "Enums/BuildingModeEntityEnum.h"
+#include "ArchVizModes/ArchVizMode.h"
+#include "ArchVizModes/RoadConstructionMode.h"
+#include "ArchVizModes/BuildingCreationMode.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/ModesMenuWidget.h"
 #include "Widgets/RoadConstructionWidget.h"
@@ -23,72 +26,73 @@ UCLASS()
 class ARCHVIZEXPLORER_API AArchVizController : public APlayerController {
 	GENERATED_BODY()
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
-	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
-	TSubclassOf<URoadConstructionWidget> RoadConstructionWidgetRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
-	TSubclassOf<UBuildingCreationWidget> BuildingCreationWidgetRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizExplorer")
-	TSubclassOf<UInteriorDesignWidget> InteriorDesignWidgetRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Road")
-	TSubclassOf<ARoadActor> RoadActorRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
-	TSubclassOf<AWallActor> WallActorRef;
-
 public:
 	AArchVizController();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	IArchVizMode* CurrentMode;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizMode | ModesMenu")
+	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstruction | Widget")
+	TSubclassOf<URoadConstructionWidget> RoadConstructionWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstruction | Mode")
+	TSubclassOf<URoadConstructionMode> RoadConstructionModeRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreation | Widget")
+	TSubclassOf<UBuildingCreationWidget> BuildingCreationWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreation | Mode")
+	TSubclassOf<UBuildingCreationMode> BuildingCreationModeRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InteriorDesign | Widget")
+	TSubclassOf<UInteriorDesignWidget> InteriorDesignWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
+	TSubclassOf<AWallActor> WallActorRef;
+
 private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
+
+	void SetArchVizMode(IArchVizMode* NewMode);
 
 	UFUNCTION()
 	void HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity);
 
 	FHitResult GetHitResult() const;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
 	EArchVizMode ArchVizMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode", meta = (EditCondition = "ArchVizMode == EArchVizMode::BuildingCreation"))
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Entity", meta = (EditCondition = "ArchVizMode == EArchVizMode::BuildingCreation"))
 	EBuildingModeEntity BuildingModeEntity;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode | ModesMenu")
 	UModesMenuWidget* ModesMenuWidget;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstruction | Widget")
 	URoadConstructionWidget* RoadConstructionWidget;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstruction | Mode")
+	URoadConstructionMode* RoadConstructionMode;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Widget")
 	UBuildingCreationWidget* BuildingCreationWidget;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizExplorer")
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Mode")
+	UBuildingCreationMode* BuildingCreationMode;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "InteriorDesign | Widget")
 	UInteriorDesignWidget* InteriorDesignWidget;
-
-	// Road Generator
-	void SetupRoadGeneratorInput();
-
-	UFUNCTION(BlueprintCallable)
-	void HandleRoadGeneratorLeftClick();
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Road")
-	ARoadActor* RoadActor;
-
-	UPROPERTY()
-	UInputMappingContext* RoadGeneratorMappingContext;
 
 	// Wall Generator
 	void SetupWallGeneratorInput();
@@ -106,7 +110,6 @@ private:
 	UInputMappingContext* WallGeneratorMappingContext;
 
 	void CleanBeforeChange();
-	void UpdateMappingContext();
 	void UpdateWidgets();
 
 	FVector SnapToGrid(const FVector& WorldLocation);

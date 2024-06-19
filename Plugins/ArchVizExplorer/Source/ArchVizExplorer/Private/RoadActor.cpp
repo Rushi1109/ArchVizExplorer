@@ -35,7 +35,7 @@ void ARoadActor::Tick(float DeltaTime) {
 void ARoadActor::GenerateRoadMesh() {
 	DestroyRoadMesh();
 
-	if (!SplineComponent || !RoadMesh) return;
+	if (!IsValid(SplineComponent) || !IsValid(RoadMesh)) return;
 
 	int32 SplinePointsCount = SplineComponent->GetNumberOfSplinePoints();
 	if (SplinePointsCount < 2) {
@@ -92,7 +92,7 @@ void ARoadActor::DestroyRoadMesh() {
 }
 
 void ARoadActor::AddNewPoint(const FVector& Location) {
-	if (!SplineComponent || !RoadMesh) return;
+	if (!IsValid(SplineComponent) || !IsValid(RoadMesh)) return;
 
 	SplineComponent->AddSplinePoint(Location, ESplineCoordinateSpace::World);
 	if (SplineComponent->GetNumberOfSplinePoints() >= 2) {
