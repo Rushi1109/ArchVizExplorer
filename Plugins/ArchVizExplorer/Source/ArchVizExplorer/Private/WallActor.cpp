@@ -5,16 +5,12 @@
 #include "ProceduralMeshComponent.h"
 
 // Sets default values
-AWallActor::AWallActor() : SegmentIndex{ -1 }, SegmentRotation{0.0} {
+AWallActor::AWallActor() : SegmentIndex{ -1 }, SegmentRotation{0.0}, PreviewWallSegment{ nullptr } {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
-
-	PreviewWallSegment = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewWallSegment"));
-	PreviewWallSegment->SetupAttachment(SceneRoot);
-	PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
 
 	//ProceduralWallGenerator = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralWallGenerator"));
 	//ProceduralWallGenerator->SetupAttachment(SceneRoot);

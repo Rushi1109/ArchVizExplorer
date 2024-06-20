@@ -47,6 +47,8 @@ void AArchVizController::BeginPlay() {
 		BuildingCreationMode = NewObject<UBuildingCreationMode>(this, BuildingCreationModeRef);
 		BuildingCreationMode->InitParam(this);
 		BuildingCreationMode->SetBuildingModeEntity(BuildingModeEntity);
+		BuildingCreationMode->SetupSubModes();
+		BuildingCreationMode->SetupInputMapping();
 	}
 }
 
@@ -54,33 +56,10 @@ void AArchVizController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (ArchVizMode == EArchVizMode::BuildingCreation) {
-		if (BuildingModeEntity == EBuildingModeEntity::WallPlacement) {
-			if (IsValid(WallActorRef) && !IsValid(WallActor)) {
-				WallActor = NewObject<AWallActor>(this, WallActorRef);
-			}
-			if (IsValid(WallActor) && !IsValid(WallActor->PreviewWallSegment)) {
-				WallActor->PreviewWallSegment = NewObject<UStaticMeshComponent>();
-				WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
-			}
-			FHitResult HitResult = GetHitResult();
-			//HitResult.Location.Z = 0.0;
-
-			if (IsValid(WallActor->WallMesh) && IsValid(WallActor->PreviewWallSegment)) {
-				WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
-
-				WallActor->PreviewWallSegment->SetWorldLocation(SnapToGrid(HitResult.Location));
-				WallActor->PreviewWallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
-			}
+		if(IsValid(BuildingCreationMode)) {
+			BuildingCreationMode->PreviewSegment();
 		}
 	}
-}
-
-FVector AArchVizController::SnapToGrid(const FVector& WorldLocation) {
-	float GridSize = 100.0f;
-	float SnappedX = FMath::RoundToFloat(WorldLocation.X / GridSize) * GridSize;
-	float SnappedY = FMath::RoundToFloat(WorldLocation.Y / GridSize) * GridSize;
-	float SnappedZ = FMath::RoundToFloat(WorldLocation.Z / GridSize) * GridSize;
-	return FVector(SnappedX, SnappedY, SnappedZ);
 }
 
 void AArchVizController::SetupInputComponent() {
@@ -89,6 +68,7 @@ void AArchVizController::SetupInputComponent() {
 }
 
 void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
+	CleanBeforeChange();
 	ArchVizMode = NewArchVizMode;
 
 	switch (ArchVizMode) {
@@ -106,7 +86,6 @@ void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
 		break;
 	}
 
-	//CleanBeforeChange();
 	UpdateWidgets();
 }
 
@@ -124,78 +103,15 @@ void AArchVizController::SetArchVizMode(IArchVizMode* NewArchVizMode) {
 
 void AArchVizController::HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity) {
 	BuildingModeEntity = NewBuildingModeEntity;
-}
 
-FHitResult AArchVizController::GetHitResult() const {
-	FHitResult MouseHitResult{};
-
-	FVector WorldLocation{}, WorldDirection{};
-
-	if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection)) {
-		FVector TraceStart = WorldLocation;
-		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0);
-
-		FCollisionQueryParams CollisionQueryParams;
-		CollisionQueryParams.bTraceComplex = true;
-		CollisionQueryParams.AddIgnoredActor(WallActor);
-
-		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
-	}
-
-	return MouseHitResult;
-}
-
-void AArchVizController::SetupWallGeneratorInput() {
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
-	check(EnhancedInputComponent);
-
-	UInputAction* WallGeneratorLeftClickAction = NewObject<UInputAction>(this);
-	WallGeneratorLeftClickAction->ValueType = EInputActionValueType::Boolean;
-
-	UInputAction* WallGeneratorRKeyPressAction = NewObject<UInputAction>(this);
-	WallGeneratorRKeyPressAction->ValueType = EInputActionValueType::Boolean;
-
-	WallGeneratorMappingContext = NewObject<UInputMappingContext>(this);
-	WallGeneratorMappingContext->MapKey(WallGeneratorLeftClickAction, EKeys::LeftMouseButton);
-	WallGeneratorMappingContext->MapKey(WallGeneratorRKeyPressAction, EKeys::R);
-
-	EnhancedInputComponent->BindAction(WallGeneratorLeftClickAction, ETriggerEvent::Completed, this, &AArchVizController::HandleWallGeneratorLeftClick);
-	EnhancedInputComponent->BindAction(WallGeneratorRKeyPressAction, ETriggerEvent::Completed, this, &AArchVizController::HandleWallGeneratorRKeyPress);
-}
-
-void AArchVizController::HandleWallGeneratorLeftClick() {
-
-	auto WallSegment = NewObject<UStaticMeshComponent>();
-
-	if (IsValid(WallActor->WallMesh)) {
-		WallSegment->SetStaticMesh(WallActor->WallMesh);
-
-		WallSegment->RegisterComponentWithWorld(GetWorld());
-		WallSegment->SetWorldLocation(WallActor->PreviewWallSegment->GetComponentLocation());
-		WallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
-		WallSegment->SetWorldScale3D(FVector{ 1.0 + (WallActor->WallMesh->GetBoundingBox().GetSize().Y / WallActor->WallMesh->GetBoundingBox().GetSize().X), 1.0, 1.0 });
-
-		WallActor->WallSegments.Add(WallSegment);
-		WallActor->SetSegmentIndex(WallActor->GetSegmentIndex() + 1);
-	}
-}
-
-void AArchVizController::HandleWallGeneratorRKeyPress() {
-	if (IsValid(WallActor)) {
-		double NewRotationYaw = (WallActor->GetSegmentRotation().Yaw + 90);
-		if (NewRotationYaw >= 360) {
-			NewRotationYaw -= 360;
-		}
-		WallActor->SetSegmentRotation(FRotator{ 0.0, NewRotationYaw, 0.0 });
-	}
+	BuildingCreationMode->SetBuildingModeEntity(NewBuildingModeEntity);
 }
 
 void AArchVizController::CleanBeforeChange() {
-	if (IsValid(WallActor)) {
-		WallActor->DestroyPreviewWallSegment();
+	if(ArchVizMode == EArchVizMode::BuildingCreation) {
+		BuildingModeEntity = EBuildingModeEntity::None;
+		BuildingCreationMode->SetBuildingModeEntity(EBuildingModeEntity::None);
 	}
-
-	BuildingModeEntity = EBuildingModeEntity::None;
 }
 
 void AArchVizController::UpdateWidgets() {

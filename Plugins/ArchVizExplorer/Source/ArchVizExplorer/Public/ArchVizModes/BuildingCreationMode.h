@@ -6,6 +6,8 @@
 #include "ArchVizMode.h"
 #include "UObject/NoExportTypes.h"
 #include "Enums/BuildingModeEntityEnum.h"
+#include "BuildingCreationModes/BuildingCreationModes.h"
+#include "BuildingCreationModes/WallPlacementMode.h"
 #include "InputMappingContext.h"
 #include "BuildingCreationMode.generated.h"
 
@@ -22,17 +24,31 @@ class ARCHVIZEXPLORER_API UBuildingCreationMode : public UObject, public IArchVi
 public:
 	UBuildingCreationMode();
 
+	void SetupSubModes();
+
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
 	void InitParam(APlayerController* Controller);
 
+	void SetSubMode(IBuildingCreationMode* NewSubMode);
+
 	void SetBuildingModeEntity(EBuildingModeEntity Entity);
 
+	void PreviewSegment();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Wall")
+	TSubclassOf<UWallPlacementMode> WallPlacementModeRef;
+
 private:
+	IBuildingCreationMode* CurrentBuildingCreationSubMode;
+
 	UPROPERTY()
 	EBuildingModeEntity BuildingModeEntity;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Wall")
+	UWallPlacementMode* WallPlacementMode;
 
 	UPROPERTY()
 	APlayerController* PlayerController;

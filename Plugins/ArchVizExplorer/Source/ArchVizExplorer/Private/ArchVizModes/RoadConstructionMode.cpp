@@ -6,9 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
-URoadConstructionMode::URoadConstructionMode() : PlayerController{ nullptr }, InputMappingContext{ nullptr } {
-
-}
+URoadConstructionMode::URoadConstructionMode() : PlayerController{ nullptr }, InputMappingContext{ nullptr }, RoadActor{ nullptr } {}
 
 void URoadConstructionMode::SetupInputMapping() {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);

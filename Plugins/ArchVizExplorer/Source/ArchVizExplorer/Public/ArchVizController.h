@@ -56,9 +56,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InteriorDesign | Widget")
 	TSubclassOf<UInteriorDesignWidget> InteriorDesignWidgetRef;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
-	TSubclassOf<AWallActor> WallActorRef;
-
 private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
@@ -67,8 +64,6 @@ private:
 
 	UFUNCTION()
 	void HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity);
-
-	FHitResult GetHitResult() const;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
 	EArchVizMode ArchVizMode;
@@ -94,25 +89,8 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "InteriorDesign | Widget")
 	UInteriorDesignWidget* InteriorDesignWidget;
 
-	// Wall Generator
-	void SetupWallGeneratorInput();
-
-	UFUNCTION(BlueprintCallable)
-	void HandleWallGeneratorLeftClick();
-
-	UFUNCTION(BlueprintCallable)
-	void HandleWallGeneratorRKeyPress();
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
-	AWallActor* WallActor;
-
-	UPROPERTY()
-	UInputMappingContext* WallGeneratorMappingContext;
-
 	void CleanBeforeChange();
 	void UpdateWidgets();
-
-	FVector SnapToGrid(const FVector& WorldLocation);
 
 	FInputModeGameAndUI InputMode;
 };
