@@ -9,11 +9,10 @@ ArchVizUtility::ArchVizUtility() {
 ArchVizUtility::~ArchVizUtility() {
 }
 
-FVector ArchVizUtility::SnapToGrid(const FVector& WorldLocation) {
-	float GridSize = 100.0f;
-	float SnappedX = FMath::RoundToFloat(WorldLocation.X / GridSize) * GridSize;
-	float SnappedY = FMath::RoundToFloat(WorldLocation.Y / GridSize) * GridSize;
-	float SnappedZ = FMath::RoundToFloat(WorldLocation.Z / GridSize) * GridSize;
+FVector ArchVizUtility::SnapToGrid(const FVector& WorldLocation, const FVector& GridSize) {
+	float SnappedX = FMath::RoundToFloat(WorldLocation.X / GridSize.X) * GridSize.X;
+	float SnappedY = FMath::RoundToFloat(WorldLocation.Y / GridSize.Y) * GridSize.Y;
+	float SnappedZ = FMath::RoundToFloat(WorldLocation.Z / GridSize.Z) * GridSize.Z;
 
 	return FVector(SnappedX, SnappedY, SnappedZ);
 }

@@ -2,7 +2,7 @@
 
 
 #include "ArchVizModes/BuildingCreationModes/WallPlacementMode.h"
-#include "WallActor.h"
+#include "Actors/BuildingCreation/WallActor.h"
 #include "Utilities/ArchVizUtility.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
@@ -57,7 +57,7 @@ void UWallPlacementMode::PreviewSegment() {
 		WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
 	}
 
-	FHitResult HitResult = GetHitResult();
+	FHitResult HitResult = WallActor->GetHitResult();
 
 	if (IsValid(WallActor->WallMesh) && IsValid(WallActor->PreviewWallSegment)) {
 		WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
@@ -106,6 +106,7 @@ FHitResult UWallPlacementMode::GetHitResult() const {
 	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection)) {
 		FVector TraceStart = WorldLocation;
 		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0);
+
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.bTraceComplex = true;
 		CollisionQueryParams.AddIgnoredActor(WallActor);
@@ -123,7 +124,6 @@ FHitResult UWallPlacementMode::GetHitResult() const {
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, MouseHitResult.ImpactPoint.ToString());
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, MouseHitResult.Location.ToString());
 	}
-
 
 	return MouseHitResult;
 }

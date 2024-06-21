@@ -12,5 +12,5 @@ public:
 	ArchVizUtility();
 	~ArchVizUtility();
 
-	static FVector SnapToGrid(const FVector& WorldLocation);
+	static FVector SnapToGrid(const FVector& WorldLocation, const FVector& GridSize = FVector{100.0});
 };

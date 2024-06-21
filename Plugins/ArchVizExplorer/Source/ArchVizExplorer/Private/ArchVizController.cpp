@@ -6,8 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "RoadActor.h"
-#include "WallActor.h"
+#include "Actors/RoadActor.h"
+#include "Actors/BuildingCreation/WallActor.h"
 
 AArchVizController::AArchVizController() : CurrentMode{ nullptr }, ArchVizMode{ EArchVizMode::ViewMode }, BuildingModeEntity{ EBuildingModeEntity::None } {
 
