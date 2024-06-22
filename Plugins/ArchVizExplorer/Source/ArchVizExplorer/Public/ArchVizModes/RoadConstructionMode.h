@@ -6,6 +6,7 @@
 #include "ArchVizMode.h"
 #include "UObject/NoExportTypes.h"
 #include "InputMappingContext.h"
+#include "Widgets/RoadConstructionWidget.h"
 #include "RoadConstructionMode.generated.h"
 
 class ARoadActor;
@@ -15,31 +16,24 @@ class APlayerController;
  *
  */
 UCLASS(Blueprintable)
-class ARCHVIZEXPLORER_API URoadConstructionMode : public UObject, public IArchVizMode {
+class ARCHVIZEXPLORER_API URoadConstructionMode : public UArchVizMode {
 	GENERATED_BODY()
 
 public:
 	URoadConstructionMode();
 
+	virtual void Setup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
-	void InitParam(APlayerController* Controller);
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Road")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstrcution | Actor")
 	TSubclassOf<ARoadActor> RoadActorRef;
 
 private:
 	UFUNCTION()
 	void HandleLeftClickAction();
 
-	UPROPERTY()
-	APlayerController* PlayerController;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Road")
+	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstrcution | Actor")
 	ARoadActor* RoadActor;
-
-	UPROPERTY()
-	UInputMappingContext* InputMappingContext;
 };

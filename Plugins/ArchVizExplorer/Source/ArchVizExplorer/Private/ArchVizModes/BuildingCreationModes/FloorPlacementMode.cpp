@@ -5,7 +5,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-UFloorPlacementMode::UFloorPlacementMode() : PlayerController{ nullptr }, InputMappingContext{ nullptr }, FloorActor{ nullptr }, bIsDragging{ false } {}
+UFloorPlacementMode::UFloorPlacementMode() : FloorActor{ nullptr }, bIsDragging{ false } {}
+
+void UFloorPlacementMode::Setup() {
+	
+}
 
 void UFloorPlacementMode::SetupInputMapping() {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
@@ -34,18 +38,6 @@ void UFloorPlacementMode::ExitSubMode() {
 			Subsystem->RemoveMappingContext(InputMappingContext);
 		}
 	}
-}
-
-void UFloorPlacementMode::InitParam(APlayerController* Controller) {
-	PlayerController = Controller;
-}
-
-void UFloorPlacementMode::PreviewSegment() {
-
-}
-
-void UFloorPlacementMode::CleanUp() {
-
 }
 
 void UFloorPlacementMode::HandleLeftClickAction() {

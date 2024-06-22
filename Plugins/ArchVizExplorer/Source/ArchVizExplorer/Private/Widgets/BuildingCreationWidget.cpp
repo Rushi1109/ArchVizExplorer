@@ -6,32 +6,32 @@
 void UBuildingCreationWidget::NativeConstruct() {
 	Super::NativeConstruct();
 
-	if (IsValid(WallIMG)) {
-		WallIMG->OnMouseButtonDownEvent.BindUFunction(this, "HandleWallEntityButtonClick");
+	if (IsValid(WallButton)) {
+		WallButton->OnClicked.AddDynamic(this, &UBuildingCreationWidget::HandleWallEntityButtonClick);
 	}
-	if (IsValid(DoorIMG)) {
-		DoorIMG->OnMouseButtonDownEvent.BindUFunction(this, "HandleDoorEntityButtonClick");
+	if (IsValid(DoorButton)) {
+		DoorButton->OnClicked.AddDynamic(this, &UBuildingCreationWidget::HandleDoorEntityButtonClick);
 	}
-	if (IsValid(FloorIMG)) {
-		FloorIMG->OnMouseButtonDownEvent.BindUFunction(this, "HandleFloorEntityButtonClick");
+	if (IsValid(FloorButton)) {
+		FloorButton->OnClicked.AddDynamic(this, &UBuildingCreationWidget::HandleFloorEntityButtonClick);
 	}
-	if (IsValid(RoofIMG)) {
-		RoofIMG->OnMouseButtonDownEvent.BindUFunction(this, "HandleRoofEntityButtonClick");
+	if (IsValid(RoofButton)) {
+		RoofButton->OnClicked.AddDynamic(this, &UBuildingCreationWidget::HandleRoofEntityButtonClick);
 	}
 }
 
-void UBuildingCreationWidget::HandleWallEntityButtonClick(FGeometry, FPointerEvent&) {
+void UBuildingCreationWidget::HandleWallEntityButtonClick() {
 	OnBuildingModeEntityChange.Broadcast(EBuildingModeEntity::WallPlacement);
 }
 
-void UBuildingCreationWidget::HandleDoorEntityButtonClick(FGeometry, FPointerEvent&) {
+void UBuildingCreationWidget::HandleDoorEntityButtonClick() {
 	OnBuildingModeEntityChange.Broadcast(EBuildingModeEntity::DoorPlacement);
 }
 
-void UBuildingCreationWidget::HandleFloorEntityButtonClick(FGeometry, FPointerEvent&) {
+void UBuildingCreationWidget::HandleFloorEntityButtonClick() {
 	OnBuildingModeEntityChange.Broadcast(EBuildingModeEntity::FloorPlacement);
 }
 
-void UBuildingCreationWidget::HandleRoofEntityButtonClick(FGeometry, FPointerEvent&) {
+void UBuildingCreationWidget::HandleRoofEntityButtonClick() {
 	OnBuildingModeEntityChange.Broadcast(EBuildingModeEntity::RoofPlacement);
 }

@@ -8,6 +8,7 @@
 #include "ArchVizModes/ArchVizMode.h"
 #include "ArchVizModes/RoadConstructionMode.h"
 #include "ArchVizModes/BuildingCreationMode.h"
+#include "ArchVizModes/InteriorDesignMode.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/ModesMenuWidget.h"
 #include "Widgets/RoadConstructionWidget.h"
@@ -36,61 +37,40 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	IArchVizMode* CurrentMode;
+	UArchVizMode* CurrentMode;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizMode | ModesMenu")
 	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstruction | Widget")
-	TSubclassOf<URoadConstructionWidget> RoadConstructionWidgetRef;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstruction | Mode")
 	TSubclassOf<URoadConstructionMode> RoadConstructionModeRef;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreation | Widget")
-	TSubclassOf<UBuildingCreationWidget> BuildingCreationWidgetRef;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreation | Mode")
 	TSubclassOf<UBuildingCreationMode> BuildingCreationModeRef;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InteriorDesign | Widget")
-	TSubclassOf<UInteriorDesignWidget> InteriorDesignWidgetRef;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InteriorDesign | Mode")
+	TSubclassOf<UInteriorDesignMode> InteriorDesignModeRef;
 
 private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
 
-	void SetArchVizMode(IArchVizMode* NewMode);
-
-	UFUNCTION()
-	void HandleBuildingModeEntityChange(EBuildingModeEntity NewBuildingModeEntity);
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
-	EArchVizMode ArchVizMode;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Entity", meta = (EditCondition = "ArchVizMode == EArchVizMode::BuildingCreation"))
-	EBuildingModeEntity BuildingModeEntity;
+	void SetArchVizMode(UArchVizMode* NewMode);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode | ModesMenu")
 	UModesMenuWidget* ModesMenuWidget;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstruction | Widget")
-	URoadConstructionWidget* RoadConstructionWidget;
+	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
+	EArchVizMode ArchVizMode;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstruction | Mode")
 	URoadConstructionMode* RoadConstructionMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Widget")
-	UBuildingCreationWidget* BuildingCreationWidget;
-
 	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Mode")
 	UBuildingCreationMode* BuildingCreationMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "InteriorDesign | Widget")
-	UInteriorDesignWidget* InteriorDesignWidget;
-
-	void CleanBeforeChange();
-	void UpdateWidgets();
+	UPROPERTY(VisibleDefaultsOnly, Category = "InteriorDesign | Mode")
+	UInteriorDesignMode* InteriorDesignMode;
 
 	FInputModeGameAndUI InputMode;
 };

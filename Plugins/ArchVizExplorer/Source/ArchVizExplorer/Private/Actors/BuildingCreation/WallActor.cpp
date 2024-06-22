@@ -3,6 +3,7 @@
 
 #include "Actors/BuildingCreation/WallActor.h"
 #include "ProceduralMeshComponent.h"
+#include "UMG/Public/Blueprint/UserWidget.h"
 
 // Sets default values
 AWallActor::AWallActor() : SegmentIndex{ -1 }, SegmentRotation{0.0}, PreviewWallSegment{ nullptr } {
@@ -19,6 +20,11 @@ AWallActor::AWallActor() : SegmentIndex{ -1 }, SegmentRotation{0.0}, PreviewWall
 // Called when the game starts or when spawned
 void AWallActor::BeginPlay() {
 	Super::BeginPlay();
+
+	if (PropertyPanelRef) {
+		PropertyPanel = CreateWidget<UUserWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel->AddToViewport();
+	}
 }
 
 // Called every frame

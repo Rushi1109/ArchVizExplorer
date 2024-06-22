@@ -6,61 +6,59 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
-URoadConstructionMode::URoadConstructionMode() : PlayerController{ nullptr }, InputMappingContext{ nullptr }, RoadActor{ nullptr } {}
+URoadConstructionMode::URoadConstructionMode() : RoadActor{ nullptr } {}
+
+void URoadConstructionMode::Setup() {
+	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
+		RoadActor = GetWorld()->SpawnActor<ARoadActor>(RoadActorRef, FTransform{});
+	}
+
+	if (IsValid(WidgetRef) && !IsValid(Widget)) {
+		Widget = CreateWidget<URoadConstructionWidget>(GetWorld(), WidgetRef, "Road Mode Widget");
+	}
+}
 
 void URoadConstructionMode::SetupInputMapping() {
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-	check(EnhancedInputComponent);
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent)) {
 
-	UInputAction* LeftClickAction = NewObject<UInputAction>(this);
-	LeftClickAction->ValueType = EInputActionValueType::Boolean;
+		UInputAction* LeftClickAction = NewObject<UInputAction>(this);
+		LeftClickAction->ValueType = EInputActionValueType::Boolean;
 
-	InputMappingContext = NewObject<UInputMappingContext>(this);
-	InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
+		InputMappingContext = NewObject<UInputMappingContext>(this);
+		InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 
-	EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleLeftClickAction);
+		EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleLeftClickAction);
+	}
 }
 
 void URoadConstructionMode::EnterMode() {
-	if (PlayerController) {
+	if (IsValid(PlayerController)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
+
+		ShowWidget();
 	}
 }
 
 void URoadConstructionMode::ExitMode() {
-	if (PlayerController) {
+	if (IsValid(PlayerController)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
 		}
-	}
-}
 
-void URoadConstructionMode::InitParam(APlayerController* Controller) {
-	PlayerController = Controller;
+		HideWidget();
+	}
 }
 
 void URoadConstructionMode::HandleLeftClickAction() {
-	FHitResult MouseHitResult{};
+	if (IsValid(RoadActor)) {
+		FHitResult HitResult{};
 
-	FVector WorldLocation{}, WorldDirection{};
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(RoadActor);
 
-	if (PlayerController && PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection)) {
-		FVector TraceStart = WorldLocation;
-		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0);
-
-		FCollisionQueryParams CollisionQueryParams;
-		CollisionQueryParams.bTraceComplex = true;
-
-		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
-	}
-
-	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
-		RoadActor = NewObject<ARoadActor>(this, RoadActorRef);
-	}
-
-	if(IsValid(RoadActor)) {
-		RoadActor->AddNewPoint(MouseHitResult.Location);
+		HitResult = RoadActor->GetHitResult(IgnoredActors);
+		RoadActor->AddNewPoint(HitResult.Location);
 	}
 }

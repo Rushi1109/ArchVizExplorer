@@ -6,9 +6,13 @@
 #include "ArchVizMode.h"
 #include "UObject/NoExportTypes.h"
 #include "Enums/BuildingModeEntityEnum.h"
-#include "BuildingCreationModes/BuildingCreationModes.h"
+#include "BuildingCreationModes/BuildingCreationSubModes.h"
 #include "BuildingCreationModes/WallPlacementMode.h"
+#include "BuildingCreationModes/DoorPlacementMode.h"
+#include "BuildingCreationModes/FloorPlacementMode.h"
+#include "BuildingCreationModes/RoofPlacementMode.h"
 #include "InputMappingContext.h"
+#include "Widgets/BuildingCreationWidget.h"
 #include "BuildingCreationMode.generated.h"
 
 class AWallActor;
@@ -18,31 +22,37 @@ class APlayerController;
  *
  */
 UCLASS(Blueprintable)
-class ARCHVIZEXPLORER_API UBuildingCreationMode : public UObject, public IArchVizMode {
+class ARCHVIZEXPLORER_API UBuildingCreationMode : public UArchVizMode {
 	GENERATED_BODY()
 
 public:
 	UBuildingCreationMode();
 
-	void SetupSubModes();
-
+	virtual void Setup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
-	void InitParam(APlayerController* Controller);
+	void SetSubMode(UBuildingCreationSubMode* NewSubMode);
 
-	void SetSubMode(IBuildingCreationMode* NewSubMode);
-
-	void SetBuildingModeEntity(EBuildingModeEntity Entity);
-
-	void PreviewSegment();
+	void HandleBuildingSubModeChange(EBuildingModeEntity NewBuildingModeEntity);
+	void UpdateBuildingModeEntity();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Wall")
 	TSubclassOf<UWallPlacementMode> WallPlacementModeRef;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Door")
+	TSubclassOf<UDoorPlacementMode> DoorPlacementModeRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Floor")
+	TSubclassOf<UFloorPlacementMode> FloorPlacementModeRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Roof")
+	TSubclassOf<URoofPlacementMode> RoofPlacementModeRef;
+
+
 private:
-	IBuildingCreationMode* CurrentBuildingCreationSubMode;
+	UBuildingCreationSubMode* CurrentBuildingCreationSubMode;
 
 	UPROPERTY()
 	EBuildingModeEntity BuildingModeEntity;
@@ -50,9 +60,12 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Wall")
 	UWallPlacementMode* WallPlacementMode;
 
-	UPROPERTY()
-	APlayerController* PlayerController;
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Door")
+	UDoorPlacementMode* DoorPlacementMode;
 
-	UPROPERTY()
-	UInputMappingContext* InputMappingContext;
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Floor")
+	UFloorPlacementMode* FloorPlacementMode;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Roof")
+	URoofPlacementMode* RoofPlacementMode;
 };

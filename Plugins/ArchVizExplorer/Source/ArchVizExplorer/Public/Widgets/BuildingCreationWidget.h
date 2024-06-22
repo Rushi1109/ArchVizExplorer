@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Enums/BuildingModeEntityEnum.h"
 #include "UMG/Public/Components/CanvasPanel.h"
-#include "UMG/Public/Components/Image.h"
+#include "UMG/Public/Components/Button.h"
 #include "BuildingCreationWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnBuildingModeEntityChange, EBuildingModeEntity);
@@ -24,29 +24,29 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void HandleWallEntityButtonClick(FGeometry Geometry, FPointerEvent& PointerEvent);
+	void HandleWallEntityButtonClick();
 
 	UFUNCTION()
-	void HandleDoorEntityButtonClick(FGeometry Geometry, FPointerEvent& PointerEvent);
+	void HandleDoorEntityButtonClick();
 
 	UFUNCTION()
-	void HandleFloorEntityButtonClick(FGeometry Geometry, FPointerEvent& PointerEvent);
+	void HandleFloorEntityButtonClick();
 
 	UFUNCTION()
-	void HandleRoofEntityButtonClick(FGeometry Geometry, FPointerEvent& PointerEvent);
+	void HandleRoofEntityButtonClick();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* Canvas;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	UImage* WallIMG;
+	UButton* WallButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	UImage* DoorIMG;
+	UButton* DoorButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	UImage* FloorIMG;
+	UButton* FloorButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	UImage* RoofIMG;
+	UButton* RoofButton;
 };

@@ -8,24 +8,31 @@
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 
-UWallPlacementMode::UWallPlacementMode() : PlayerController{ nullptr }, InputMappingContext{ nullptr }, WallActor{ nullptr } {}
+UWallPlacementMode::UWallPlacementMode() : WallActor{ nullptr } {}
+
+void UWallPlacementMode::Setup() {
+	if (WallActorRef) {
+		WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef);
+	}
+}
 
 void UWallPlacementMode::SetupInputMapping() {
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-	check(EnhancedInputComponent);
+	if (IsValid(PlayerController)) {
+		UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
 
-	UInputAction* LeftClickAction = NewObject<UInputAction>(this);
-	LeftClickAction->ValueType = EInputActionValueType::Boolean;
+		UInputAction* LeftClickAction = NewObject<UInputAction>(this);
+		LeftClickAction->ValueType = EInputActionValueType::Boolean;
 
-	UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
-	RKeyPressAction->ValueType = EInputActionValueType::Boolean;
+		UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
+		RKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
-	InputMappingContext = NewObject<UInputMappingContext>(this);
-	InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
-	InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
+		InputMappingContext = NewObject<UInputMappingContext>(this);
+		InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
+		InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
 
-	EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleLeftClickAction);
-	EnhancedInputComponent->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleRKeyPressAction);
+		EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleLeftClickAction);
+		EnhancedInputComponent->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleRKeyPressAction);
+	}
 }
 
 void UWallPlacementMode::EnterSubMode() {
@@ -41,35 +48,6 @@ void UWallPlacementMode::ExitSubMode() {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
 		}
-	}
-}
-
-void UWallPlacementMode::InitParam(APlayerController* Controller) {
-	PlayerController = Controller;
-}
-
-void UWallPlacementMode::PreviewSegment() {
-	if (IsValid(WallActorRef) && !IsValid(WallActor)) {
-		WallActor = NewObject<AWallActor>(this, WallActorRef);
-	}
-	if (IsValid(WallActor) && !IsValid(WallActor->PreviewWallSegment)) {
-		WallActor->PreviewWallSegment = NewObject<UStaticMeshComponent>();
-		WallActor->PreviewWallSegment->RegisterComponentWithWorld(GetWorld());
-	}
-
-	FHitResult HitResult = WallActor->GetHitResult();
-
-	if (IsValid(WallActor->WallMesh) && IsValid(WallActor->PreviewWallSegment)) {
-		WallActor->PreviewWallSegment->SetStaticMesh(WallActor->WallMesh);
-
-		WallActor->PreviewWallSegment->SetWorldLocation(ArchVizUtility::SnapToGrid(HitResult.Location));
-		WallActor->PreviewWallSegment->SetWorldRotation(WallActor->GetSegmentRotation());
-	}
-}
-
-void UWallPlacementMode::CleanUp() {
-	if (IsValid(WallActor)) {
-		WallActor->DestroyPreviewWallSegment();
 	}
 }
 
@@ -96,34 +74,4 @@ void UWallPlacementMode::HandleRKeyPressAction() {
 		}
 		WallActor->SetSegmentRotation(FRotator{ 0.0, NewRotationYaw, 0.0 });
 	}
-}
-
-FHitResult UWallPlacementMode::GetHitResult() const {
-	FHitResult MouseHitResult{};
-
-	FVector WorldLocation{}, WorldDirection{};
-
-	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection)) {
-		FVector TraceStart = WorldLocation;
-		FVector TraceEnd = WorldLocation + (WorldDirection * 10000.0);
-
-		FCollisionQueryParams CollisionQueryParams;
-		CollisionQueryParams.bTraceComplex = true;
-		CollisionQueryParams.AddIgnoredActor(WallActor);
-		CollisionQueryParams.AddIgnoredActor(PlayerController->GetPawn());
-
-		GetWorld()->LineTraceSingleByChannel(MouseHitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
-
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 2.0f);
-		if (MouseHitResult.bBlockingHit) {
-			DrawDebugPoint(GetWorld(), MouseHitResult.ImpactPoint, 10.0f, FColor::Red, false, 2.0f);
-		}
-	}
-
-	if(GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, MouseHitResult.ImpactPoint.ToString());
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, MouseHitResult.Location.ToString());
-	}
-
-	return MouseHitResult;
 }
