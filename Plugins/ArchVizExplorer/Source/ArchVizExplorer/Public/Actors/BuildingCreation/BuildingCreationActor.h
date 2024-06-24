@@ -6,6 +6,14 @@
 #include "Actors/ArchVizActor.h"
 #include "BuildingCreationActor.generated.h"
 
+UENUM(BlueprintType)
+enum class EBuildingActorState : uint8 {
+	Selected,
+	Previewing,
+	Generating,
+	Moving
+};
+
 /**
  *
  */
@@ -17,9 +25,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	TSubclassOf<UUserWidget> PropertyPanelRef;
 
+	EBuildingActorState GetState();
+	void SetState(EBuildingActorState NewState);
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	UUserWidget* PropertyPanel;
+
+	EBuildingActorState State;
 
 	void RotateActor(double Degrees);
 };

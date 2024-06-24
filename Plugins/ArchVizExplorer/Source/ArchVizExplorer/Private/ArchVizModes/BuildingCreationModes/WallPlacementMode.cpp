@@ -68,7 +68,7 @@ void UWallPlacementMode::HandleLeftClickAction() {
 
 			if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
 				WallActor = Cast<AWallActor>(HitResult.GetActor());
-				WallActor->SetState(EWallActorState::Selected);
+				WallActor->SetState(EBuildingActorState::Selected);
 
 				WallActor->PropertyPanel->SetVisibility(ESlateVisibility::Visible);
 			}
@@ -78,7 +78,7 @@ void UWallPlacementMode::HandleLeftClickAction() {
 
 				WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
 				WallActor->GenerateSegments();
-				WallActor->SetState(EWallActorState::Previewing);
+				WallActor->SetState(EBuildingActorState::Previewing);
 				WallSubModeState = EWallPlacementModeState::NewWallSelected;
 
 				// Material
@@ -86,7 +86,7 @@ void UWallPlacementMode::HandleLeftClickAction() {
 			break;
 		case EWallPlacementModeState::OldWallSelected:
 			WallSubModeState = EWallPlacementModeState::Free;
-			WallActor->SetState(EWallActorState::Selected);
+			WallActor->SetState(EBuildingActorState::Selected);
 			break;
 		case EWallPlacementModeState::NewWallSelected:
 			if (IsValid(WallActor)) {
@@ -98,13 +98,13 @@ void UWallPlacementMode::HandleLeftClickAction() {
 
 					WallActor->SetStartLocation(HitResult.Location);
 					WallActor->SetActorLocation(HitResult.Location);
-					WallActor->SetState(EWallActorState::Generating);
+					WallActor->SetState(EBuildingActorState::Generating);
 				}
 				else {
 					bNewWallStart = false;
 
 					WallActor->SetEndLocation(HitResult.Location);
-					WallActor->SetState(EWallActorState::Selected);
+					WallActor->SetState(EBuildingActorState::Selected);
 					WallSubModeState = EWallPlacementModeState::Free;
 				}
 			}
@@ -118,12 +118,13 @@ void UWallPlacementMode::HandleLeftClickAction() {
 void UWallPlacementMode::HandleRKeyPressAction() {
 	if (IsValid(WallActor)) {
 		WallActor->RotateActor(90.0);
+		WallActor->AdjustEdgeOffset();
 	}
 }
 
 void UWallPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(WallActor)) {
-		WallActor->SetState(EWallActorState::Moving);
+		WallActor->SetState(EBuildingActorState::Moving);
 		WallSubModeState = EWallPlacementModeState::OldWallSelected;
 	}
 }

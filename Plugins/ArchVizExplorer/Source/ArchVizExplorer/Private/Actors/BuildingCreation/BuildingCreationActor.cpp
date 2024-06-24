@@ -3,6 +3,14 @@
 
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
 
+EBuildingActorState ABuildingCreationActor::GetState() {
+	return State;
+}
+
+void ABuildingCreationActor::SetState(EBuildingActorState NewState) {
+	State = NewState;
+}
+
 void ABuildingCreationActor::RotateActor(double Degrees) {
 	FRotator CurrentRotation = GetActorRotation();
 

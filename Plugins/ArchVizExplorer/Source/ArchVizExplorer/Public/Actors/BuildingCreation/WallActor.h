@@ -7,16 +7,6 @@
 #include "GameFramework/Actor.h"
 #include "WallActor.generated.h"
 
-class UProceduralMeshComponent;
-
-UENUM(BlueprintType)
-enum class EWallActorState : uint8 {
-	Selected,
-	Previewing,
-	Generating,
-	Moving
-};
-
 UCLASS()
 class ARCHVIZEXPLORER_API AWallActor : public ABuildingCreationActor {
 	GENERATED_BODY()
@@ -41,9 +31,6 @@ public:
 	void SetEndLocation(const FVector& NewEndLocation);
 	const FVector& GetEndLocation() const;
 
-	void SetState(EWallActorState NewState);
-	EWallActorState GetState() const;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall")
 	UStaticMesh* WallMesh;
 
@@ -54,11 +41,10 @@ private:
 	FVector StartLocation;
 	FVector EndLocation;
 
-	EWallActorState State;
-
 	void GenerateSegments(double Length = 0.0);
 	void DestroySegments();
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
+	void AdjustEdgeOffset();
 };

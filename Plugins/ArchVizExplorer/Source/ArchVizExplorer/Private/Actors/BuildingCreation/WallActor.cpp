@@ -7,14 +7,14 @@
 #include "Utilities/ArchVizUtility.h"
 
 // Sets default values
-AWallActor::AWallActor() : WallMesh{nullptr}, State{EWallActorState::Selected} {
+AWallActor::AWallActor() : WallMesh{nullptr} {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
 
-	PrimaryActorTick.TickInterval = 0.3;
+	PrimaryActorTick.TickInterval = 0.2;
 }
 
 // Called when the game starts or when spawned
@@ -31,39 +31,15 @@ void AWallActor::BeginPlay() {
 void AWallActor::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (State == EWallActorState::Previewing) {
+	if (State == EBuildingActorState::Previewing) {
 		HandlePreviewingState();
 	}
-	else if (State == EWallActorState::Moving) {
+	else if (State == EBuildingActorState::Moving) {
 		HandleMovingState();
 	}
-	else if (State == EWallActorState::Generating) {
+	else if (State == EBuildingActorState::Generating) {
 		HandleGeneratingState();
 	}
-}
-
-void AWallActor::SetStartLocation(const FVector& NewStartLocation) {
-	StartLocation = NewStartLocation;
-}
-
-const FVector& AWallActor::GetStartLocation() const {
-	return StartLocation;
-}
-
-void AWallActor::SetEndLocation(const FVector& NewEndLocation) {
-	EndLocation = NewEndLocation;
-}
-
-const FVector& AWallActor::GetEndLocation() const {
-	return EndLocation;
-}
-
-void AWallActor::SetState(EWallActorState NewState) {
-	State = NewState;
-}
-
-EWallActorState AWallActor::GetState() const {
-	return State;
 }
 
 void AWallActor::GenerateSegments(double Length /*= 0.0*/) {
@@ -112,6 +88,9 @@ void AWallActor::HandleMovingState() {
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
 	SetActorLocation(HitResult.Location);
+	SetStartLocation(HitResult.Location);
+
+	AdjustEdgeOffset();
 }
 
 void AWallActor::HandleGeneratingState() {
@@ -129,11 +108,9 @@ void AWallActor::HandleGeneratingState() {
 
 			if (XWallLength >= 0) {
 				SetActorRotation(FRotator{0.0, 0.0, 0.0});
-				SetActorLocation(FVector{ StartLocation.X + 10, StartLocation.Y, StartLocation.Z });
 			}
 			else {
 				SetActorRotation(FRotator{0.0, 180.0, 0.0});
-				SetActorLocation(FVector{ StartLocation.X - 10, StartLocation.Y, StartLocation.Z });
 			}
 		}
 		else {
@@ -141,12 +118,45 @@ void AWallActor::HandleGeneratingState() {
 
 			if (YWallLength >= 0) {
 				SetActorRotation(FRotator{ 0.0, 90.0, 0.0 });
-				SetActorLocation(FVector{ StartLocation.X, StartLocation.Y + 10, StartLocation.Z });
 			}
 			else {
 				SetActorRotation(FRotator{ 0.0, 270.0, 0.0 });
-				SetActorLocation(FVector{ StartLocation.X, StartLocation.Y - 10, StartLocation.Z });
 			}
 		}
+
+		AdjustEdgeOffset();
 	}
+}
+
+void AWallActor::AdjustEdgeOffset() {
+	FRotator ActorRotation = GetActorRotation();
+
+	if (ActorRotation.Yaw >= -5.0 && ActorRotation.Yaw <= 5.0) {
+		SetActorLocation(FVector{StartLocation.X + 10, StartLocation.Y, StartLocation.Z});
+	}
+	else if (ActorRotation.Yaw >= 85.0 && ActorRotation.Yaw <= 95.0) {
+		SetActorLocation(FVector{ StartLocation.X, StartLocation.Y + 10, StartLocation.Z });
+	}
+	else if (ActorRotation.Yaw >= 175.0 && ActorRotation.Yaw <= 185.0) {
+		SetActorLocation(FVector{ StartLocation.X - 10, StartLocation.Y, StartLocation.Z });
+	}
+	else if (ActorRotation.Yaw >= -95.0 && ActorRotation.Yaw <= -85.0) {
+		SetActorLocation(FVector{ StartLocation.X, StartLocation.Y - 10, StartLocation.Z });
+	}
+}
+
+void AWallActor::SetStartLocation(const FVector& NewStartLocation) {
+	StartLocation = NewStartLocation;
+}
+
+const FVector& AWallActor::GetStartLocation() const {
+	return StartLocation;
+}
+
+void AWallActor::SetEndLocation(const FVector& NewEndLocation) {
+	EndLocation = NewEndLocation;
+}
+
+const FVector& AWallActor::GetEndLocation() const {
+	return EndLocation;
 }
