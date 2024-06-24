@@ -10,13 +10,6 @@
 
 class AWallActor;
 
-UENUM(BlueprintType)
-enum class EWallPlacementModeState : uint8 {
-	Free,
-	OldWallSelected,
-	NewWallSelected
-};
-
 /**
  *
  */
@@ -49,6 +42,4 @@ private:
 	AWallActor* WallActor;
 
 	bool bNewWallStart;
-
-	EWallPlacementModeState WallSubModeState;
 };

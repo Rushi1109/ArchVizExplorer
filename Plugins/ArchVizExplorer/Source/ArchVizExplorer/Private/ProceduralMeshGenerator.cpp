@@ -11,7 +11,7 @@ ProceduralMeshGenerator::ProceduralMeshGenerator() {
 ProceduralMeshGenerator::~ProceduralMeshGenerator() {
 }
 
-void ProceduralMeshGenerator::GenerateCube(UProceduralMeshComponent* ProceduralMeshComponent, int32 SectionIndex, double DimensionX, double DimensionY, double DimensionZ, double ZOffset /*= 0.f*/) {
+void ProceduralMeshGenerator::GenerateCube(UProceduralMeshComponent* ProceduralMeshComponent, int32 SectionIndex, const FVector& Dimension, const FVector& Offset) {
 	ProceduralMeshComponent->ClearAllMeshSections();
 
 	TArray<FVector> Vertices;
@@ -20,40 +20,40 @@ void ProceduralMeshGenerator::GenerateCube(UProceduralMeshComponent* ProceduralM
 	TArray<FVector> Normals;
 
 	// Front Face
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 0 - - +
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 1 - - -
-	Vertices.Add(FVector{ -DimensionX / 2, +DimensionY / 2, ZOffset - DimensionZ / 2 }); // 2 - + -
-	Vertices.Add(FVector{ -DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 3 - + +
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 0 - - +
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 1 - - -
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 2 - + -
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 3 - + +
 
 	// Right Face
-	Vertices.Add(FVector{ -DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 4 - + + 3
-	Vertices.Add(FVector{ -DimensionX / 2, DimensionY / 2, ZOffset - DimensionZ / 2 }); // 5 - + - 2
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset - DimensionZ / 2 }); // 6 + + -
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 7 + + +
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 4 - + + 3
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 5 - + - 2
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 6 + + -
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 7 + + +
 
 	// Back Face
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 8 + + + 7
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset - DimensionZ / 2 }); // 9 + + - 6
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 10 + - - 
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 11 + - + 
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 8 + + + 7
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 9 + + - 6
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 10 + - - 
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 11 + - + 
 
 	// Left Face
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 12 + - + 11
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 13 + - - 10
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 14 - - - 1
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 15 - - + 0
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 12 + - + 11
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 13 + - - 10
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 14 - - - 1
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 15 - - + 0
 
 	// Top Face
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 16 + - + 11
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset + DimensionZ / 2 }); // 17 - - + 0
-	Vertices.Add(FVector{ -DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 18 - + + 3
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset + DimensionZ / 2 }); // 19 + + + 7
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 16 + - + 11
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 17 - - + 0
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 18 - + + 3
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z + Dimension.Z / 2 }); // 19 + + + 7
 
 	// Bottom Face
-	Vertices.Add(FVector{ -DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 20 - - - 1
-	Vertices.Add(FVector{ DimensionX / 2, -DimensionY / 2, ZOffset - DimensionZ / 2 }); // 21 + - - 10
-	Vertices.Add(FVector{ DimensionX / 2, DimensionY / 2, ZOffset - DimensionZ / 2 }); // 22 + + - 6
-	Vertices.Add(FVector{ -DimensionX / 2, DimensionY / 2, ZOffset - DimensionZ / 2 }); // 23 - + - 2
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 20 - - - 1
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y - Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 21 + - - 10
+	Vertices.Add(FVector{ Offset.X + Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 22 + + - 6
+	Vertices.Add(FVector{ Offset.X - Dimension.X / 2, Offset.Y + Dimension.Y / 2, Offset.Z - Dimension.Z / 2 }); // 23 - + - 2
 
 	// Triangles
 	for (int32 i = 0; i < 24; i += 4) {

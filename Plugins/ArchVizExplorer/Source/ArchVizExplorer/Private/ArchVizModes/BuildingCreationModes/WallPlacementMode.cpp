@@ -14,7 +14,7 @@ UWallPlacementMode::UWallPlacementMode() {}
 void UWallPlacementMode::Setup() {
 	bNewWallStart = false;
 	WallActor = nullptr;
-	WallSubModeState = EWallPlacementModeState::Free;
+	SubModeState = EBuildingSubModeState::Free;
 }
 
 void UWallPlacementMode::SetupInputMapping() {
@@ -61,8 +61,8 @@ void UWallPlacementMode::HandleLeftClickAction() {
 	if (IsValid(WallActorRef)) {
 		FHitResult HitResult;
 
-		switch (WallSubModeState) {
-		case EWallPlacementModeState::Free:
+		switch (SubModeState) {
+		case EBuildingSubModeState::Free:
 			HitResult = GetHitResult();
 			HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
@@ -70,7 +70,7 @@ void UWallPlacementMode::HandleLeftClickAction() {
 				WallActor = Cast<AWallActor>(HitResult.GetActor());
 				WallActor->SetState(EBuildingActorState::Selected);
 
-				WallActor->PropertyPanel->SetVisibility(ESlateVisibility::Visible);
+				WallActor->ShowPropertyPanel();
 			}
 			else {
 				FActorSpawnParameters SpawnParams;
@@ -79,16 +79,16 @@ void UWallPlacementMode::HandleLeftClickAction() {
 				WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
 				WallActor->GenerateSegments();
 				WallActor->SetState(EBuildingActorState::Previewing);
-				WallSubModeState = EWallPlacementModeState::NewWallSelected;
+				SubModeState = EBuildingSubModeState::NewEntity;
 
 				// Material
 			}
 			break;
-		case EWallPlacementModeState::OldWallSelected:
-			WallSubModeState = EWallPlacementModeState::Free;
+		case EBuildingSubModeState::OldEntity:
+			SubModeState = EBuildingSubModeState::Free;
 			WallActor->SetState(EBuildingActorState::Selected);
 			break;
-		case EWallPlacementModeState::NewWallSelected:
+		case EBuildingSubModeState::NewEntity:
 			if (IsValid(WallActor)) {
 				HitResult = GetHitResult(TArray<AActor*>{WallActor});
 				HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
@@ -105,7 +105,7 @@ void UWallPlacementMode::HandleLeftClickAction() {
 
 					WallActor->SetEndLocation(HitResult.Location);
 					WallActor->SetState(EBuildingActorState::Selected);
-					WallSubModeState = EWallPlacementModeState::Free;
+					SubModeState = EBuildingSubModeState::Free;
 				}
 			}
 			break;
@@ -125,6 +125,6 @@ void UWallPlacementMode::HandleRKeyPressAction() {
 void UWallPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(WallActor)) {
 		WallActor->SetState(EBuildingActorState::Moving);
-		WallSubModeState = EWallPlacementModeState::OldWallSelected;
+		SubModeState = EBuildingSubModeState::OldEntity;
 	}
 }

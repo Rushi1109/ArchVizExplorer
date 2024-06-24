@@ -34,5 +34,8 @@ protected:
 
 	EBuildingActorState State;
 
+	void ShowPropertyPanel();
+	void HidePropertyPanel();
+
 	void RotateActor(double Degrees);
 };

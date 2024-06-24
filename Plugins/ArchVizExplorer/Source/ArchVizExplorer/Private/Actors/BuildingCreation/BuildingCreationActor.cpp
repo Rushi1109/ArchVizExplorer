@@ -2,6 +2,7 @@
 
 
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
+#include "UMG/Public/Blueprint/UserWidget.h"
 
 EBuildingActorState ABuildingCreationActor::GetState() {
 	return State;
@@ -9,6 +10,18 @@ EBuildingActorState ABuildingCreationActor::GetState() {
 
 void ABuildingCreationActor::SetState(EBuildingActorState NewState) {
 	State = NewState;
+}
+
+void ABuildingCreationActor::ShowPropertyPanel() {
+	if(IsValid(PropertyPanel)) {
+		PropertyPanel->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ABuildingCreationActor::HidePropertyPanel() {
+	if(IsValid(PropertyPanel)) {
+		PropertyPanel->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void ABuildingCreationActor::RotateActor(double Degrees) {

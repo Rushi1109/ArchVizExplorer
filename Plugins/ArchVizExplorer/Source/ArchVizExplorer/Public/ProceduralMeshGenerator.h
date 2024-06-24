@@ -15,7 +15,6 @@ public:
 	~ProceduralMeshGenerator();
 
 	UFUNCTION(BlueprintCallable)
-	void GenerateCube(UProceduralMeshComponent* ProceduralMeshComponent, int32 SectionIndex, double DimensionX, double DimensionY, double DimensionZ, double ZOffset = 0.f);
-
-	void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2);
+	static void GenerateCube(UProceduralMeshComponent* ProceduralMeshComponent, int32 SectionIndex, const FVector& Dimension, const FVector& Offset = FVector{0.0});
+	static void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2);
 };

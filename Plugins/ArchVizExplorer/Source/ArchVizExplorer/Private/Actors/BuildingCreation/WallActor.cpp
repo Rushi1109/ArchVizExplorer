@@ -95,7 +95,7 @@ void AWallActor::HandleMovingState() {
 
 void AWallActor::HandleGeneratingState() {
 	FHitResult HitResult = GetHitResult(TArray<AActor*>{this});
-	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);;
+	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
 	SetEndLocation(HitResult.Location);
 

@@ -9,6 +9,13 @@
 class APlayerController;
 class UInputMappingContext;
 
+UENUM(BlueprintType)
+enum class EBuildingSubModeState : uint8 {
+	Free,
+	OldEntity,
+	NewEntity
+};
+
 /**
  *
  */
@@ -32,4 +39,6 @@ protected:
 
 	UPROPERTY()
 	UInputMappingContext* InputMappingContext;
+
+	EBuildingSubModeState SubModeState;
 };

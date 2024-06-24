@@ -32,8 +32,14 @@ private:
 	UFUNCTION()
 	void HandleLeftClickAction();
 
+	UFUNCTION()
+	void HandleRKeyPressAction();
+
+	UFUNCTION()
+	void HandleMKeyPressAction();
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
 	AFloorActor* FloorActor;
 
-	bool bIsDragging;
+	bool bNewFloorStart;
 };
