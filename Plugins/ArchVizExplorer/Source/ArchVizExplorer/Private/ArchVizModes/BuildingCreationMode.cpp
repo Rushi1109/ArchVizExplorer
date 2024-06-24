@@ -8,18 +8,22 @@ UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{
 void UBuildingCreationMode::Setup() {
 	if (IsValid(WallPlacementModeRef)) {
 		WallPlacementMode = NewObject<UWallPlacementMode>(this, WallPlacementModeRef);
+		WallPlacementMode->InitParams(PlayerController);
 		WallPlacementMode->Setup();
 	}
 	if (IsValid(DoorPlacementModeRef)) {
 		DoorPlacementMode = NewObject<UDoorPlacementMode>(this, DoorPlacementModeRef);
+		DoorPlacementMode->InitParams(PlayerController);
 		DoorPlacementMode->Setup();
 	}
 	if (IsValid(FloorPlacementModeRef)) {
 		FloorPlacementMode = NewObject<UFloorPlacementMode>(this, FloorPlacementModeRef);
+		FloorPlacementMode->InitParams(PlayerController);
 		FloorPlacementMode->Setup();
 	}
 	if (IsValid(RoofPlacementModeRef)) {
 		RoofPlacementMode = NewObject<URoofPlacementMode>(this, RoofPlacementModeRef);
+		RoofPlacementMode->InitParams(PlayerController);
 		RoofPlacementMode->Setup();
 	}
 

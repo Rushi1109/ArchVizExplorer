@@ -11,7 +11,7 @@ void UDoorPlacementMode::Setup() {
 
 void UDoorPlacementMode::EnterSubMode() {
 	if (IsValid(PlayerController)) {
-		if (auto* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
+		if (UEnhancedInputLocalPlayerSubsystem* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			LocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
@@ -19,7 +19,7 @@ void UDoorPlacementMode::EnterSubMode() {
 
 void UDoorPlacementMode::ExitSubMode() {
 	if (IsValid(PlayerController)) {
-		if (auto* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
+		if (UEnhancedInputLocalPlayerSubsystem* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			LocalPlayerSubsystem->RemoveMappingContext(InputMappingContext);
 		}
 	}
@@ -31,7 +31,7 @@ void UDoorPlacementMode::SetupInputMapping() {
 			InputMappingContext = NewObject<UInputMappingContext>();
 
 			//Left-Click
-			auto* LeftMouseClickAction = NewObject<UInputAction>();
+			UInputAction* LeftMouseClickAction = NewObject<UInputAction>();
 			LeftMouseClickAction->ValueType = EInputActionValueType::Boolean;
 
 

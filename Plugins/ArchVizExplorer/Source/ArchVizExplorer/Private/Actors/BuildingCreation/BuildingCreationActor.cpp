@@ -3,10 +3,10 @@
 
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
 
-void ABuildingCreationActor::RotateActorBy90Degrees() {
+void ABuildingCreationActor::RotateActor(double Degrees) {
 	FRotator CurrentRotation = GetActorRotation();
 
-	CurrentRotation.Yaw = static_cast<int>(CurrentRotation.Yaw + 90) % 360;
+	CurrentRotation.Yaw = static_cast<int>(CurrentRotation.Yaw + Degrees) % 360;
 
-	SetActorRotation(FRotator{CurrentRotation});
+	SetActorRotation(CurrentRotation);
 }

@@ -9,11 +9,21 @@
 
 class UProceduralMeshComponent;
 
+UENUM(BlueprintType)
+enum class EWallActorState : uint8 {
+	Selected,
+	Previewing,
+	Generating,
+	Moving
+};
+
 UCLASS()
 class ARCHVIZEXPLORER_API AWallActor : public ABuildingCreationActor {
 	GENERATED_BODY()
 
 public:
+	friend class UWallPlacementMode;
+	
 	// Sets default values for this actor's properties
 	AWallActor();
 
@@ -21,26 +31,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Wall")
-	//UProceduralMeshComponent* ProceduralWallGenerator;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	inline int32 GetSegmentIndex() const {
-		return SegmentIndex;
-	}
-	inline void SetSegmentIndex(int32 Index) {
-		SegmentIndex = Index;
-	}
+	void SetStartLocation(const FVector& NewStartLocation);
+	const FVector& GetStartLocation() const;
 
-	inline FRotator GetSegmentRotation() const {
-		return SegmentRotation;
-	}
-	inline void SetSegmentRotation(const FRotator& Rotation) {
-		SegmentRotation = Rotation;
-	}
+	void SetEndLocation(const FVector& NewEndLocation);
+	const FVector& GetEndLocation() const;
+
+	void SetState(EWallActorState NewState);
+	EWallActorState GetState() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall")
 	UStaticMesh* WallMesh;
@@ -48,15 +50,15 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Wall")
 	TArray<UStaticMeshComponent*> WallSegments;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
-	UStaticMeshComponent* PreviewWallSegment;
-
-	UFUNCTION()
-	void DestroyPreviewWallSegment();
-
-	FHitResult GetHitResult() const;
 private:
-	int32 SegmentIndex;
+	FVector StartLocation;
+	FVector EndLocation;
 
-	FRotator SegmentRotation;
+	EWallActorState State;
+
+	void GenerateSegments(double Length = 0.0);
+	void DestroySegments();
+	void HandlePreviewingState();
+	void HandleMovingState();
+	void HandleGeneratingState();
 };

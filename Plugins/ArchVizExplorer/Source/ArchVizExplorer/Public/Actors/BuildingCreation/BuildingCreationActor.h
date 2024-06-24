@@ -21,5 +21,5 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	UUserWidget* PropertyPanel;
 
-	void RotateActorBy90Degrees();
+	void RotateActor(double Degrees);
 };

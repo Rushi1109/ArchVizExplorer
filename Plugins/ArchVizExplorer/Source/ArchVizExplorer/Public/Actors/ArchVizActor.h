@@ -25,5 +25,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore) const;
+	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>{}) const;
 };
