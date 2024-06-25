@@ -40,7 +40,7 @@ private:
 	FVector StartLocation;
 	FVector EndLocation;
 
-	void GenerateFloor(const FVector& Dimensions);
+	void GenerateFloor(const FVector& Dimensions, const FVector& Offset);
 	void DestroyFloor();
 	void HandlePreviewingState();
 	void HandleMovingState();

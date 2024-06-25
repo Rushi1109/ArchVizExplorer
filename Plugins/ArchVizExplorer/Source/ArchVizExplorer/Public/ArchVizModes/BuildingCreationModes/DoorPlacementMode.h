@@ -6,6 +6,7 @@
 #include "BuildingCreationSubModes.h"
 #include "UObject/NoExportTypes.h"
 #include "InputMappingContext.h"
+#include "Actors/BuildingCreation/DoorActor.h"
 #include "DoorPlacementMode.generated.h"
 
 /**
@@ -17,12 +18,21 @@ class ARCHVIZEXPLORER_API UDoorPlacementMode : public UBuildingCreationSubMode {
 
 public:
 	virtual void Setup() override;
+	virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
-private:
-	UFUNCTION()
-	void HandleLeftMouseClick();
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ADoorActor> DoorActorRef;
 
+private:
+	void HandleLeftClickAction();
+	void HandleRKeyPressAction();
+	void HandleMKeyPressAction();
+	void HandleOKeyPressAction();
+
+	UPROPERTY()
+	ADoorActor* DoorActor;
 };

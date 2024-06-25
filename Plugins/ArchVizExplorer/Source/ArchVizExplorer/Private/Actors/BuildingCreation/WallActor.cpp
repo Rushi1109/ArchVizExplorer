@@ -5,9 +5,10 @@
 #include "ProceduralMeshComponent.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "Utilities/ArchVizUtility.h"
+#include "Actors/BuildingCreation/DoorActor.h"
 
 // Sets default values
-AWallActor::AWallActor() : WallMesh{nullptr} {
+AWallActor::AWallActor() : WallMesh{nullptr}, DoorAttachableWallMesh{nullptr} {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -142,6 +143,18 @@ void AWallActor::AdjustEdgeOffset() {
 	}
 	else if (ActorRotation.Yaw >= -95.0 && ActorRotation.Yaw <= -85.0) {
 		SetActorLocation(FVector{ StartLocation.X, StartLocation.Y - 10, StartLocation.Z });
+	}
+}
+
+void AWallActor::AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, ADoorActor* DoorActor) {
+	if (UStaticMeshComponent* SegmentStaticMesh = Cast<UStaticMeshComponent>(ComponentToReplace)) {
+		int32 SegmentIndex = WallSegments.Find(SegmentStaticMesh);
+
+		if (SegmentIndex != INDEX_NONE) {
+			WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
+
+			DoorActor->AttachToComponent(WallSegments[SegmentIndex], FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("DoorSocket"));
+		}
 	}
 }
 

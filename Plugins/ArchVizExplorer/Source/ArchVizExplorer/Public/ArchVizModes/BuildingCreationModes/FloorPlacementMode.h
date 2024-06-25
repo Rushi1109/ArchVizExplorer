@@ -21,6 +21,7 @@ public:
 	UFloorPlacementMode();
 
 	virtual void Setup() override;
+	virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;

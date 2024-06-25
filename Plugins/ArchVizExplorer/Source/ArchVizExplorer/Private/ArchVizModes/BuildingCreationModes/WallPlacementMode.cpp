@@ -17,6 +17,17 @@ void UWallPlacementMode::Setup() {
 	SubModeState = EBuildingSubModeState::Free;
 }
 
+void UWallPlacementMode::Cleanup() {
+	if (IsValid(WallActor)) {
+		if((WallActor->GetState() == EBuildingActorState::Previewing) || (WallActor->GetState() == EBuildingActorState::Generating)) {
+			WallActor->DestroyActor();
+		}
+		else if (WallActor->GetState() == EBuildingActorState::Moving) {
+			WallActor->SetState(EBuildingActorState::Selected);
+		}
+	}
+}
+
 void UWallPlacementMode::SetupInputMapping() {
 	if (IsValid(PlayerController)) {
 		UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
@@ -45,6 +56,8 @@ void UWallPlacementMode::EnterSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
+
+			Setup();
 		}
 	}
 }
@@ -53,6 +66,8 @@ void UWallPlacementMode::ExitSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
+
+			Cleanup();
 		}
 	}
 }

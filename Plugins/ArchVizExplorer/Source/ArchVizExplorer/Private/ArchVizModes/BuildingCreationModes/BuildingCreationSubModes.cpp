@@ -19,10 +19,7 @@ FHitResult UBuildingCreationSubMode::GetHitResult(const TArray<AActor*>& ActorsT
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.bTraceComplex = true;
 		CollisionQueryParams.AddIgnoredActor(PlayerController->GetPawn());
-
-		for (const auto& Actor : ActorsToIgnore) {
-			CollisionQueryParams.AddIgnoredActor(Actor);
-		}
+		CollisionQueryParams.AddIgnoredActors(ActorsToIgnore);
 
 		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
 	}

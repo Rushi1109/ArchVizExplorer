@@ -55,10 +55,10 @@ const FVector& AFloorActor::GetEndLocation() {
 	return EndLocation;
 }
 
-void AFloorActor::GenerateFloor(const FVector& Dimensions) {
+void AFloorActor::GenerateFloor(const FVector& Dimensions, const FVector& Offset) {
 	DestroyFloor();
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Dimensions / 2);
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
 }
 
 void AFloorActor::DestroyFloor() {
@@ -88,5 +88,5 @@ void AFloorActor::HandleGeneratingState() {
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
 
-	GenerateFloor(FVector{XFloorLength, YFloorLength, 10});
+	GenerateFloor(FVector{abs(XFloorLength), abs(YFloorLength), 10}, FVector{XFloorLength / 2, YFloorLength / 2, 5});
 }

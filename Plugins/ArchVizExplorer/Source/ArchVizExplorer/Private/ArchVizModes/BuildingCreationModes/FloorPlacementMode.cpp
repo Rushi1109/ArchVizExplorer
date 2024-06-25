@@ -15,6 +15,17 @@ void UFloorPlacementMode::Setup() {
 	SubModeState = EBuildingSubModeState::Free;
 }
 
+void UFloorPlacementMode::Cleanup() {
+	if (IsValid(FloorActor)) {
+		if ((FloorActor->GetState() == EBuildingActorState::Previewing) || (FloorActor->GetState() == EBuildingActorState::Generating)) {
+			FloorActor->DestroyActor();
+		}
+		else if (FloorActor->GetState() == EBuildingActorState::Moving) {
+			FloorActor->SetState(EBuildingActorState::Selected);
+		}
+	}
+}
+
 void UFloorPlacementMode::SetupInputMapping() {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
 	check(EnhancedInputComponent);
@@ -42,6 +53,8 @@ void UFloorPlacementMode::EnterSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
+
+			Setup();
 		}
 	}
 }
@@ -50,6 +63,8 @@ void UFloorPlacementMode::ExitSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
+
+			Cleanup();
 		}
 	}
 }
@@ -75,7 +90,7 @@ void UFloorPlacementMode::HandleLeftClickAction() {
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 				FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, SpawnParams);
-				FloorActor->GenerateFloor(FVector{ 100, 100, 10 });
+				FloorActor->GenerateFloor(FVector{ 100, 100, 10 }, FVector{50, 50, 5});
 				FloorActor->SetState(EBuildingActorState::Previewing);
 				SubModeState = EBuildingSubModeState::NewEntity;
 
