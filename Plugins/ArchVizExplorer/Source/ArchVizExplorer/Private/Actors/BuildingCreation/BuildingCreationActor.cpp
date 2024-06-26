@@ -4,23 +4,38 @@
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
 
+ABuildingCreationActor::ABuildingCreationActor() : State{ EBuildingActorState::None } {
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 EBuildingActorState ABuildingCreationActor::GetState() {
 	return State;
 }
 
 void ABuildingCreationActor::SetState(EBuildingActorState NewState) {
 	State = NewState;
+
+	HandleStateChange();
+}
+
+void ABuildingCreationActor::HandleStateChange() {
+	if (State == EBuildingActorState::Selected) {
+		ShowPropertyPanel();
+	}
+	else {
+		HidePropertyPanel();
+	}
 }
 
 void ABuildingCreationActor::ShowPropertyPanel() {
 	if(IsValid(PropertyPanel)) {
-		PropertyPanel->SetVisibility(ESlateVisibility::Visible);
+		PropertyPanel->AddToViewport();
 	}
 }
 
 void ABuildingCreationActor::HidePropertyPanel() {
 	if(IsValid(PropertyPanel)) {
-		PropertyPanel->SetVisibility(ESlateVisibility::Hidden);
+		PropertyPanel->RemoveFromParent();
 	}
 }
 

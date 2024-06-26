@@ -93,5 +93,8 @@ void UBuildingCreationMode::EnterMode() {
 }
 
 void UBuildingCreationMode::ExitMode() {
+	if (CurrentBuildingCreationSubMode) {
+		CurrentBuildingCreationSubMode->ExitSubMode();
+	}
 	HideWidget();
 }

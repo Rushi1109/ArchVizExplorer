@@ -20,9 +20,8 @@ AWallActor::AWallActor() : WallMesh{nullptr}, DoorAttachableWallMesh{nullptr} {
 void AWallActor::BeginPlay() {
 	Super::BeginPlay();
 
-	if (PropertyPanelRef) {
+	if (IsValid(PropertyPanelRef)) {
 		PropertyPanel = CreateWidget<UUserWidget>(GetWorld(), PropertyPanelRef);
-		PropertyPanel->AddToViewport();
 	}
 }
 

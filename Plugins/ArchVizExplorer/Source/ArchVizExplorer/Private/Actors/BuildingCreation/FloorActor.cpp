@@ -56,7 +56,7 @@ void AFloorActor::DestroyFloor() {
 
 void AFloorActor::HandlePreviewingState() {
 	FHitResult HitResult = GetHitResult(TArray<AActor*>{this});
-	HitResult.Location = ArchVizUtility::SnapToGridFloored(HitResult.Location);
+	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
 	SetActorLocation(HitResult.Location);
 }

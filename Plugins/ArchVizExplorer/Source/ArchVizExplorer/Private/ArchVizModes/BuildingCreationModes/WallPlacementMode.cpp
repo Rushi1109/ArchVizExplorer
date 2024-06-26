@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 UWallPlacementMode::UWallPlacementMode() {}
 
@@ -22,9 +23,8 @@ void UWallPlacementMode::Cleanup() {
 		if ((WallActor->GetState() == EBuildingActorState::Previewing) || (WallActor->GetState() == EBuildingActorState::Generating)) {
 			WallActor->DestroyActor();
 		}
-		else if (WallActor->GetState() == EBuildingActorState::Moving) {
-			WallActor->SetState(EBuildingActorState::Selected);
-		}
+		WallActor->SetState(EBuildingActorState::None);
+		WallActor = nullptr;
 	}
 }
 
@@ -76,6 +76,11 @@ void UWallPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::None);
+		WallActor = nullptr;
+	}
+
 	if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
 		WallActor = Cast<AWallActor>(HitResult.GetActor());
 		WallActor->SetState(EBuildingActorState::Selected);
@@ -87,6 +92,8 @@ void UWallPlacementMode::HandleFreeState() {
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
+		BindWidgetButtons();
+
 		WallActor->GenerateSegments();
 		WallActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
@@ -116,6 +123,8 @@ void UWallPlacementMode::HandleNewEntityState() {
 			bNewWallStart = false;
 
 			WallActor->SetEndLocation(HitResult.Location);
+			UpdateWallLenghSlider();
+
 			WallActor->SetState(EBuildingActorState::Selected);
 			SubModeState = EBuildingSubModeState::Free;
 		}
@@ -149,5 +158,62 @@ void UWallPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(WallActor)) {
 		WallActor->SetState(EBuildingActorState::Moving);
 		SubModeState = EBuildingSubModeState::OldEntity;
+	}
+}
+
+void UWallPlacementMode::BindWidgetButtons() {
+	if (IsValid(WallActor) && IsValid(WallActor->PropertyPanel) && WallActor->PropertyPanel->IsA(UPropertyPanelWidget::StaticClass())) {
+		UPropertyPanelWidget* PropertyPanel = Cast<UPropertyPanelWidget>(WallActor->PropertyPanel);
+
+		PropertyPanel->NewWallButton->OnClicked.AddDynamic(this, &UWallPlacementMode::HandleNewButtonClick);
+		PropertyPanel->DeleteWallButton->OnClicked.AddDynamic(this, &UWallPlacementMode::HandleDeleteButtonClick);
+		PropertyPanel->WallLengthSpinBox->OnValueChanged.AddDynamic(this, &UWallPlacementMode::HandleLengthSliderValueChange);
+	}
+}
+
+void UWallPlacementMode::HandleNewButtonClick() {
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::None);
+
+		if(IsValid(WallActorRef)) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
+			BindWidgetButtons();
+
+			WallActor->GenerateSegments();
+			WallActor->SetState(EBuildingActorState::Previewing);
+			SubModeState = EBuildingSubModeState::NewEntity;
+		}
+	}
+}
+
+void UWallPlacementMode::HandleDeleteButtonClick() {
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::None);
+		WallActor->DestroyActor();
+	}
+}
+
+void UWallPlacementMode::HandleLengthSliderValueChange(float InValue) {
+	if (IsValid(WallActor)) {
+		WallActor->GenerateSegments(InValue);
+	}
+}
+
+void UWallPlacementMode::UpdateWallLenghSlider() {
+	if (IsValid(WallActor) && IsValid(WallActor->PropertyPanel) && WallActor->PropertyPanel->IsA(UPropertyPanelWidget::StaticClass())) {
+		UPropertyPanelWidget* PropertyPanel = Cast<UPropertyPanelWidget>(WallActor->PropertyPanel);
+
+		double XDistance = FMath::Abs(WallActor->GetEndLocation().X - WallActor->GetStartLocation().X);
+		double YDistance = FMath::Abs(WallActor->GetEndLocation().Y - WallActor->GetStartLocation().Y);
+
+		if (XDistance >= YDistance) {
+			PropertyPanel->WallLengthSpinBox->SetValue(XDistance);
+		}
+		else {
+			PropertyPanel->WallLengthSpinBox->SetValue(YDistance);
+		}
 	}
 }

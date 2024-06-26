@@ -8,6 +8,7 @@
 
 UENUM(BlueprintType)
 enum class EBuildingActorState : uint8 {
+	None,
 	Selected,
 	Previewing,
 	Generating,
@@ -22,11 +23,14 @@ class ARCHVIZEXPLORER_API ABuildingCreationActor : public AArchVizActor {
 	GENERATED_BODY()
 
 public:
+	ABuildingCreationActor();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	TSubclassOf<UUserWidget> PropertyPanelRef;
 
 	EBuildingActorState GetState();
 	void SetState(EBuildingActorState NewState);
+	void HandleStateChange();
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
