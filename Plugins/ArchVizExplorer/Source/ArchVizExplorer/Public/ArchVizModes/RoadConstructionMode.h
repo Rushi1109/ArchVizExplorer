@@ -34,6 +34,5 @@ private:
 	UFUNCTION()
 	void HandleLeftClickAction();
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstrcution | Actor")
 	ARoadActor* RoadActor;
 };

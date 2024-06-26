@@ -24,6 +24,10 @@ public:
 	virtual void ExitSubMode() override;
 
 protected:
+	virtual void HandleFreeState() override;
+	virtual void HandleOldEntityState() override;
+	virtual void HandleNewEntityState() override;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ADoorActor> DoorActorRef;
 

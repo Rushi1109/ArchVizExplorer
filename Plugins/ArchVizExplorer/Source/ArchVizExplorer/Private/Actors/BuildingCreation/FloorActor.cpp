@@ -16,6 +16,11 @@ AFloorActor::AFloorActor() {
 
 	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("Procedural Mesh Component"));
 	ProceduralMeshComponent->SetupAttachment(SceneRoot);
+
+	ProceduralMeshComponent->ContainsPhysicsTriMeshData(true);
+	ProceduralMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ProceduralMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	ProceduralMeshComponent->SetCollisionObjectType(ECC_WorldDynamic);
 }
 
 // Called when the game starts or when spawned
@@ -39,22 +44,6 @@ void AFloorActor::Tick(float DeltaTime) {
 	}
 }
 
-void AFloorActor::SetStartLocation(const FVector& NewStartLocation) {
-	StartLocation = NewStartLocation;
-}
-
-const FVector& AFloorActor::GetStartLocation() {
-	return StartLocation;
-}
-
-void AFloorActor::SetEndLocation(const FVector& NewEndLocation) {
-	EndLocation = NewEndLocation;
-}
-
-const FVector& AFloorActor::GetEndLocation() {
-	return EndLocation;
-}
-
 void AFloorActor::GenerateFloor(const FVector& Dimensions, const FVector& Offset) {
 	DestroyFloor();
 
@@ -67,7 +56,7 @@ void AFloorActor::DestroyFloor() {
 
 void AFloorActor::HandlePreviewingState() {
 	FHitResult HitResult = GetHitResult(TArray<AActor*>{this});
-	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
+	HitResult.Location = ArchVizUtility::SnapToGridFloored(HitResult.Location);
 
 	SetActorLocation(HitResult.Location);
 }
@@ -83,10 +72,66 @@ void AFloorActor::HandleGeneratingState() {
 	FHitResult HitResult = GetHitResult(TArray<AActor*>{this});
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
+	if (EndLocation == HitResult.Location) {
+		return;
+	}
 	SetEndLocation(HitResult.Location);
 
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
 
-	GenerateFloor(FVector{abs(XFloorLength), abs(YFloorLength), 10}, FVector{XFloorLength / 2, YFloorLength / 2, 5});
+	double EdgeOffset{ 10.0 };
+
+	FVector Dimensions{ FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 2 };
+	FVector Offset{ Dimensions / 2 };
+
+	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
+		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
+	}
+	else if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
+		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0,0.0,180.0 });
+		Offset.Z *= -1.0;
+	}
+	else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
+		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0,0.0 });
+		Offset.Z *= -1.0;
+	}
+	else {
+		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
+	}
+
+	FVector NewStartLocation{ StartLocation };
+
+	if (XFloorLength >= 0.0) {
+		NewStartLocation.X -= EdgeOffset;
+	}
+	else {
+		NewStartLocation.X += EdgeOffset;
+	}
+	if (YFloorLength >= 0.0) {
+		NewStartLocation.Y -= EdgeOffset;
+	}
+	else {
+		NewStartLocation.Y += EdgeOffset;
+	}
+
+	SetActorLocation(NewStartLocation);
+
+	GenerateFloor(Dimensions, Offset);
+}
+
+void AFloorActor::SetStartLocation(const FVector& NewStartLocation) {
+	StartLocation = NewStartLocation;
+}
+
+const FVector& AFloorActor::GetStartLocation() {
+	return StartLocation;
+}
+
+void AFloorActor::SetEndLocation(const FVector& NewEndLocation) {
+	EndLocation = NewEndLocation;
+}
+
+const FVector& AFloorActor::GetEndLocation() {
+	return EndLocation;
 }

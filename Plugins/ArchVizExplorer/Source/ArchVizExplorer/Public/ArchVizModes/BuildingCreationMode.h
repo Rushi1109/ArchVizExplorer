@@ -57,15 +57,15 @@ private:
 	UPROPERTY()
 	EBuildingModeEntity BuildingModeEntity;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Wall")
+	UPROPERTY()
 	UWallPlacementMode* WallPlacementMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Door")
+	UPROPERTY()
 	UDoorPlacementMode* DoorPlacementMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Floor")
+	UPROPERTY()
 	UFloorPlacementMode* FloorPlacementMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreationMode | Roof")
+	UPROPERTY()
 	URoofPlacementMode* RoofPlacementMode;
 };

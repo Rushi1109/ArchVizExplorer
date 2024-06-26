@@ -26,20 +26,19 @@ public:
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
+protected:
+	virtual void HandleFreeState() override;
+	virtual void HandleOldEntityState() override;
+	virtual void HandleNewEntityState() override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
 	TSubclassOf<AWallActor> WallActorRef;
 
 private:
-	UFUNCTION()
 	void HandleLeftClickAction();
-
-	UFUNCTION()
 	void HandleRKeyPressAction();
-
-	UFUNCTION()
 	void HandleMKeyPressAction();
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
 	AWallActor* WallActor;
 
 	bool bNewWallStart;

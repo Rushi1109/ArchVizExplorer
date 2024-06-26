@@ -14,8 +14,6 @@ AWallActor::AWallActor() : WallMesh{nullptr}, DoorAttachableWallMesh{nullptr} {
 
 	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
 	SetRootComponent(SceneRoot);
-
-	PrimaryActorTick.TickInterval = 0.2;
 }
 
 // Called when the game starts or when spawned
@@ -64,8 +62,9 @@ void AWallActor::GenerateSegments(double Length /*= 0.0*/) {
 			StaticMeshComponent->SetStaticMesh(WallMesh);
 			WallSegments.Add(StaticMeshComponent);
 		}
-
 	}
+
+	UpdateSegments();
 }
 
 void AWallActor::DestroySegments() {
@@ -75,6 +74,23 @@ void AWallActor::DestroySegments() {
 	}
 
 	WallSegments.Empty();
+}
+
+void AWallActor::UpdateSegments() {
+	int SegmentCount = WallSegments.Num();
+
+	for (const auto& [SegmentIndex, DoorActor] : IndexDoorMapping) {
+		if (SegmentIndex >= SegmentCount) {
+			if (IndexDoorMapping[SegmentIndex]) {
+				IndexDoorMapping[SegmentIndex]->Destroy();
+			}
+			IndexDoorMapping.Remove(SegmentIndex);
+			continue;
+		}
+		WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
+
+		AttachDoorComponent(WallSegments[SegmentIndex], DoorActor);
+	}
 }
 
 void AWallActor::HandlePreviewingState() {
@@ -152,8 +168,22 @@ void AWallActor::AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, AD
 
 		if (SegmentIndex != INDEX_NONE) {
 			WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
+			IndexDoorMapping.Add(TTuple<int32, ADoorActor*>{SegmentIndex, DoorActor});
 
-			DoorActor->AttachToComponent(WallSegments[SegmentIndex], FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("DoorSocket"));
+			DoorActor->AttachToComponent(WallSegments[SegmentIndex], FAttachmentTransformRules::KeepRelativeTransform, TEXT("DoorSocket"));
+			DoorActor->SetActorRelativeRotation(FRotator::ZeroRotator);
+			DoorActor->SetActorRelativeLocation(FVector::ZeroVector);
+		}
+	}
+}
+
+void AWallActor::DetachDoorComponent(ADoorActor* DoorActor) {
+	if (IsValid(DoorActor) && IsValid(WallMesh)) {
+		if (const int32* SegmentIndex = IndexDoorMapping.FindKey(DoorActor)) {
+				WallSegments[*SegmentIndex]->SetStaticMesh(WallMesh);
+				DoorActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+				IndexDoorMapping.Remove(*SegmentIndex);
 		}
 	}
 }

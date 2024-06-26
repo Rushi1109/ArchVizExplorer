@@ -27,26 +27,27 @@ void UFloorPlacementMode::Cleanup() {
 }
 
 void UFloorPlacementMode::SetupInputMapping() {
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-	check(EnhancedInputComponent);
+	if (IsValid(PlayerController)) {
+		if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerController->InputComponent)) {
+			UInputAction* LeftClickAction = NewObject<UInputAction>(this);
+			LeftClickAction->ValueType = EInputActionValueType::Boolean;
 
-	UInputAction* LeftClickAction = NewObject<UInputAction>(this);
-	LeftClickAction->ValueType = EInputActionValueType::Boolean;
+			UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
+			RKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
-	UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
-	RKeyPressAction->ValueType = EInputActionValueType::Boolean;
+			UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
+			MKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
-	UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
-	MKeyPressAction->ValueType = EInputActionValueType::Boolean;
+			InputMappingContext = NewObject<UInputMappingContext>(this);
+			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
+			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
+			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
 
-	InputMappingContext = NewObject<UInputMappingContext>(this);
-	InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
-	InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
-	InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
-
-	EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleLeftClickAction);
-	EnhancedInputComponent->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleRKeyPressAction);
-	EnhancedInputComponent->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleMKeyPressAction);
+			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleLeftClickAction);
+			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleRKeyPressAction);
+			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleMKeyPressAction);
+		}
+	}
 }
 
 void UFloorPlacementMode::EnterSubMode() {
@@ -69,58 +70,68 @@ void UFloorPlacementMode::ExitSubMode() {
 	}
 }
 
+void UFloorPlacementMode::HandleFreeState() {
+	FHitResult HitResult = GetHitResult();
+	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
+
+	if (HitResult.GetActor() && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
+		FloorActor = Cast<AFloorActor>(HitResult.GetActor());
+		FloorActor->SetState(EBuildingActorState::Selected);
+
+		// TODO:: Widget
+		FloorActor->ShowPropertyPanel();
+	}
+	else {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, SpawnParams);
+		FloorActor->GenerateFloor(FVector{ 100, 100, 2 }, FVector{ 50, 50, 1 });
+		FloorActor->SetState(EBuildingActorState::Previewing);
+		SubModeState = EBuildingSubModeState::NewEntity;
+
+		// TODO:: Material
+	}
+}
+
+void UFloorPlacementMode::HandleOldEntityState() {
+	SubModeState = EBuildingSubModeState::Free;
+	FloorActor->SetState(EBuildingActorState::Selected);
+}
+
+void UFloorPlacementMode::HandleNewEntityState() {
+	if (IsValid(FloorActor)) {
+		FHitResult HitResult = GetHitResult(TArray<AActor*>{FloorActor});
+		HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
+
+		if (!bNewFloorStart) {
+			bNewFloorStart = true;
+
+			FloorActor->SetStartLocation(HitResult.Location);
+			FloorActor->SetActorLocation(HitResult.Location);
+			FloorActor->SetState(EBuildingActorState::Generating);
+		}
+		else {
+			bNewFloorStart = false;
+
+			FloorActor->SetEndLocation(HitResult.Location);
+			FloorActor->SetState(EBuildingActorState::Selected);
+			SubModeState = EBuildingSubModeState::Free;
+		}
+	}
+}
+
 void UFloorPlacementMode::HandleLeftClickAction() {
 	if (IsValid(FloorActorRef)) {
-		FHitResult HitResult;
-
 		switch (SubModeState) {
 		case EBuildingSubModeState::Free:
-			HitResult = GetHitResult();
-			HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
-
-			if (HitResult.GetActor() && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
-				FloorActor = Cast<AFloorActor>(HitResult.GetActor());
-				FloorActor->SetState(EBuildingActorState::Selected);
-
-				// TODO:: Widget
-				FloorActor->ShowPropertyPanel();
-			}
-			else {
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-				FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, SpawnParams);
-				FloorActor->GenerateFloor(FVector{ 100, 100, 10 }, FVector{50, 50, 5});
-				FloorActor->SetState(EBuildingActorState::Previewing);
-				SubModeState = EBuildingSubModeState::NewEntity;
-
-				// TODO:: Material
-			}
+			HandleFreeState();
 			break;
 		case EBuildingSubModeState::OldEntity:
-			SubModeState = EBuildingSubModeState::Free;
-			FloorActor->SetState(EBuildingActorState::Selected);
+			HandleOldEntityState();
 			break;
 		case EBuildingSubModeState::NewEntity:
-			if (IsValid(FloorActor)) {
-				HitResult = GetHitResult(TArray<AActor*>{FloorActor});
-				HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
-
-				if (!bNewFloorStart) {
-					bNewFloorStart = true;
-
-					FloorActor->SetStartLocation(HitResult.Location);
-					FloorActor->SetActorLocation(HitResult.Location);
-					FloorActor->SetState(EBuildingActorState::Generating);
-				}
-				else {
-					bNewFloorStart = false;
-
-					FloorActor->SetEndLocation(HitResult.Location);
-					FloorActor->SetState(EBuildingActorState::Selected);
-					SubModeState = EBuildingSubModeState::Free;
-				}
-			}
+			HandleNewEntityState();
 			break;
 		}
 	}

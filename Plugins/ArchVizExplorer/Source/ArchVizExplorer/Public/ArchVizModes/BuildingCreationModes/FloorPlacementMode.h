@@ -26,20 +26,19 @@ public:
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Wall")
+protected:
+	virtual void HandleFreeState() override;
+	virtual void HandleOldEntityState() override;
+	virtual void HandleNewEntityState() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Floor")
 	TSubclassOf<AFloorActor> FloorActorRef;
 
 private:
-	UFUNCTION()
 	void HandleLeftClickAction();
-
-	UFUNCTION()
 	void HandleRKeyPressAction();
-
-	UFUNCTION()
 	void HandleMKeyPressAction();
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Wall")
 	AFloorActor* FloorActor;
 
 	bool bNewFloorStart;

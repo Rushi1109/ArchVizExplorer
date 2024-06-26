@@ -34,6 +34,7 @@ public:
 	const FVector& GetEndLocation() const;
 
 	void AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, ADoorActor* DoorActor);
+	void DetachDoorComponent(ADoorActor* DoorActor);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall")
 	UStaticMesh* WallMesh;
@@ -41,8 +42,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall")
 	UStaticMesh* DoorAttachableWallMesh;
 
-	UPROPERTY(VisibleAnywhere, Category = "Wall")
 	TArray<UStaticMeshComponent*> WallSegments;
+	
+	TMap<int32, ADoorActor*> IndexDoorMapping;
 
 private:
 	FVector StartLocation;
@@ -50,6 +52,7 @@ private:
 
 	void GenerateSegments(double Length = 0.0);
 	void DestroySegments();
+	void UpdateSegments();
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();

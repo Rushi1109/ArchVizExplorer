@@ -72,48 +72,54 @@ void UDoorPlacementMode::SetupInputMapping() {
 		}
 	}
 }
+
+void UDoorPlacementMode::HandleFreeState() {
+	FHitResult HitResult = GetHitResult();
+
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ADoorActor::StaticClass())) {
+		DoorActor = Cast<ADoorActor>(HitResult.GetActor());
+		DoorActor->SetState(EBuildingActorState::Selected);
+		//TODO:: Widget
+	}
+	else {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		DoorActor = GetWorld()->SpawnActor<ADoorActor>(DoorActorRef, SpawnParams);
+		DoorActor->SetState(EBuildingActorState::Previewing);
+		SubModeState = EBuildingSubModeState::NewEntity;
+		//TODO:: Material
+	}
+}
+
+void UDoorPlacementMode::HandleOldEntityState() {}
+
+void UDoorPlacementMode::HandleNewEntityState() {
+	if (IsValid(DoorActor)) {
+		FHitResult HitResult = GetHitResult(TArray<AActor*> {DoorActor});
+
+		if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+			AWallActor* WallActor = Cast<AWallActor>(HitResult.GetActor());
+
+			if (IsValid(WallActor) && IsValid(HitResult.GetComponent())) {
+				DoorActor->SetState(EBuildingActorState::Selected);
+				WallActor->AttachDoorComponent(HitResult.GetComponent(), DoorActor);
+				SubModeState = EBuildingSubModeState::Free;
+			}
+		}
+	}
+}
+
 void UDoorPlacementMode::HandleLeftClickAction() {
 	if (IsValid(DoorActorRef)) {
-		FHitResult HitResult = GetHitResult();
-		//HitResult.Location = ArchVizUtility::GetSnappedLocation(HitResult.Location);
-
 		switch (SubModeState) {
 		case EBuildingSubModeState::Free:
-			if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ADoorActor::StaticClass())) {
-				DoorActor = Cast<ADoorActor>(HitResult.GetActor());
-				DoorActor->SetState(EBuildingActorState::Selected);
-				//TODO:: Widget
-			}
-			else {
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-				DoorActor = GetWorld()->SpawnActor<ADoorActor>(DoorActorRef, SpawnParams);
-				DoorActor->SetState(EBuildingActorState::Previewing);
-				SubModeState = EBuildingSubModeState::NewEntity;
-				//TODO:: Material
-			}
+			HandleFreeState();
 			break;
 		case EBuildingSubModeState::OldEntity:
-			SubModeState = EBuildingSubModeState::Free;
-			DoorActor->SetState(EBuildingActorState::Selected);
-			break;
+			[[fallthrough]];
 		case EBuildingSubModeState::NewEntity:
-			if (IsValid(DoorActor)) {
-
-				HitResult = GetHitResult(TArray<AActor*> {DoorActor});
-				//HitResult.Location = ArchVizUtility::GetSnappedLocation(HitResult.Location);
-
-				if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
-					AWallActor* WallActor = Cast<AWallActor>(HitResult.GetActor());
-
-					if (IsValid(WallActor) && IsValid(HitResult.GetComponent())) {
-						DoorActor->SetState(EBuildingActorState::Selected);
-						WallActor->AttachDoorComponent(HitResult.GetComponent(), DoorActor);
-						SubModeState = EBuildingSubModeState::Free;
-					}
-				}
-			}
+			HandleNewEntityState();
 			break;
 		}
 	}
@@ -121,12 +127,16 @@ void UDoorPlacementMode::HandleLeftClickAction() {
 
 void UDoorPlacementMode::HandleRKeyPressAction() {
 	if (IsValid(DoorActor)) {
-		DoorActor->RotateActor(90.0);
+		DoorActor->RotateActor(180.0);
 	}
 }
 
 void UDoorPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(DoorActor)) {
+		if (AWallActor* WallActor = Cast<AWallActor>(DoorActor->GetAttachParentActor())) {
+			WallActor->DetachDoorComponent(DoorActor);
+		}
+
 		DoorActor->SetState(EBuildingActorState::Moving);
 		SubModeState = EBuildingSubModeState::OldEntity;
 	}

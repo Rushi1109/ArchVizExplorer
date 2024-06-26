@@ -33,6 +33,10 @@ public:
 	virtual void InitParams(APlayerController* Controller);
 
 protected:
+	virtual void HandleFreeState() PURE_VIRTUAL(UBuildingCreationSubMode::HandleFreeState(), );
+	virtual void HandleOldEntityState() PURE_VIRTUAL(UBuildingCreationSubMode::HandleOldEntityState(), );
+	virtual void HandleNewEntityState() PURE_VIRTUAL(UBuildingCreationSubMode::HandleNewEntityState(), );
+
 	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>{}) const;
 
 	UPROPERTY()

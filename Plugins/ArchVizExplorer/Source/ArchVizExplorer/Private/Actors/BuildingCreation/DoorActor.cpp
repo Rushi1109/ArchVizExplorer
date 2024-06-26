@@ -15,8 +15,6 @@ ADoorActor::ADoorActor() : DoorFrameMesh{nullptr}, DoorMesh{nullptr} {
 
 	DoorComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Door Component"));
 	DoorComponent->SetupAttachment(DoorFrameComponent, TEXT("Door"));
-
-	PrimaryActorTick.TickInterval = 0.1;
 }
 
 void ADoorActor::BeginPlay() {

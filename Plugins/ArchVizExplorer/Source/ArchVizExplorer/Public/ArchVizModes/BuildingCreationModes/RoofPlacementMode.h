@@ -8,6 +8,8 @@
 #include "InputMappingContext.h"
 #include "RoofPlacementMode.generated.h"
 
+class ARoofActor;
+
 /**
  *
  */
@@ -16,12 +18,28 @@ class ARCHVIZEXPLORER_API URoofPlacementMode : public UBuildingCreationSubMode {
 	GENERATED_BODY()
 
 public:
+	URoofPlacementMode();
+
 	virtual void Setup() override;
+	virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
+protected:
+	virtual void HandleFreeState() override;
+	virtual void HandleOldEntityState() override;
+	virtual void HandleNewEntityState() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Roof")
+	TSubclassOf<ARoofActor> RoofActorRef;
+
 private:
-	UFUNCTION()
-	void HandleLeftMouseClick();
+	void HandleLeftClickAction();
+	void HandleRKeyPressAction();
+	void HandleMKeyPressAction();
+
+	ARoofActor* RoofActor;
+
+	bool bNewFloorStart;
 };

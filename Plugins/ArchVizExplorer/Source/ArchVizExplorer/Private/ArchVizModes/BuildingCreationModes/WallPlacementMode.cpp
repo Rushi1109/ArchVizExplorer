@@ -19,7 +19,7 @@ void UWallPlacementMode::Setup() {
 
 void UWallPlacementMode::Cleanup() {
 	if (IsValid(WallActor)) {
-		if((WallActor->GetState() == EBuildingActorState::Previewing) || (WallActor->GetState() == EBuildingActorState::Generating)) {
+		if ((WallActor->GetState() == EBuildingActorState::Previewing) || (WallActor->GetState() == EBuildingActorState::Generating)) {
 			WallActor->DestroyActor();
 		}
 		else if (WallActor->GetState() == EBuildingActorState::Moving) {
@@ -30,25 +30,25 @@ void UWallPlacementMode::Cleanup() {
 
 void UWallPlacementMode::SetupInputMapping() {
 	if (IsValid(PlayerController)) {
-		UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
+		if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerController->InputComponent)) {
+			UInputAction* LeftClickAction = NewObject<UInputAction>(this);
+			LeftClickAction->ValueType = EInputActionValueType::Boolean;
 
-		UInputAction* LeftClickAction = NewObject<UInputAction>(this);
-		LeftClickAction->ValueType = EInputActionValueType::Boolean;
+			UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
+			RKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
-		UInputAction* RKeyPressAction = NewObject<UInputAction>(this);
-		RKeyPressAction->ValueType = EInputActionValueType::Boolean;
+			UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
+			MKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
-		UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
-		MKeyPressAction->ValueType = EInputActionValueType::Boolean;
+			InputMappingContext = NewObject<UInputMappingContext>(this);
+			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
+			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
+			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
 
-		InputMappingContext = NewObject<UInputMappingContext>(this);
-		InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
-		InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
-		InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
-
-		EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleLeftClickAction);
-		EnhancedInputComponent->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleRKeyPressAction);
-		EnhancedInputComponent->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleMKeyPressAction);
+			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleLeftClickAction);
+			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleRKeyPressAction);
+			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleMKeyPressAction);
+		}
 	}
 }
 
@@ -72,59 +72,67 @@ void UWallPlacementMode::ExitSubMode() {
 	}
 }
 
+void UWallPlacementMode::HandleFreeState() {
+	FHitResult HitResult = GetHitResult();
+	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
+
+	if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+		WallActor = Cast<AWallActor>(HitResult.GetActor());
+		WallActor->SetState(EBuildingActorState::Selected);
+
+		WallActor->ShowPropertyPanel();
+	}
+	else {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
+		WallActor->GenerateSegments();
+		WallActor->SetState(EBuildingActorState::Previewing);
+		SubModeState = EBuildingSubModeState::NewEntity;
+
+		// Material
+	}
+}
+
+void UWallPlacementMode::HandleOldEntityState() {
+	SubModeState = EBuildingSubModeState::Free;
+	WallActor->SetState(EBuildingActorState::Selected);
+}
+
+void UWallPlacementMode::HandleNewEntityState() {
+	if (IsValid(WallActor)) {
+		FHitResult HitResult = GetHitResult(TArray<AActor*>{WallActor});
+		HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
+
+		if (!bNewWallStart) {
+			bNewWallStart = true;
+
+			WallActor->SetStartLocation(HitResult.Location);
+			WallActor->SetActorLocation(HitResult.Location);
+			WallActor->SetState(EBuildingActorState::Generating);
+		}
+		else {
+			bNewWallStart = false;
+
+			WallActor->SetEndLocation(HitResult.Location);
+			WallActor->SetState(EBuildingActorState::Selected);
+			SubModeState = EBuildingSubModeState::Free;
+		}
+	}
+}
+
 void UWallPlacementMode::HandleLeftClickAction() {
 	if (IsValid(WallActorRef)) {
-		FHitResult HitResult;
-
 		switch (SubModeState) {
 		case EBuildingSubModeState::Free:
-			HitResult = GetHitResult();
-			HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
-
-			if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
-				WallActor = Cast<AWallActor>(HitResult.GetActor());
-				WallActor->SetState(EBuildingActorState::Selected);
-
-				WallActor->ShowPropertyPanel();
-			}
-			else {
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-				WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, SpawnParams);
-				WallActor->GenerateSegments();
-				WallActor->SetState(EBuildingActorState::Previewing);
-				SubModeState = EBuildingSubModeState::NewEntity;
-
-				// Material
-			}
+			HandleFreeState();
 			break;
 		case EBuildingSubModeState::OldEntity:
-			SubModeState = EBuildingSubModeState::Free;
-			WallActor->SetState(EBuildingActorState::Selected);
+			HandleOldEntityState();
 			break;
 		case EBuildingSubModeState::NewEntity:
-			if (IsValid(WallActor)) {
-				HitResult = GetHitResult(TArray<AActor*>{WallActor});
-				HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
-
-				if (!bNewWallStart) {
-					bNewWallStart = true;
-
-					WallActor->SetStartLocation(HitResult.Location);
-					WallActor->SetActorLocation(HitResult.Location);
-					WallActor->SetState(EBuildingActorState::Generating);
-				}
-				else {
-					bNewWallStart = false;
-
-					WallActor->SetEndLocation(HitResult.Location);
-					WallActor->SetState(EBuildingActorState::Selected);
-					SubModeState = EBuildingSubModeState::Free;
-				}
-			}
-			break;
-		default:
+			HandleNewEntityState();
 			break;
 		}
 	}
