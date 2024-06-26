@@ -45,4 +45,5 @@ private:
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
+	void UpdateFloorDimensionSlider();
 };

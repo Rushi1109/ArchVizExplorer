@@ -37,6 +37,17 @@ private:
 	void HandleMKeyPressAction();
 	void HandleOKeyPressAction();
 
+	void BindWidgetDelegates();
+
+	UFUNCTION()
+	void HandleNewButtonClick();
+
+	UFUNCTION()
+	void HandleDeleteButtonClick();
+
+	UFUNCTION()
+	void HandleClosePanelButtonClick();
+
 	UPROPERTY()
 	ADoorActor* DoorActor;
 };

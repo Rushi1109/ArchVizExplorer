@@ -5,6 +5,7 @@
 #include "ProceduralMeshComponent.h"
 #include "Utilities/ArchVizUtility.h"
 #include "ProceduralMeshGenerator.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 // Sets default values
 AFloorActor::AFloorActor() {
@@ -27,6 +28,10 @@ AFloorActor::AFloorActor() {
 void AFloorActor::BeginPlay() {
 	Super::BeginPlay();
 
+	if (IsValid(PropertyPanelRef)) {
+		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(2);
+	}
 }
 
 // Called every frame
@@ -100,24 +105,32 @@ void AFloorActor::HandleGeneratingState() {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
 	}
 
-	FVector NewStartLocation{ StartLocation };
+	//FVector NewStartLocation{ StartLocation };
 
-	if (XFloorLength >= 0.0) {
-		NewStartLocation.X -= EdgeOffset;
-	}
-	else {
-		NewStartLocation.X += EdgeOffset;
-	}
-	if (YFloorLength >= 0.0) {
-		NewStartLocation.Y -= EdgeOffset;
-	}
-	else {
-		NewStartLocation.Y += EdgeOffset;
-	}
+	//if (XFloorLength >= 0.0) {
+	//	NewStartLocation.X -= EdgeOffset;
+	//}
+	//else {
+	//	NewStartLocation.X += EdgeOffset;
+	//}
+	//if (YFloorLength >= 0.0) {
+	//	NewStartLocation.Y -= EdgeOffset;
+	//}
+	//else {
+	//	NewStartLocation.Y += EdgeOffset;
+	//}
 
-	SetActorLocation(NewStartLocation);
+	//SetActorLocation(NewStartLocation);
 
 	GenerateFloor(Dimensions, Offset);
+}
+
+void AFloorActor::UpdateFloorDimensionSlider() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->FloorLengthSpinBox->SetValue(FMath::Abs(EndLocation.X - StartLocation.X));
+		PropertyPanel->FloorWidthSpinBox->SetValue(FMath::Abs(EndLocation.Y - StartLocation.Y));
+		PropertyPanel->FloorHeightSpinBox->SetValue(FMath::Abs(2));
+	}
 }
 
 void AFloorActor::SetStartLocation(const FVector& NewStartLocation) {

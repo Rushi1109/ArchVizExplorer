@@ -7,6 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "Utilities/ArchVizUtility.h"
 #include "Actors/BuildingCreation/WallActor.h"
+#include "ProceduralMeshComponent.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 URoofPlacementMode::URoofPlacementMode() {}
 
@@ -21,9 +23,10 @@ void URoofPlacementMode::Cleanup() {
 		if ((RoofActor->GetState() == EBuildingActorState::Previewing) || (RoofActor->GetState() == EBuildingActorState::Generating)) {
 			RoofActor->DestroyActor();
 		}
-		else if (RoofActor->GetState() == EBuildingActorState::Moving) {
-			RoofActor->SetState(EBuildingActorState::Selected);
+		else {
+			RoofActor->SetState(EBuildingActorState::None);
 		}
+		RoofActor = nullptr;
 	}
 }
 
@@ -75,6 +78,11 @@ void URoofPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
+	if (RoofActor) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor = nullptr;
+	}
+
 	if (HitResult.GetActor() && HitResult.GetActor()->IsA(ARoofActor::StaticClass())) {
 		RoofActor = Cast<ARoofActor>(HitResult.GetActor());
 		RoofActor->SetState(EBuildingActorState::Selected);
@@ -87,6 +95,9 @@ void URoofPlacementMode::HandleFreeState() {
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		RoofActor = GetWorld()->SpawnActor<ARoofActor>(RoofActorRef, SpawnParams);
+
+		BindWidgetDelegates();
+
 		RoofActor->GenerateRoof(FVector{ 100, 100, 10 }, FVector{ 50, 50, 5 });
 		RoofActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
@@ -117,6 +128,7 @@ void URoofPlacementMode::HandleNewEntityState() {
 				bNewFloorStart = false;
 
 				RoofActor->SetEndLocation(HitResult.Location);
+				RoofActor->UpdateRoofDimensionSlider();
 				RoofActor->SetState(EBuildingActorState::Selected);
 				SubModeState = EBuildingSubModeState::Free;
 			}
@@ -150,5 +162,77 @@ void URoofPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(RoofActor)) {
 		RoofActor->SetState(EBuildingActorState::Moving);
 		SubModeState = EBuildingSubModeState::OldEntity;
+	}
+}
+
+void URoofPlacementMode::BindWidgetDelegates() {
+	if (IsValid(RoofActor) && IsValid(RoofActor->PropertyPanel)) {
+		RoofActor->PropertyPanel->NewRoofButton->OnClicked.AddDynamic(this, &URoofPlacementMode::HandleNewButtonClick);
+		RoofActor->PropertyPanel->DeleteRoofButton->OnClicked.AddDynamic(this, &URoofPlacementMode::HandleDeleteButtonClick);
+		RoofActor->PropertyPanel->ClosePanelRoofButton->OnClicked.AddDynamic(this, &URoofPlacementMode::HandleClosePanelButtonClick);
+		RoofActor->PropertyPanel->RoofLengthSpinBox->OnValueChanged.AddDynamic(this, &URoofPlacementMode::HandleDimensionSliderValueChange);
+		RoofActor->PropertyPanel->RoofWidthSpinBox->OnValueChanged.AddDynamic(this, &URoofPlacementMode::HandleDimensionSliderValueChange);
+		RoofActor->PropertyPanel->RoofHeightSpinBox->OnValueChanged.AddDynamic(this, &URoofPlacementMode::HandleDimensionSliderValueChange);
+	}
+}
+
+void URoofPlacementMode::HandleNewButtonClick() {
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor = nullptr;
+
+		if (IsValid(RoofActorRef)) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			RoofActor = GetWorld()->SpawnActor<ARoofActor>(RoofActorRef, SpawnParams);
+
+			BindWidgetDelegates();
+
+			RoofActor->GenerateRoof(FVector{ 100, 100, 10 }, FVector{ 50, 50, 5 });
+			RoofActor->SetState(EBuildingActorState::Previewing);
+			SubModeState = EBuildingSubModeState::NewEntity;
+		}
+	}
+}
+
+void URoofPlacementMode::HandleDeleteButtonClick() {
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor->DestroyActor();
+		RoofActor = nullptr;
+	}
+}
+
+void URoofPlacementMode::HandleClosePanelButtonClick() {
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor = nullptr;
+	}
+}
+
+void URoofPlacementMode::HandleDimensionSliderValueChange(float InValue) {
+	if (IsValid(RoofActor) && IsValid(RoofActor->PropertyPanel)) {
+
+		float RoofLength = RoofActor->PropertyPanel->RoofLengthSpinBox->GetValue();
+		float RoofWidth = RoofActor->PropertyPanel->RoofWidthSpinBox->GetValue();
+		float RoofHeight = RoofActor->PropertyPanel->RoofHeightSpinBox->GetValue();
+
+		double EdgeOffset{ 10.0 };
+
+		double XFloorLength = RoofActor->GetEndLocation().X - RoofActor->GetStartLocation().X;
+		double YFloorLength = RoofActor->GetEndLocation().Y - RoofActor->GetStartLocation().Y;
+
+		FVector RoofDimensions{ RoofLength + (2 * EdgeOffset), RoofWidth + (2 * EdgeOffset), RoofHeight };
+		FVector Offset{ RoofLength / 2, RoofWidth / 2, RoofHeight / 2 };
+
+		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
+			Offset.Z *= -1.0;
+		}
+		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
+			Offset.Z *= -1.0;
+		}
+
+		RoofActor->GenerateRoof( RoofDimensions, Offset);
 	}
 }

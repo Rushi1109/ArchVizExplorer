@@ -20,6 +20,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UWidgetSwitcher* WidgetSwitcher;
 
+	// Wall Grid
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	USpinBox* WallLengthSpinBox;
 
@@ -28,4 +29,56 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UButton* DeleteWallButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClosePanelWallButton;
+
+	// Door Grid
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* NewDoorButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* DeleteDoorButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClosePanelDoorButton;
+
+
+	// Floor Grid
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* FloorLengthSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* FloorWidthSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* FloorHeightSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* NewFloorButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* DeleteFloorButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClosePanelFloorButton;
+
+	// Roof Grid
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* RoofLengthSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* RoofWidthSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* RoofHeightSpinBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* NewRoofButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* DeleteRoofButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClosePanelRoofButton;
 };

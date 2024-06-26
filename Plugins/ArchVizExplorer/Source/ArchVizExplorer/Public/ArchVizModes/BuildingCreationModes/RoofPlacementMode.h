@@ -39,6 +39,20 @@ private:
 	void HandleRKeyPressAction();
 	void HandleMKeyPressAction();
 
+	void BindWidgetDelegates();
+
+	UFUNCTION()
+	void HandleNewButtonClick();
+
+	UFUNCTION()
+	void HandleDeleteButtonClick();
+
+	UFUNCTION()
+	void HandleClosePanelButtonClick();
+
+	UFUNCTION()
+	void HandleDimensionSliderValueChange(float InValue);
+
 	ARoofActor* RoofActor;
 
 	bool bNewFloorStart;

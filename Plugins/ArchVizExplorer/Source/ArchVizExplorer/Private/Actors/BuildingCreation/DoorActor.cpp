@@ -3,6 +3,7 @@
 
 #include "Actors/BuildingCreation/DoorActor.h"
 #include "Actors/BuildingCreation/WallActor.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 ADoorActor::ADoorActor() : DoorFrameMesh{nullptr}, DoorMesh{nullptr} {
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,6 +26,11 @@ void ADoorActor::BeginPlay() {
 	}
 	if (IsValid(DoorMesh)) {
 		DoorComponent->SetStaticMesh(DoorMesh);
+	}
+
+	if (IsValid(PropertyPanelRef)) {
+		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(1);
 	}
 }
 

@@ -35,6 +35,8 @@ public:
 	void SetEndLocation(const FVector& NewEndLocation); 
 	const FVector& GetEndLocation();
 
+	void UpdateRoofDimensionSlider();
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Floor")
 	UProceduralMeshComponent* ProceduralMeshComponent;

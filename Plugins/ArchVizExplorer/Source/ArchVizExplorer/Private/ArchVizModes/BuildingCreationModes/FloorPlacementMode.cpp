@@ -5,6 +5,7 @@
 #include "Actors/BuildingCreation/FloorActor.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Widgets/PropertyPanelWidget.h"
 #include "Utilities/ArchVizUtility.h"
 
 UFloorPlacementMode::UFloorPlacementMode() {}
@@ -20,9 +21,10 @@ void UFloorPlacementMode::Cleanup() {
 		if ((FloorActor->GetState() == EBuildingActorState::Previewing) || (FloorActor->GetState() == EBuildingActorState::Generating)) {
 			FloorActor->DestroyActor();
 		}
-		else if (FloorActor->GetState() == EBuildingActorState::Moving) {
-			FloorActor->SetState(EBuildingActorState::Selected);
+		else {
+			FloorActor->SetState(EBuildingActorState::None);
 		}
+		FloorActor = nullptr;
 	}
 }
 
@@ -74,7 +76,12 @@ void UFloorPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
-	if (HitResult.GetActor() && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
+	if (IsValid(FloorActor)) {
+		FloorActor->SetState(EBuildingActorState::None);
+		FloorActor = nullptr;
+	}
+
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
 		FloorActor = Cast<AFloorActor>(HitResult.GetActor());
 		FloorActor->SetState(EBuildingActorState::Selected);
 
@@ -86,6 +93,9 @@ void UFloorPlacementMode::HandleFreeState() {
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, SpawnParams);
+
+		BindWidgetDelegates();
+
 		FloorActor->GenerateFloor(FVector{ 100, 100, 2 }, FVector{ 50, 50, 1 });
 		FloorActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
@@ -115,6 +125,7 @@ void UFloorPlacementMode::HandleNewEntityState() {
 			bNewFloorStart = false;
 
 			FloorActor->SetEndLocation(HitResult.Location);
+			FloorActor->UpdateFloorDimensionSlider();
 			FloorActor->SetState(EBuildingActorState::Selected);
 			SubModeState = EBuildingSubModeState::Free;
 		}
@@ -147,5 +158,77 @@ void UFloorPlacementMode::HandleMKeyPressAction() {
 	if (IsValid(FloorActor)) {
 		FloorActor->SetState(EBuildingActorState::Moving);
 		SubModeState = EBuildingSubModeState::OldEntity;
+	}
+}
+
+void UFloorPlacementMode::BindWidgetDelegates() {
+	if (IsValid(FloorActor) && IsValid(FloorActor->PropertyPanel)) {
+		FloorActor->PropertyPanel->NewFloorButton->OnClicked.AddDynamic(this, &UFloorPlacementMode::HandleNewButtonClick);
+		FloorActor->PropertyPanel->DeleteFloorButton->OnClicked.AddDynamic(this, &UFloorPlacementMode::HandleDeleteButtonClick);
+		FloorActor->PropertyPanel->ClosePanelFloorButton->OnClicked.AddDynamic(this, &UFloorPlacementMode::HandleClosePanelButtonClick);
+		FloorActor->PropertyPanel->FloorLengthSpinBox->OnValueChanged.AddDynamic(this, &UFloorPlacementMode::HandleDimensionSliderValueChange);
+		FloorActor->PropertyPanel->FloorWidthSpinBox->OnValueChanged.AddDynamic(this, &UFloorPlacementMode::HandleDimensionSliderValueChange);
+		FloorActor->PropertyPanel->FloorHeightSpinBox->OnValueChanged.AddDynamic(this, &UFloorPlacementMode::HandleDimensionSliderValueChange);
+	}
+}
+
+void UFloorPlacementMode::HandleNewButtonClick() {
+	if (IsValid(FloorActor)) {
+		FloorActor->SetState(EBuildingActorState::None);
+		FloorActor = nullptr;
+
+		if (IsValid(FloorActorRef)) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, SpawnParams);
+
+			BindWidgetDelegates();
+
+			FloorActor->GenerateFloor(FVector{ 100, 100, 2 }, FVector{ 50, 50, 1 });
+			FloorActor->SetState(EBuildingActorState::Previewing);
+			SubModeState = EBuildingSubModeState::NewEntity;
+		}
+	}
+}
+
+void UFloorPlacementMode::HandleDeleteButtonClick() {
+	if (IsValid(FloorActor)) {
+		FloorActor->SetState(EBuildingActorState::None);
+		FloorActor->DestroyActor();
+		FloorActor = nullptr;
+	}
+}
+
+void UFloorPlacementMode::HandleClosePanelButtonClick() {
+	if (IsValid(FloorActor)) {
+		FloorActor->SetState(EBuildingActorState::None);
+		FloorActor = nullptr;
+	}
+}
+
+void UFloorPlacementMode::HandleDimensionSliderValueChange(float InValue) {
+	if (IsValid(FloorActor) && IsValid(FloorActor->PropertyPanel)) {
+
+		float FloorLength = FloorActor->PropertyPanel->FloorLengthSpinBox->GetValue();
+		float FloorWidth = FloorActor->PropertyPanel->FloorWidthSpinBox->GetValue();
+		float FloorHeight = FloorActor->PropertyPanel->FloorHeightSpinBox->GetValue();
+
+		double EdgeOffset{ 10.0 };
+
+		double XFloorLength = FloorActor->GetEndLocation().X - FloorActor->GetStartLocation().X;
+		double YFloorLength = FloorActor->GetEndLocation().Y - FloorActor->GetStartLocation().Y;
+
+		FVector RoofDimensions{ FloorLength + (2 * EdgeOffset), FloorWidth + (2 * EdgeOffset), FloorHeight };
+		FVector Offset{ FloorLength / 2, FloorWidth / 2, FloorHeight / 2 };
+
+		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
+			Offset.Z *= -1.0;
+		}
+		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
+			Offset.Z *= -1.0;
+		}
+
+		FloorActor->GenerateFloor(RoofDimensions, Offset);
 	}
 }

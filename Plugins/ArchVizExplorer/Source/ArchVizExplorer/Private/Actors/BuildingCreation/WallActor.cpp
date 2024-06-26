@@ -6,6 +6,7 @@
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "Utilities/ArchVizUtility.h"
 #include "Actors/BuildingCreation/DoorActor.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 // Sets default values
 AWallActor::AWallActor() : WallMesh{nullptr}, DoorAttachableWallMesh{nullptr} {
@@ -21,7 +22,8 @@ void AWallActor::BeginPlay() {
 	Super::BeginPlay();
 
 	if (IsValid(PropertyPanelRef)) {
-		PropertyPanel = CreateWidget<UUserWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(0);
 	}
 }
 
@@ -158,6 +160,20 @@ void AWallActor::AdjustEdgeOffset() {
 	}
 	else if (ActorRotation.Yaw >= -95.0 && ActorRotation.Yaw <= -85.0) {
 		SetActorLocation(FVector{ StartLocation.X, StartLocation.Y - 10, StartLocation.Z });
+	}
+}
+
+void AWallActor::UpdateWallLenghSlider() {
+	if (IsValid(PropertyPanel)) {
+		double XDistance = FMath::Abs(EndLocation.X - StartLocation.X);
+		double YDistance = FMath::Abs(EndLocation.Y - StartLocation.Y);
+
+		if (XDistance >= YDistance) {
+			PropertyPanel->WallLengthSpinBox->SetValue(XDistance);
+		}
+		else {
+			PropertyPanel->WallLengthSpinBox->SetValue(YDistance);
+		}
 	}
 }
 

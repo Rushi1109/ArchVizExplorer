@@ -5,6 +5,7 @@
 #include "ProceduralMeshComponent.h"
 #include "Utilities/ArchVizUtility.h"
 #include "ProceduralMeshGenerator.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 // Sets default values
 ARoofActor::ARoofActor() {
@@ -22,6 +23,10 @@ ARoofActor::ARoofActor() {
 void ARoofActor::BeginPlay() {
 	Super::BeginPlay();
 
+	if (IsValid(PropertyPanelRef)) {
+		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
+		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(3);
+	}
 }
 
 // Called every frame
@@ -78,7 +83,7 @@ void ARoofActor::HandleGeneratingState() {
 	double EdgeOffset{10.0};
 
 	FVector Dimensions{ FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 20 };
-	FVector Offset{ Dimensions / 2 };
+	FVector Offset{ FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength) / 2, 10 };
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
@@ -95,24 +100,32 @@ void ARoofActor::HandleGeneratingState() {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
 	}
 
-	FVector NewStartLocation{StartLocation};
+	//FVector NewStartLocation{StartLocation};
 
-	if (XFloorLength >= 0.0) {
-		NewStartLocation.X -= EdgeOffset;
-	}
-	else {
-		NewStartLocation.X += EdgeOffset;
-	}
-	if (YFloorLength >= 0.0) {
-		NewStartLocation.Y -= EdgeOffset;
-	}
-	else {
-		NewStartLocation.Y += EdgeOffset;
-	}
+	//if (XFloorLength >= 0.0) {
+	//	NewStartLocation.X -= EdgeOffset;
+	//}
+	//else {
+	//	NewStartLocation.X += EdgeOffset;
+	//}
+	//if (YFloorLength >= 0.0) {
+	//	NewStartLocation.Y -= EdgeOffset;
+	//}
+	//else {
+	//	NewStartLocation.Y += EdgeOffset;
+	//}
 
-	SetActorLocation(NewStartLocation);
+	//SetActorLocation(NewStartLocation);
 
 	GenerateRoof(Dimensions, Offset);
+}
+
+void ARoofActor::UpdateRoofDimensionSlider() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->RoofLengthSpinBox->SetValue(FMath::Abs(EndLocation.X - StartLocation.X));
+		PropertyPanel->RoofWidthSpinBox->SetValue(FMath::Abs(EndLocation.Y - StartLocation.Y));
+		PropertyPanel->RoofHeightSpinBox->SetValue(FMath::Abs(20));
+	}
 }
 
 void ARoofActor::SetStartLocation(const FVector& NewStartLocation) {

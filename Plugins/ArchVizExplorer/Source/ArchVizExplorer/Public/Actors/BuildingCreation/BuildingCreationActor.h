@@ -15,6 +15,8 @@ enum class EBuildingActorState : uint8 {
 	Moving
 };
 
+class UPropertyPanelWidget;
+
 /**
  *
  */
@@ -26,7 +28,7 @@ public:
 	ABuildingCreationActor();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
-	TSubclassOf<UUserWidget> PropertyPanelRef;
+	TSubclassOf<UPropertyPanelWidget> PropertyPanelRef;
 
 	EBuildingActorState GetState();
 	void SetState(EBuildingActorState NewState);
@@ -34,7 +36,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
-	UUserWidget* PropertyPanel;
+	UPropertyPanelWidget* PropertyPanel;
 
 	EBuildingActorState State;
 

@@ -39,7 +39,7 @@ private:
 	void HandleRKeyPressAction();
 	void HandleMKeyPressAction();
 
-	void BindWidgetButtons();
+	void BindWidgetDelegates();
 
 	UFUNCTION()
 	void HandleNewButtonClick();
@@ -48,9 +48,10 @@ private:
 	void HandleDeleteButtonClick();
 
 	UFUNCTION()
-	void HandleLengthSliderValueChange(float InValue);
+	void HandleClosePanelButtonClick();
 
-	void UpdateWallLenghSlider();
+	UFUNCTION()
+	void HandleLengthSliderValueChange(float InValue);
 
 	AWallActor* WallActor;
 

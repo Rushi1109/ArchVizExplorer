@@ -2,7 +2,7 @@
 
 
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
-#include "UMG/Public/Blueprint/UserWidget.h"
+#include "Widgets/PropertyPanelWidget.h"
 
 ABuildingCreationActor::ABuildingCreationActor() : State{ EBuildingActorState::None } {
 	PrimaryActorTick.bCanEverTick = true;

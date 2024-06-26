@@ -57,4 +57,5 @@ private:
 	void HandleMovingState();
 	void HandleGeneratingState();
 	void AdjustEdgeOffset();
+	void UpdateWallLenghSlider();
 };
