@@ -7,6 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "Utilities/ArchVizUtility.h"
 #include "Actors/BuildingCreation/WallActor.h"
+#include "Actors/BuildingCreation/DoorActor.h"
+#include "Actors/BuildingCreation/FloorActor.h"
 #include "ProceduralMeshComponent.h"
 #include "Widgets/PropertyPanelWidget.h"
 
@@ -80,6 +82,19 @@ void URoofPlacementMode::SetupInputMapping() {
 	}
 }
 
+void URoofPlacementMode::SetCurrentRoofActor(ARoofActor* Actor) {
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor = nullptr;
+	}
+
+	RoofActor = Actor;
+
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::Selected);
+	}
+}
+
 void URoofPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
@@ -89,12 +104,18 @@ void URoofPlacementMode::HandleFreeState() {
 		RoofActor = nullptr;
 	}
 
-	if (HitResult.GetActor() && HitResult.GetActor()->IsA(ARoofActor::StaticClass())) {
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ARoofActor::StaticClass())) {
 		RoofActor = Cast<ARoofActor>(HitResult.GetActor());
 		RoofActor->SetState(EBuildingActorState::Selected);
-
-		// TODO:: Widget
-		RoofActor->ShowPropertyPanel();
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ADoorActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::DoorPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::FloorPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::WallPlacement, HitResult.GetActor());
 	}
 	else {
 		FActorSpawnParameters SpawnParams;

@@ -2,36 +2,49 @@
 
 
 #include "ArchVizModes/BuildingCreationMode.h"
+#include "Actors/BuildingCreation/WallActor.h"
+#include "Actors/BuildingCreation/DoorActor.h"
+#include "Actors/BuildingCreation/RoofActor.h"
+#include "Actors/BuildingCreation/FloorActor.h"
 
-UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{ nullptr }, BuildingModeEntity{ EBuildingModeEntity::None } {}
+UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{ nullptr }, BuildingModeEntity{ EBuildingModeEntity::WallPlacement }, WallPlacementMode{ nullptr }, DoorPlacementMode{ nullptr }, RoofPlacementMode{ nullptr }, FloorPlacementMode{ nullptr } {}
 
 void UBuildingCreationMode::Setup() {
+	if (IsValid(WidgetRef)) {
+		Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetRef, TEXT("Building Creation Widget"));
+		if (auto* BuildingCreationWidget = Cast<UBuildingCreationWidget>(Widget)) {
+			BuildingCreationWidget->OnBuildingModeEntityChange.AddUObject(this, &UBuildingCreationMode::HandleBuildingSubModeChange);
+		}
+	}
+
 	if (IsValid(WallPlacementModeRef)) {
 		WallPlacementMode = NewObject<UWallPlacementMode>(this, WallPlacementModeRef);
 		WallPlacementMode->InitParams(PlayerController);
 		WallPlacementMode->Setup();
+		WallPlacementMode->OnOtherBuildingActorSelected.BindUObject(this, &UBuildingCreationMode::HandleBuildingActorSelected);
 	}
 	if (IsValid(DoorPlacementModeRef)) {
 		DoorPlacementMode = NewObject<UDoorPlacementMode>(this, DoorPlacementModeRef);
 		DoorPlacementMode->InitParams(PlayerController);
 		DoorPlacementMode->Setup();
+		DoorPlacementMode->OnOtherBuildingActorSelected.BindUObject(this, &UBuildingCreationMode::HandleBuildingActorSelected);
 	}
 	if (IsValid(FloorPlacementModeRef)) {
 		FloorPlacementMode = NewObject<UFloorPlacementMode>(this, FloorPlacementModeRef);
 		FloorPlacementMode->InitParams(PlayerController);
 		FloorPlacementMode->Setup();
+		FloorPlacementMode->OnOtherBuildingActorSelected.BindUObject(this, &UBuildingCreationMode::HandleBuildingActorSelected);
 	}
 	if (IsValid(RoofPlacementModeRef)) {
 		RoofPlacementMode = NewObject<URoofPlacementMode>(this, RoofPlacementModeRef);
 		RoofPlacementMode->InitParams(PlayerController);
 		RoofPlacementMode->Setup();
+		RoofPlacementMode->OnOtherBuildingActorSelected.BindUObject(this, &UBuildingCreationMode::HandleBuildingActorSelected);
 	}
 
-	if (IsValid(WidgetRef)) {
-		Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetRef, TEXT("Building Creation Widget"));
-		if(auto* BuildingCreationWidget = Cast<UBuildingCreationWidget>(Widget)) {
-			BuildingCreationWidget->OnBuildingModeEntityChange.AddUObject(this, &UBuildingCreationMode::HandleBuildingSubModeChange);
-		}
+	if (IsValid(WallPlacementMode)) {
+		BuildingModeEntity = EBuildingModeEntity::WallPlacement;
+		CurrentBuildingCreationSubMode = WallPlacementMode;
 	}
 }
 
@@ -51,13 +64,19 @@ void UBuildingCreationMode::HandleBuildingSubModeChange(EBuildingModeEntity NewB
 	BuildingModeEntity = NewBuildingModeEntity;
 
 	UpdateBuildingModeEntity();
+
+	if (UBuildingCreationWidget* BuildingWidget = Cast<UBuildingCreationWidget>(Widget)) {
+		BuildingWidget->HighlightSelectedColour(NewBuildingModeEntity);
+	}
+}
+
+void UBuildingCreationMode::HandleBuildingActorSelected(EBuildingModeEntity NewBuildingModeEntity, AActor* Actor) {
+	HandleBuildingSubModeChange(NewBuildingModeEntity);
+	UpdateSelectedActor(Actor);
 }
 
 void UBuildingCreationMode::UpdateBuildingModeEntity() {
 	switch (BuildingModeEntity) {
-	case EBuildingModeEntity::None:
-		CurrentBuildingCreationSubMode = nullptr;
-		break;
 	case EBuildingModeEntity::WallPlacement:
 		SetSubMode(WallPlacementMode);
 		break;
@@ -69,6 +88,39 @@ void UBuildingCreationMode::UpdateBuildingModeEntity() {
 		break;
 	case EBuildingModeEntity::RoofPlacement:
 		SetSubMode(RoofPlacementMode);
+		break;
+	}
+}
+
+void UBuildingCreationMode::UpdateSelectedActor(AActor* Actor) {
+	switch (BuildingModeEntity) {
+	case EBuildingModeEntity::WallPlacement:
+		if (auto* WallActor = Cast<AWallActor>(Actor)) {
+			if (IsValid(WallPlacementMode)) {
+				WallPlacementMode->SetCurrentWallActor(WallActor);
+			}
+		}
+		break;
+	case EBuildingModeEntity::DoorPlacement:
+		if (auto* DoorActor = Cast<ADoorActor>(Actor)) {
+			if (IsValid(DoorPlacementMode)) {
+				DoorPlacementMode->SetCurrentDoorActor(DoorActor);
+			}
+		}
+		break;
+	case EBuildingModeEntity::FloorPlacement:
+		if (auto* FloorActor = Cast<AFloorActor>(Actor)) {
+			if (IsValid(FloorPlacementMode)) {
+				FloorPlacementMode->SetCurrentFloorActor(FloorActor);
+			}
+		}
+		break;
+	case EBuildingModeEntity::RoofPlacement:
+		if (auto* RoofActor = Cast<ARoofActor>(Actor)) {
+			if (IsValid(RoofPlacementMode)) {
+				RoofPlacementMode->SetCurrentRoofActor(RoofActor);
+			}
+		}
 		break;
 	}
 }
@@ -90,11 +142,14 @@ void UBuildingCreationMode::SetupInputMapping() {
 
 void UBuildingCreationMode::EnterMode() {
 	ShowWidget();
+	if (CurrentBuildingCreationSubMode) {
+		CurrentBuildingCreationSubMode->EnterSubMode();
+	}
 }
 
 void UBuildingCreationMode::ExitMode() {
+	HideWidget();
 	if (CurrentBuildingCreationSubMode) {
 		CurrentBuildingCreationSubMode->ExitSubMode();
 	}
-	HideWidget();
 }

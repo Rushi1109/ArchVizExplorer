@@ -35,3 +35,107 @@ void UBuildingCreationWidget::HandleFloorEntityButtonClick() {
 void UBuildingCreationWidget::HandleRoofEntityButtonClick() {
 	OnBuildingModeEntityChange.Broadcast(EBuildingModeEntity::RoofPlacement);
 }
+
+void UBuildingCreationWidget::HighlightSelectedColour(EBuildingModeEntity NewBuildingModeEntity) {
+	switch (NewBuildingModeEntity) {
+	case EBuildingModeEntity::WallPlacement:
+		if (IsValid(WallButton)) {
+			FButtonStyle ButtonStyle = WallButton->GetStyle();
+			SetHighlightedTint(ButtonStyle);
+			WallButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(DoorButton)) {
+			FButtonStyle ButtonStyle = DoorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			DoorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(FloorButton)) {
+			FButtonStyle ButtonStyle = FloorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			FloorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(RoofButton)) {
+			FButtonStyle ButtonStyle = RoofButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			RoofButton->SetStyle(ButtonStyle);
+		}
+		break;
+	case EBuildingModeEntity::DoorPlacement:
+		if (IsValid(WallButton)) {
+			FButtonStyle ButtonStyle = WallButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			WallButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(DoorButton)) {
+			FButtonStyle ButtonStyle = DoorButton->GetStyle();
+			SetHighlightedTint(ButtonStyle);
+			DoorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(FloorButton)) {
+			FButtonStyle ButtonStyle = FloorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			FloorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(RoofButton)) {
+			FButtonStyle ButtonStyle = RoofButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			RoofButton->SetStyle(ButtonStyle);
+		}
+		break;
+	case EBuildingModeEntity::FloorPlacement:
+		if (IsValid(WallButton)) {
+			FButtonStyle ButtonStyle = WallButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			WallButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(DoorButton)) {
+			FButtonStyle ButtonStyle = DoorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			DoorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(FloorButton)) {
+			FButtonStyle ButtonStyle = FloorButton->GetStyle();
+			SetHighlightedTint(ButtonStyle);
+			FloorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(RoofButton)) {
+			FButtonStyle ButtonStyle = RoofButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			RoofButton->SetStyle(ButtonStyle);
+		}
+		break;
+	case EBuildingModeEntity::RoofPlacement:
+		if (IsValid(WallButton)) {
+			FButtonStyle ButtonStyle = WallButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			WallButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(DoorButton)) {
+			FButtonStyle ButtonStyle = DoorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			DoorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(FloorButton)) {
+			FButtonStyle ButtonStyle = FloorButton->GetStyle();
+			SetNormalTint(ButtonStyle);
+			FloorButton->SetStyle(ButtonStyle);
+		}
+		if (IsValid(RoofButton)) {
+			FButtonStyle ButtonStyle = RoofButton->GetStyle();
+			SetHighlightedTint(ButtonStyle);
+			RoofButton->SetStyle(ButtonStyle);
+		}
+		break;
+	}
+}
+
+
+void UBuildingCreationWidget::SetNormalTint(FButtonStyle& ButtonStyle) {
+	FSlateColor NewNormalTint = FSlateColor(FLinearColor(1.f, 1.f, 1.f));
+	ButtonStyle.Normal.TintColor = NewNormalTint;
+}
+
+void UBuildingCreationWidget::SetHighlightedTint(FButtonStyle& ButtonStyle) {
+	FSlateColor NewNormalTint = FSlateColor(FLinearColor(0.3125f, 0.3125f, 0.3125f));
+	ButtonStyle.Normal.TintColor = NewNormalTint;
+}

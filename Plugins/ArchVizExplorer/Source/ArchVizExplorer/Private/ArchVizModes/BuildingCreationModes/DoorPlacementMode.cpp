@@ -6,6 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "Widgets/PropertyPanelWidget.h"
 #include "Actors/BuildingCreation/WallActor.h"
+#include "Actors/BuildingCreation/FloorActor.h"
+#include "Actors/BuildingCreation/RoofActor.h"
 
 void UDoorPlacementMode::Setup() {
 	DoorActor = nullptr;
@@ -81,6 +83,20 @@ void UDoorPlacementMode::SetupInputMapping() {
 	}
 }
 
+void UDoorPlacementMode::SetCurrentDoorActor(ADoorActor* Actor) {
+		if (IsValid(DoorActor)) {
+			DoorActor->SetState(EBuildingActorState::None);
+			DoorActor = nullptr;
+		}
+
+		DoorActor = Actor;
+
+		if (IsValid(DoorActor)) {
+			DoorActor->SetState(EBuildingActorState::Selected);
+		}
+
+}
+
 void UDoorPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 
@@ -92,7 +108,15 @@ void UDoorPlacementMode::HandleFreeState() {
 	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ADoorActor::StaticClass())) {
 		DoorActor = Cast<ADoorActor>(HitResult.GetActor());
 		DoorActor->SetState(EBuildingActorState::Selected);
-		//TODO:: Widget
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ARoofActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::RoofPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::FloorPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::WallPlacement, HitResult.GetActor());
 	}
 	else {
 		FActorSpawnParameters SpawnParams;

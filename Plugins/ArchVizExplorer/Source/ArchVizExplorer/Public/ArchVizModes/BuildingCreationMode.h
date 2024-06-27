@@ -36,7 +36,9 @@ public:
 	void SetSubMode(UBuildingCreationSubMode* NewSubMode);
 
 	void HandleBuildingSubModeChange(EBuildingModeEntity NewBuildingModeEntity);
+	void HandleBuildingActorSelected(EBuildingModeEntity NewBuildingModeEntity, AActor* Actor);
 	void UpdateBuildingModeEntity();
+	void UpdateSelectedActor(AActor* Actor);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingCreationMode | Wall")
 	TSubclassOf<UWallPlacementMode> WallPlacementModeRef;

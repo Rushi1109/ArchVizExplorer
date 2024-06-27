@@ -26,6 +26,7 @@ public:
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
+	void SetCurrentWallActor(AWallActor* Actor);
 protected:
 	virtual void HandleFreeState() override;
 	virtual void HandleOldEntityState() override;

@@ -20,6 +20,8 @@ class ARCHVIZEXPLORER_API UBuildingCreationWidget : public UUserWidget {
 public:
 	FOnBuildingModeEntityChange OnBuildingModeEntityChange;
 
+	void HighlightSelectedColour(EBuildingModeEntity NewBuildingModeEntity);
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -49,4 +51,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UButton* RoofButton;
+
+private:
+	void SetNormalTint(FButtonStyle& ButtonStyle);
+	void SetHighlightedTint(FButtonStyle& ButtonStyle);
 };

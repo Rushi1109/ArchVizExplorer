@@ -9,6 +9,9 @@
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 #include "Widgets/PropertyPanelWidget.h"
+#include "Actors/BuildingCreation/DoorActor.h"
+#include "Actors/BuildingCreation/FloorActor.h"
+#include "Actors/BuildingCreation/RoofActor.h"
 
 UWallPlacementMode::UWallPlacementMode() {}
 
@@ -61,6 +64,19 @@ void UWallPlacementMode::SetupInputMapping() {
 	}
 }
 
+void UWallPlacementMode::SetCurrentWallActor(AWallActor* Actor) {
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::None);
+		WallActor = nullptr;
+	}
+
+	WallActor = Actor;
+
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::Selected);
+	}
+}
+
 void UWallPlacementMode::EnterSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
@@ -90,11 +106,18 @@ void UWallPlacementMode::HandleFreeState() {
 		WallActor = nullptr;
 	}
 
-	if (HitResult.GetActor() && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
 		WallActor = Cast<AWallActor>(HitResult.GetActor());
 		WallActor->SetState(EBuildingActorState::Selected);
-
-		WallActor->ShowPropertyPanel();
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ADoorActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::DoorPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(AFloorActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::FloorPlacement, HitResult.GetActor());
+	}
+	else if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ARoofActor::StaticClass())) {
+		OnOtherBuildingActorSelected.ExecuteIfBound(EBuildingModeEntity::RoofPlacement, HitResult.GetActor());
 	}
 	else {
 		if (IsValid(WallActorRef)) {

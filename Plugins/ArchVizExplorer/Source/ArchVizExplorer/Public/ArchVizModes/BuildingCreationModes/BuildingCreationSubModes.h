@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enums/BuildingModeEntityEnum.h"
 #include "UObject/NoExportTypes.h"
 #include "BuildingCreationSubModes.generated.h"
 
@@ -15,6 +16,8 @@ enum class EBuildingSubModeState : uint8 {
 	OldEntity,
 	NewEntity
 };
+
+DECLARE_DELEGATE_TwoParams(FOnOtherBuildingActorSelected, EBuildingModeEntity, AActor*)
 
 /**
  *
@@ -31,6 +34,8 @@ public:
 	virtual void ExitSubMode() PURE_VIRTUAL(UBuildingCreationSubMode::ExitSubMode(), );
 
 	virtual void InitParams(APlayerController* Controller);
+
+	FOnOtherBuildingActorSelected OnOtherBuildingActorSelected;
 
 protected:
 	virtual void HandleFreeState() PURE_VIRTUAL(UBuildingCreationSubMode::HandleFreeState(), );

@@ -7,7 +7,6 @@
 
 UENUM()
 enum class EBuildingModeEntity : uint8 {
-	None,
 	WallPlacement,
 	DoorPlacement,
 	FloorPlacement,

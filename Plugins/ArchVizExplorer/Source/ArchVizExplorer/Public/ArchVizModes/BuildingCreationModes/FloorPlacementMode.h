@@ -26,6 +26,7 @@ public:
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
+	void SetCurrentFloorActor(AFloorActor* Actor);
 protected:
 	virtual void HandleFreeState() override;
 	virtual void HandleOldEntityState() override;

@@ -23,6 +23,7 @@ public:
 	virtual void EnterSubMode() override;
 	virtual void ExitSubMode() override;
 
+	void SetCurrentDoorActor(ADoorActor* Actor);
 protected:
 	virtual void HandleFreeState() override;
 	virtual void HandleOldEntityState() override;
