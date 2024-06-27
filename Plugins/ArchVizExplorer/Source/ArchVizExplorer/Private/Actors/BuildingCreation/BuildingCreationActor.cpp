@@ -3,6 +3,7 @@
 
 #include "Actors/BuildingCreation/BuildingCreationActor.h"
 #include "Widgets/PropertyPanelWidget.h"
+#include "Components/PrimitiveComponent.h"
 
 ABuildingCreationActor::ABuildingCreationActor() : State{ EBuildingActorState::None } {
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,9 +22,32 @@ void ABuildingCreationActor::SetState(EBuildingActorState NewState) {
 void ABuildingCreationActor::HandleStateChange() {
 	if (State == EBuildingActorState::Selected) {
 		ShowPropertyPanel();
+		HighlightSelectedActor();
 	}
 	else {
 		HidePropertyPanel();
+		UnHighlightDeselectedActor();
+	}
+}
+
+void ABuildingCreationActor::HighlightSelectedActor() {
+	TSet<UActorComponent*> ActorComponents = GetComponents();
+
+	for (auto& ActorComponent : ActorComponents) {
+		if (UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(ActorComponent)) {
+			Component->SetRenderCustomDepth(true);
+			Component->CustomDepthStencilValue = 2;
+		}
+	}
+}
+
+void ABuildingCreationActor::UnHighlightDeselectedActor() {
+	TSet<UActorComponent*> ActorComponents = GetComponents();
+
+	for (auto& ActorComponent : ActorComponents) {
+		if (UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(ActorComponent)) {
+			Component->SetRenderCustomDepth(false);
+		}
 	}
 }
 

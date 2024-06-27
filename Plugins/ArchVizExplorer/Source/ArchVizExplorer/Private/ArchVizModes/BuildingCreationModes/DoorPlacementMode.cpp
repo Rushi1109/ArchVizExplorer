@@ -15,9 +15,13 @@ void UDoorPlacementMode::Setup() {
 void UDoorPlacementMode::Cleanup() {
 	if (IsValid(DoorActor)) {
 		if ((DoorActor->GetState() == EBuildingActorState::Previewing) || (DoorActor->GetState() == EBuildingActorState::Moving)) {
+			DoorActor->SetState(EBuildingActorState::None);
 			DoorActor->DestroyActor();
-			DoorActor = nullptr;
 		}
+		else {
+			DoorActor->SetState(EBuildingActorState::None);
+		}
+		DoorActor = nullptr;
 	}
 }
 
@@ -58,16 +62,21 @@ void UDoorPlacementMode::SetupInputMapping() {
 			UInputAction* OKeyPressAction = NewObject<UInputAction>(this);
 			OKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
+			UInputAction* DeleteKeyPressAction = NewObject<UInputAction>(this);
+			DeleteKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
 			InputMappingContext = NewObject<UInputMappingContext>(this);
 			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
 			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
 			InputMappingContext->MapKey(OKeyPressAction, EKeys::O);
+			InputMappingContext->MapKey(DeleteKeyPressAction, EKeys::Delete);
 
 			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UDoorPlacementMode::HandleLeftClickAction);
 			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UDoorPlacementMode::HandleRKeyPressAction);
 			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UDoorPlacementMode::HandleMKeyPressAction);
 			EIC->BindAction(OKeyPressAction, ETriggerEvent::Completed, this, &UDoorPlacementMode::HandleOKeyPressAction);
+			EIC->BindAction(DeleteKeyPressAction, ETriggerEvent::Completed, this, &UDoorPlacementMode::HandleDeleteKeyPressAction);
 		}
 	}
 }
@@ -160,6 +169,19 @@ void UDoorPlacementMode::HandleOKeyPressAction() {
 	}
 }
 
+void UDoorPlacementMode::HandleDeleteKeyPressAction() {
+	if (IsValid(DoorActor)) {
+		DoorActor->SetState(EBuildingActorState::None);
+
+		if (AWallActor* WallActor = Cast<AWallActor>(DoorActor->GetAttachParentActor())) {
+			WallActor->DetachDoorComponent(DoorActor);
+		}
+
+		DoorActor->DestroyActor();
+		DoorActor = nullptr;
+	}
+}
+
 void UDoorPlacementMode::BindWidgetDelegates() {
 	if (IsValid(DoorActor) && IsValid(DoorActor->PropertyPanel)) {
 		DoorActor->PropertyPanel->NewDoorButton->OnClicked.AddDynamic(this, &UDoorPlacementMode::HandleNewButtonClick);
@@ -188,16 +210,7 @@ void UDoorPlacementMode::HandleNewButtonClick() {
 }
 
 void UDoorPlacementMode::HandleDeleteButtonClick() {
-	if (IsValid(DoorActor)) {
-		DoorActor->SetState(EBuildingActorState::None);
-
-		if (AWallActor* WallActor = Cast<AWallActor>(DoorActor->GetAttachParentActor())) {
-			WallActor->DetachDoorComponent(DoorActor);
-		}
-
-		DoorActor->DestroyActor();
-		DoorActor = nullptr;
-	}
+	HandleDeleteKeyPressAction();
 }
 
 void UDoorPlacementMode::HandleClosePanelButtonClick() {

@@ -35,6 +35,7 @@ public:
 
 	void AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, ADoorActor* DoorActor);
 	void DetachDoorComponent(ADoorActor* DoorActor);
+	void DestroyDoorComponents();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall")
 	UStaticMesh* WallMesh;

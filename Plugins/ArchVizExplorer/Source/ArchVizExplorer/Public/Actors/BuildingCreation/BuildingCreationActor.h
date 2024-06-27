@@ -34,11 +34,15 @@ public:
 	void SetState(EBuildingActorState NewState);
 	void HandleStateChange();
 
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	UPropertyPanelWidget* PropertyPanel;
 
 	EBuildingActorState State;
+
+	void HighlightSelectedActor();
+	void UnHighlightDeselectedActor();
 
 	void ShowPropertyPanel();
 	void HidePropertyPanel();

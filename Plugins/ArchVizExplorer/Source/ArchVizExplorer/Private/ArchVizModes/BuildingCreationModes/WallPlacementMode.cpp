@@ -21,6 +21,8 @@ void UWallPlacementMode::Setup() {
 void UWallPlacementMode::Cleanup() {
 	if (IsValid(WallActor)) {
 		if ((WallActor->GetState() == EBuildingActorState::Previewing) || (WallActor->GetState() == EBuildingActorState::Generating)) {
+			WallActor->SetState(EBuildingActorState::None);
+			WallActor->DestroyDoorComponents();
 			WallActor->DestroyActor();
 		}
 		else {
@@ -42,14 +44,19 @@ void UWallPlacementMode::SetupInputMapping() {
 			UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
 			MKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
+			UInputAction* DeleteKeyPressAction = NewObject<UInputAction>(this);
+			DeleteKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
 			InputMappingContext = NewObject<UInputMappingContext>(this);
 			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
 			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
+			InputMappingContext->MapKey(DeleteKeyPressAction, EKeys::Delete);
 
 			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleLeftClickAction);
 			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleRKeyPressAction);
 			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleMKeyPressAction);
+			EIC->BindAction(DeleteKeyPressAction, ETriggerEvent::Completed, this, &UWallPlacementMode::HandleDeleteKeyPressAction);
 		}
 	}
 }
@@ -166,6 +173,15 @@ void UWallPlacementMode::HandleMKeyPressAction() {
 	}
 }
 
+void UWallPlacementMode::HandleDeleteKeyPressAction() {
+	if (IsValid(WallActor)) {
+		WallActor->SetState(EBuildingActorState::None);
+		WallActor->DestroyDoorComponents();
+		WallActor->DestroyActor();
+		WallActor = nullptr;
+	}
+}
+
 void UWallPlacementMode::BindWidgetDelegates() {
 	if (IsValid(WallActor) && IsValid(WallActor->PropertyPanel)) {
 		WallActor->PropertyPanel->NewWallButton->OnClicked.AddDynamic(this, &UWallPlacementMode::HandleNewButtonClick);
@@ -196,11 +212,7 @@ void UWallPlacementMode::HandleNewButtonClick() {
 }
 
 void UWallPlacementMode::HandleDeleteButtonClick() {
-	if (IsValid(WallActor)) {
-		WallActor->SetState(EBuildingActorState::None);
-		WallActor->DestroyActor();
-		WallActor = nullptr;
-	}
+	HandleDeleteKeyPressAction();
 }
 
 void UWallPlacementMode::HandleClosePanelButtonClick() {

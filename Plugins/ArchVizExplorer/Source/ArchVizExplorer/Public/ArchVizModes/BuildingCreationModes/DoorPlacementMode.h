@@ -36,6 +36,7 @@ private:
 	void HandleRKeyPressAction();
 	void HandleMKeyPressAction();
 	void HandleOKeyPressAction();
+	void HandleDeleteKeyPressAction();
 
 	void BindWidgetDelegates();
 

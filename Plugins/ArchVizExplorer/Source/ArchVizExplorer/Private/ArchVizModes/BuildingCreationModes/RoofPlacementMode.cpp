@@ -21,6 +21,7 @@ void URoofPlacementMode::Setup() {
 void URoofPlacementMode::Cleanup() {
 	if (IsValid(RoofActor)) {
 		if ((RoofActor->GetState() == EBuildingActorState::Previewing) || (RoofActor->GetState() == EBuildingActorState::Generating)) {
+			RoofActor->SetState(EBuildingActorState::None);
 			RoofActor->DestroyActor();
 		}
 		else {
@@ -62,14 +63,19 @@ void URoofPlacementMode::SetupInputMapping() {
 			UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
 			MKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
+			UInputAction* DeleteKeyPressAction = NewObject<UInputAction>(this);
+			DeleteKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
 			InputMappingContext = NewObject<UInputMappingContext>(this);
 			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
 			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
+			InputMappingContext->MapKey(DeleteKeyPressAction, EKeys::Delete);
 
 			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &URoofPlacementMode::HandleLeftClickAction);
 			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &URoofPlacementMode::HandleRKeyPressAction);
 			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &URoofPlacementMode::HandleMKeyPressAction);
+			EIC->BindAction(DeleteKeyPressAction, ETriggerEvent::Completed, this, &URoofPlacementMode::HandleDeleteKeyPressAction);
 		}
 	}
 }
@@ -165,6 +171,14 @@ void URoofPlacementMode::HandleMKeyPressAction() {
 	}
 }
 
+void URoofPlacementMode::HandleDeleteKeyPressAction() {
+	if (IsValid(RoofActor)) {
+		RoofActor->SetState(EBuildingActorState::None);
+		RoofActor->DestroyActor();
+		RoofActor = nullptr;
+	}
+}
+
 void URoofPlacementMode::BindWidgetDelegates() {
 	if (IsValid(RoofActor) && IsValid(RoofActor->PropertyPanel)) {
 		RoofActor->PropertyPanel->NewRoofButton->OnClicked.AddDynamic(this, &URoofPlacementMode::HandleNewButtonClick);
@@ -197,11 +211,7 @@ void URoofPlacementMode::HandleNewButtonClick() {
 }
 
 void URoofPlacementMode::HandleDeleteButtonClick() {
-	if (IsValid(RoofActor)) {
-		RoofActor->SetState(EBuildingActorState::None);
-		RoofActor->DestroyActor();
-		RoofActor = nullptr;
-	}
+	HandleDeleteKeyPressAction();
 }
 
 void URoofPlacementMode::HandleClosePanelButtonClick() {

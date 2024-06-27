@@ -78,19 +78,27 @@ void AWallActor::DestroySegments() {
 }
 
 void AWallActor::UpdateSegments() {
-	int SegmentCount = WallSegments.Num();
+	int32 NumberOfSegments = WallSegments.Num();
 
-	for (const auto& [SegmentIndex, DoorActor] : IndexDoorMapping) {
-		if (SegmentIndex >= SegmentCount) {
-			if (IndexDoorMapping[SegmentIndex]) {
-				IndexDoorMapping[SegmentIndex]->Destroy();
+	for (auto It = IndexDoorMapping.CreateIterator(); It; ++It) {
+		int32 SegmentIndex = It.Key();
+		ADoorActor* DoorActor = It.Value();
+
+		if (SegmentIndex >= (NumberOfSegments - 1)) {
+			if (IsValid(DoorActor)) {
+				DoorActor->Destroy();
 			}
-			IndexDoorMapping.Remove(SegmentIndex);
+			It.RemoveCurrent();
 			continue;
 		}
-		WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
 
-		AttachDoorComponent(WallSegments[SegmentIndex], DoorActor);
+		if (WallSegments.IsValidIndex(SegmentIndex)) {
+			WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
+
+			DoorActor->AttachToComponent(WallSegments[SegmentIndex], FAttachmentTransformRules::KeepRelativeTransform, TEXT("DoorSocket"));
+			DoorActor->SetActorRelativeRotation(FRotator::ZeroRotator);
+			DoorActor->SetActorRelativeLocation(FVector::ZeroVector);
+		}
 	}
 }
 
@@ -201,6 +209,16 @@ void AWallActor::DetachDoorComponent(ADoorActor* DoorActor) {
 				IndexDoorMapping.Remove(*SegmentIndex);
 		}
 	}
+}
+
+void AWallActor::DestroyDoorComponents() {
+	for (auto& [SegmentIndex, DoorActor] : IndexDoorMapping) {
+		if (IsValid(DoorActor)) {
+			DoorActor->Destroy();
+		}
+	}
+
+	IndexDoorMapping.Empty();
 }
 
 void AWallActor::SetStartLocation(const FVector& NewStartLocation) {

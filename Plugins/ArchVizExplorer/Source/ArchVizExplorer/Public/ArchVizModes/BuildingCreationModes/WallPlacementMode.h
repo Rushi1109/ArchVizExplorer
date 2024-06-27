@@ -38,6 +38,7 @@ private:
 	void HandleLeftClickAction();
 	void HandleRKeyPressAction();
 	void HandleMKeyPressAction();
+	void HandleDeleteKeyPressAction();
 
 	void BindWidgetDelegates();
 

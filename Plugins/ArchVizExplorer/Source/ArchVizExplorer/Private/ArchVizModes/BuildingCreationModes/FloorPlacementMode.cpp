@@ -19,6 +19,7 @@ void UFloorPlacementMode::Setup() {
 void UFloorPlacementMode::Cleanup() {
 	if (IsValid(FloorActor)) {
 		if ((FloorActor->GetState() == EBuildingActorState::Previewing) || (FloorActor->GetState() == EBuildingActorState::Generating)) {
+			FloorActor->SetState(EBuildingActorState::None);
 			FloorActor->DestroyActor();
 		}
 		else {
@@ -40,14 +41,19 @@ void UFloorPlacementMode::SetupInputMapping() {
 			UInputAction* MKeyPressAction = NewObject<UInputAction>(this);
 			MKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
+			UInputAction* DeleteKeyPressAction = NewObject<UInputAction>(this);
+			DeleteKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
 			InputMappingContext = NewObject<UInputMappingContext>(this);
 			InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 			InputMappingContext->MapKey(RKeyPressAction, EKeys::R);
 			InputMappingContext->MapKey(MKeyPressAction, EKeys::M);
+			InputMappingContext->MapKey(DeleteKeyPressAction, EKeys::Delete);
 
 			EIC->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleLeftClickAction);
 			EIC->BindAction(RKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleRKeyPressAction);
 			EIC->BindAction(MKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleMKeyPressAction);
+			EIC->BindAction(DeleteKeyPressAction, ETriggerEvent::Completed, this, &UFloorPlacementMode::HandleDeleteKeyPressAction);
 		}
 	}
 }
@@ -161,6 +167,14 @@ void UFloorPlacementMode::HandleMKeyPressAction() {
 	}
 }
 
+void UFloorPlacementMode::HandleDeleteKeyPressAction() {
+	if (IsValid(FloorActor)) {
+		FloorActor->SetState(EBuildingActorState::None);
+		FloorActor->DestroyActor();
+		FloorActor = nullptr;
+	}
+}
+
 void UFloorPlacementMode::BindWidgetDelegates() {
 	if (IsValid(FloorActor) && IsValid(FloorActor->PropertyPanel)) {
 		FloorActor->PropertyPanel->NewFloorButton->OnClicked.AddDynamic(this, &UFloorPlacementMode::HandleNewButtonClick);
@@ -193,11 +207,7 @@ void UFloorPlacementMode::HandleNewButtonClick() {
 }
 
 void UFloorPlacementMode::HandleDeleteButtonClick() {
-	if (IsValid(FloorActor)) {
-		FloorActor->SetState(EBuildingActorState::None);
-		FloorActor->DestroyActor();
-		FloorActor = nullptr;
-	}
+	HandleDeleteKeyPressAction();
 }
 
 void UFloorPlacementMode::HandleClosePanelButtonClick() {
