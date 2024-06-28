@@ -134,8 +134,10 @@ void UFloorPlacementMode::HandleFreeState() {
 }
 
 void UFloorPlacementMode::HandleOldEntityState() {
-	SubModeState = EBuildingSubModeState::Free;
-	FloorActor->SetState(EBuildingActorState::Selected);
+	if (IsValid(FloorActor)) {
+		SubModeState = EBuildingSubModeState::Free;
+		FloorActor->SetState(EBuildingActorState::Selected);
+	}
 }
 
 void UFloorPlacementMode::HandleNewEntityState() {

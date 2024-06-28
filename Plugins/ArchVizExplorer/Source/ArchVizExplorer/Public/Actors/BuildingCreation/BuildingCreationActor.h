@@ -27,25 +27,11 @@ class ARCHVIZEXPLORER_API ABuildingCreationActor : public AArchVizActor {
 public:
 	ABuildingCreationActor();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
-	TSubclassOf<UPropertyPanelWidget> PropertyPanelRef;
-
 	EBuildingActorState GetState();
 	void SetState(EBuildingActorState NewState);
 	void HandleStateChange();
 
 
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
-	UPropertyPanelWidget* PropertyPanel;
-
 	EBuildingActorState State;
-
-	void HighlightSelectedActor();
-	void UnHighlightDeselectedActor();
-
-	void ShowPropertyPanel();
-	void HidePropertyPanel();
-
-	void RotateActor(double Degrees);
 };

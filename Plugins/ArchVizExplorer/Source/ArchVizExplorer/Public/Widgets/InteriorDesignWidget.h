@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "UMG/Public/Components/TextBlock.h"
+#include "UMG/Public/Components/Button.h"
+#include "DataAssets/InteriorDataAsset.h"
 #include "InteriorDesignWidget.generated.h"
 
 /**
@@ -17,6 +18,39 @@ class ARCHVIZEXPLORER_API UInteriorDesignWidget : public UUserWidget {
 protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* TextInteriorMode;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ChairButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* TableButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* BedButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* CeilingLightButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* LampButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* FrameButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* ChairDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* TableDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* BedDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* CeilingLightDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* LampDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UInteriorDataAsset* FrameDataAsset;
 };

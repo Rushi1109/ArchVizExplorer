@@ -99,7 +99,7 @@ void URoofPlacementMode::HandleFreeState() {
 	FHitResult HitResult = GetHitResult();
 	HitResult.Location = ArchVizUtility::SnapToGrid(HitResult.Location);
 
-	if (RoofActor) {
+	if (IsValid(RoofActor)) {
 		RoofActor->SetState(EBuildingActorState::None);
 		RoofActor = nullptr;
 	}
@@ -134,8 +134,10 @@ void URoofPlacementMode::HandleFreeState() {
 }
 
 void URoofPlacementMode::HandleOldEntityState() {
-	SubModeState = EBuildingSubModeState::Free;
-	RoofActor->SetState(EBuildingActorState::Selected);
+	if (IsValid(RoofActor)) {
+		SubModeState = EBuildingSubModeState::Free;
+		RoofActor->SetState(EBuildingActorState::Selected);
+	}
 }
 
 void URoofPlacementMode::HandleNewEntityState() {

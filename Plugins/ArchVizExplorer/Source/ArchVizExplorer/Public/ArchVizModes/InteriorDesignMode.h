@@ -6,7 +6,15 @@
 #include "ArchVizModes/ArchVizMode.h"
 #include "InputMappingContext.h"
 #include "UObject/NoExportTypes.h"
+#include "Actors/InteriorActor.h"
 #include "InteriorDesignMode.generated.h"
+
+UENUM(BlueprintType)
+enum class EInteriorModeState : uint8 {
+	Free,
+    OldEntity,
+    NewEntity
+};
 
 /**
  *
@@ -23,7 +31,36 @@ public:
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
+protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<AInteriorActor> InteriorActorRef;
+
 private:
-	UFUNCTION()
-	void HandleLeftClickAction();
+    EInteriorModeState InteriorModeState;
+
+    UPROPERTY()
+    AInteriorActor* InteriorActor;
+
+    UFUNCTION()
+    void HandleInteriorAssetSelect(EInteriorAssetType AssetType, UStaticMesh* StaticMesh);
+
+    void HandleFreeState();
+    void HandleOldEntityState();
+    void HandleNewEntityState();
+
+    void HandleLeftClickAction();
+    void HandleRKeyPressAction();
+    void HandleMKeyPressAction();
+    void HandleDeleteKeyPressAction();
+
+    void BindWidgetDelegates();
+
+    UFUNCTION()
+    void HandleNewButtonClick();
+
+    UFUNCTION()
+    void HandleDeleteButtonClick();
+
+    UFUNCTION()
+    void HandleClosePanelButtonClick();
 };

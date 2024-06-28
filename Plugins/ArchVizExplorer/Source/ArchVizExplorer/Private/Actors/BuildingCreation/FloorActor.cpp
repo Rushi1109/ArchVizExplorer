@@ -88,7 +88,7 @@ void AFloorActor::HandleGeneratingState() {
 	double EdgeOffset{ 10.0 };
 
 	FVector Dimensions{ FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 2 };
-	FVector Offset{ Dimensions / 2 };
+	FVector Offset{ FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength)/2, 1 };
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });

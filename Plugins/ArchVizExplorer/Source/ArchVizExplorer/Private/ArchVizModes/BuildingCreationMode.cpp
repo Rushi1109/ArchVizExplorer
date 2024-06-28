@@ -7,7 +7,7 @@
 #include "Actors/BuildingCreation/RoofActor.h"
 #include "Actors/BuildingCreation/FloorActor.h"
 
-UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{ nullptr }, BuildingModeEntity{ EBuildingModeEntity::WallPlacement }, WallPlacementMode{ nullptr }, DoorPlacementMode{ nullptr }, RoofPlacementMode{ nullptr }, FloorPlacementMode{ nullptr } {}
+UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{ nullptr }, BuildingModeEntity{ EBuildingModeEntity::WallPlacement }, WallPlacementMode{ nullptr }, DoorPlacementMode{ nullptr }, FloorPlacementMode{ nullptr }, RoofPlacementMode{ nullptr } {}
 
 void UBuildingCreationMode::Setup() {
 	if (IsValid(WidgetRef)) {

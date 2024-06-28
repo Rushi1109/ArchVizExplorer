@@ -20,6 +20,48 @@ void AArchVizActor::DestroyActor() {
 	Destroy();
 }
 
+void AArchVizActor::HighlightSelectedActor() {
+	TSet<UActorComponent*> ActorComponents = GetComponents();
+
+	for (auto& ActorComponent : ActorComponents) {
+		if (UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(ActorComponent)) {
+			Component->SetRenderCustomDepth(true);
+			Component->CustomDepthStencilValue = 2;
+		}
+	}
+}
+
+void AArchVizActor::UnHighlightDeselectedActor() {
+	TSet<UActorComponent*> ActorComponents = GetComponents();
+
+	for (auto& ActorComponent : ActorComponents) {
+		if (UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(ActorComponent)) {
+			Component->SetRenderCustomDepth(false);
+		}
+	}
+}
+
+void AArchVizActor::ShowPropertyPanel() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->AddToViewport();
+	}
+}
+
+void AArchVizActor::HidePropertyPanel() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->RemoveFromParent();
+	}
+}
+
+void AArchVizActor::RotateActor(double Degrees) {
+	FRotator CurrentRotation = GetActorRotation();
+
+	CurrentRotation.Yaw = static_cast<int>(CurrentRotation.Yaw + Degrees) % 360;
+
+	SetActorRotation(CurrentRotation);
+}
+
+
 FHitResult AArchVizActor::GetHitResult(const TArray<AActor*>& ActorsToIgnore) const {
 	FHitResult HitResult{};
 

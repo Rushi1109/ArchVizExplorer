@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Widgets/PropertyPanelWidget.h"
 #include "ArchVizActor.generated.h"
 
 UCLASS()
@@ -20,6 +21,19 @@ protected:
 
 	void DestroyActor();
 
+	void ShowPropertyPanel();
+	void HidePropertyPanel();
+
+	void HighlightSelectedActor();
+	void UnHighlightDeselectedActor();
+
+	void RotateActor(double Degrees);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
+	TSubclassOf<UPropertyPanelWidget> PropertyPanelRef;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
+	UPropertyPanelWidget* PropertyPanel;
 
 public:
 	// Called every frame

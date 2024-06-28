@@ -81,4 +81,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UButton* ClosePanelRoofButton;
+
+	// Interior Grid
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* NewInteriorItemButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* DeleteInteriorItemButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	UButton* ClosePanelInteriorButton;
 };

@@ -138,8 +138,10 @@ void UWallPlacementMode::HandleFreeState() {
 }
 
 void UWallPlacementMode::HandleOldEntityState() {
-	SubModeState = EBuildingSubModeState::Free;
-	WallActor->SetState(EBuildingActorState::Selected);
+	if (IsValid(WallActor)) {
+		SubModeState = EBuildingSubModeState::Free;
+		WallActor->SetState(EBuildingActorState::Selected);
+	}
 }
 
 void UWallPlacementMode::HandleNewEntityState() {
