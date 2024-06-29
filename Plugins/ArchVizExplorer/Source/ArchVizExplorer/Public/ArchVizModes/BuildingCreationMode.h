@@ -29,6 +29,7 @@ public:
 	UBuildingCreationMode();
 
 	virtual void Setup() override;
+	virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;

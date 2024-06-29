@@ -31,8 +31,6 @@ void UDoorPlacementMode::EnterSubMode() {
 	if (IsValid(PlayerController)) {
 		if (UEnhancedInputLocalPlayerSubsystem* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			LocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
-
-			Setup();
 		}
 	}
 }
@@ -41,8 +39,6 @@ void UDoorPlacementMode::ExitSubMode() {
 	if (IsValid(PlayerController)) {
 		if (UEnhancedInputLocalPlayerSubsystem* LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			LocalPlayerSubsystem->RemoveMappingContext(InputMappingContext);
-
-			Cleanup();
 		}
 	}
 }

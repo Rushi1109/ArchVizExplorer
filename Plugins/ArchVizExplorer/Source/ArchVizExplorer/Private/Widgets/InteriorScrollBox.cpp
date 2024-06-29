@@ -6,6 +6,8 @@
 
 void UInteriorScrollBox::PopulateWidget(UInteriorDataAsset* DataAsset) {
 	if (IsValid(DataAsset) && IsValid(ScrollBox)) {
+		ScrollBox->ClearChildren();
+		
 		TArray<FInteriorAsset> InteriorAssets = DataAsset->InteriorAssets;
 
 		for (const auto& Asset : InteriorAssets) {

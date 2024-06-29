@@ -79,8 +79,6 @@ void UFloorPlacementMode::EnterSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
-
-			Setup();
 		}
 	}
 }
@@ -89,8 +87,6 @@ void UFloorPlacementMode::ExitSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
-
-			Cleanup();
 		}
 	}
 }

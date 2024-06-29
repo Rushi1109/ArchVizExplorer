@@ -37,8 +37,6 @@ void URoofPlacementMode::EnterSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
-
-			Setup();
 		}
 	}
 }
@@ -47,8 +45,6 @@ void URoofPlacementMode::ExitSubMode() {
 	if (PlayerController) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->RemoveMappingContext(InputMappingContext);
-
-			Cleanup();
 		}
 	}
 }

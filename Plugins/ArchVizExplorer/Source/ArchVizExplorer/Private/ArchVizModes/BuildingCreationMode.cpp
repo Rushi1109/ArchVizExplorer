@@ -48,8 +48,15 @@ void UBuildingCreationMode::Setup() {
 	}
 }
 
+void UBuildingCreationMode::Cleanup() {
+	if (IsValid(CurrentBuildingCreationSubMode)) {
+		CurrentBuildingCreationSubMode->Cleanup();
+	}
+}
+
 void UBuildingCreationMode::SetSubMode(UBuildingCreationSubMode* NewSubMode) {
 	if (CurrentBuildingCreationSubMode) {
+		CurrentBuildingCreationSubMode->Cleanup();
 		CurrentBuildingCreationSubMode->ExitSubMode();
 	}
 
@@ -57,6 +64,7 @@ void UBuildingCreationMode::SetSubMode(UBuildingCreationSubMode* NewSubMode) {
 
 	if (CurrentBuildingCreationSubMode) {
 		CurrentBuildingCreationSubMode->EnterSubMode();
+		CurrentBuildingCreationSubMode->Setup();
 	}
 }
 
@@ -144,12 +152,14 @@ void UBuildingCreationMode::EnterMode() {
 	ShowWidget();
 	if (CurrentBuildingCreationSubMode) {
 		CurrentBuildingCreationSubMode->EnterSubMode();
+		CurrentBuildingCreationSubMode->Setup();
 	}
 }
 
 void UBuildingCreationMode::ExitMode() {
 	HideWidget();
 	if (CurrentBuildingCreationSubMode) {
+		CurrentBuildingCreationSubMode->Cleanup();
 		CurrentBuildingCreationSubMode->ExitSubMode();
 	}
 }

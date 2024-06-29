@@ -11,12 +11,13 @@ USTRUCT(Blueprintable)
 struct FInteriorAsset {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UTexture2D* Thumbnail;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* StaticMesh;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EInteriorAssetType InteriorAssetType;
 };
 
@@ -28,5 +29,6 @@ class ARCHVIZEXPLORER_API UInteriorDataAsset : public UDataAsset {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FInteriorAsset> InteriorAssets;
 };

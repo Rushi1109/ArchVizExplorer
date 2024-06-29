@@ -24,6 +24,9 @@ void ABuildingCreationActor::HandleStateChange() {
 		ShowPropertyPanel();
 		HighlightSelectedActor();
 	}
+	else if (State == EBuildingActorState::Moving) {
+		HighlightSelectedActor();
+	}
 	else {
 		HidePropertyPanel();
 		UnHighlightDeselectedActor();

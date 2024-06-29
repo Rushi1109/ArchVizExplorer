@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UMG/Public/Components/Button.h"
 #include "DataAssets/InteriorDataAsset.h"
+#include "InteriorScrollBox.h"
 #include "InteriorDesignWidget.generated.h"
 
 /**
@@ -15,9 +16,33 @@ UCLASS()
 class ARCHVIZEXPLORER_API UInteriorDesignWidget : public UUserWidget {
 	GENERATED_BODY()
 
+public:
+		// Scroll Widget
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UInteriorScrollBox* InteriorScrollBox;
+
 protected:
 	virtual void NativeConstruct() override;
 
+	UFUNCTION()
+	void HandleChairButtonClick();
+
+	UFUNCTION()
+	void HandleTableButtonClick();
+
+	UFUNCTION()
+	void HandleBedButtonClick();
+
+	UFUNCTION()
+	void HandleCeilingLightButtonClick();
+
+	UFUNCTION()
+	void HandleLampButtonClick();
+
+	UFUNCTION()
+	void HandleFrameButtonClick();
+
+	// Buttons
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* ChairButton;
 
@@ -36,21 +61,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* FrameButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	// DataAssets
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* ChairDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* TableDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* BedDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* CeilingLightDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* LampDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data Asset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data Asset")
 	UInteriorDataAsset* FrameDataAsset;
 };

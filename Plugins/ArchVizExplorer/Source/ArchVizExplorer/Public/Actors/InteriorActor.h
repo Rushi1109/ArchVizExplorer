@@ -34,6 +34,8 @@ public:
 	// Sets default values for this actor's properties
 	AInteriorActor();
 
+	void HandleStateChange();
+
 	void SetState(EInteriorActorState NewInteriorActorState);
 	EInteriorActorState GetState() const;
 

@@ -27,6 +27,7 @@ public:
 	UInteriorDesignMode();
 
 	virtual void Setup() override;
+    virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
@@ -42,7 +43,7 @@ private:
     AInteriorActor* InteriorActor;
 
     UFUNCTION()
-    void HandleInteriorAssetSelect(EInteriorAssetType AssetType, UStaticMesh* StaticMesh);
+    void HandleInteriorAssetSelect(FInteriorAsset InteriorAsset);
 
     void HandleFreeState();
     void HandleOldEntityState();

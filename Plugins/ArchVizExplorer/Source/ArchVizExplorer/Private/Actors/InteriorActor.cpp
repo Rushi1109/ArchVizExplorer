@@ -16,8 +16,24 @@ AInteriorActor::AInteriorActor() {
 	StaticMeshComponent->SetupAttachment(SceneRoot);
 }
 
+void AInteriorActor::HandleStateChange() {
+	if (InteriorActorState == EInteriorActorState::Selected) {
+		ShowPropertyPanel();
+		HighlightSelectedActor();
+	}
+	else if (InteriorActorState == EInteriorActorState::Moving) {
+		HighlightSelectedActor();
+	}
+	else {
+		HidePropertyPanel();
+		UnHighlightDeselectedActor();
+	}
+}
+
 void AInteriorActor::SetState(EInteriorActorState NewInteriorActorState) {
 	InteriorActorState = NewInteriorActorState;
+
+	HandleStateChange();
 }
 
 EInteriorActorState AInteriorActor::GetState() const {
@@ -34,11 +50,11 @@ EInteriorAssetType AInteriorActor::GetAssetType() const {
 
 
 void AInteriorActor::SetStaticMesh(UStaticMesh* NewStaticMesh) {
-	StaticMesh = NewStaticMesh;
+	StaticMeshComponent->SetStaticMesh(NewStaticMesh);
 }
 
 UStaticMesh* AInteriorActor::GetStaticMesh() const {
-	return StaticMesh;
+	return StaticMeshComponent->GetStaticMesh();
 }
 
 // Called when the game starts or when spawned
@@ -69,7 +85,7 @@ void AInteriorActor::HandlePreviewingState() {
 	if (IsValid(HitResult.GetActor())) {
 		SetActorLocation(HitResult.Location);
 
-		if (HitResult.GetActor()->IsA(AWallActor::StaticClass())) {
+		if (HitResult.GetActor()->IsA(AWallActor::StaticClass()) && InteriorAssetType == EInteriorAssetType::WallPlaceable) {
 			SetActorRotation(HitResult.GetActor()->GetActorRotation());
 		}
 	}
