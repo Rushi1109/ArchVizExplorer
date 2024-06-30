@@ -89,6 +89,8 @@ void UInteriorDesignMode::ExitMode() {
 }
 
 void UInteriorDesignMode::HandleInteriorAssetSelect(FInteriorAsset InteriorAsset) {
+	Cleanup();
+
 	if (InteriorActorRef) {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

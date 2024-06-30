@@ -22,6 +22,7 @@ void AInteriorActor::HandleStateChange() {
 		HighlightSelectedActor();
 	}
 	else if (InteriorActorState == EInteriorActorState::Moving) {
+		HidePropertyPanel();
 		HighlightSelectedActor();
 	}
 	else {
