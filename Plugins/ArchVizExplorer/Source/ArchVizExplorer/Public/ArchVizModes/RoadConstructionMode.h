@@ -23,6 +23,7 @@ public:
 	URoadConstructionMode();
 
 	virtual void Setup() override;
+	virtual void Cleanup() override;
 	virtual void SetupInputMapping() override;
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
@@ -33,6 +34,21 @@ public:
 private:
 	UFUNCTION()
 	void HandleLeftClickAction();
+	void HandleNKeyPressAction();
+	void HandleDeleteKeyPressAction();
+	void BindWidgetDelegates();
+
+	UFUNCTION()
+	void HandleNewButtonClick();
+
+	UFUNCTION()
+	void HandleDeleteButtonClick();
+
+	UFUNCTION()
+	void HandleClosePanelButtonClick();
+
+	UFUNCTION()
+	void HandleRoadTypeChange(FString Selectedtype, ESelectInfo::Type SelectionType);
 
 	ARoadActor* RoadActor;
 };

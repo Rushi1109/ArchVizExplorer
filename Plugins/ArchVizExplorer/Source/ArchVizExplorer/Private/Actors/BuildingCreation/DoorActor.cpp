@@ -5,7 +5,7 @@
 #include "Actors/BuildingCreation/WallActor.h"
 #include "Widgets/PropertyPanelWidget.h"
 
-ADoorActor::ADoorActor() : DoorFrameMesh{nullptr}, DoorMesh{nullptr} {
+ADoorActor::ADoorActor() : bIsOpen{false}, DoorFrameMesh{nullptr}, DoorMesh{nullptr} {
 	PrimaryActorTick.bCanEverTick = true;
 
 	USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));

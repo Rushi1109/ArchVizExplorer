@@ -186,6 +186,7 @@ void UDoorPlacementMode::HandleOKeyPressAction() {
 		else {
 			DoorActor->DoorComponent->SetRelativeRotation(FRotator{ 0.0, 0.0, 0.0 });
 		}
+		DoorActor->bIsOpen = !DoorActor->bIsOpen;
 	}
 }
 
