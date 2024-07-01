@@ -8,6 +8,8 @@
 #include "UMG/Public/Components/CanvasPanel.h"
 #include "UMG/Public/Components/TextBlock.h"
 #include "UMG/Public/Components/Button.h"
+#include "UMG/Public/Components/Border.h"
+#include "UMG/Public/Components/BackgroundBlur.h"
 #include "ModesMenuWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnArchVizModeChanged, EArchVizMode);
