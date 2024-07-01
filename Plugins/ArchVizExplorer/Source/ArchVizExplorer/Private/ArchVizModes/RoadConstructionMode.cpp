@@ -11,15 +11,16 @@
 URoadConstructionMode::URoadConstructionMode() : RoadActor{ nullptr } {}
 
 void URoadConstructionMode::Setup() {
-	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
-		RoadActor = GetWorld()->SpawnActor<ARoadActor>(RoadActorRef, FTransform{});
-		RoadActor->SetState(ERoadActorState::Selected);
-
-		BindWidgetDelegates();
-	}
+	RoadModeState = ERoadModeState::Free;
 
 	if (IsValid(WidgetRef) && !IsValid(Widget)) {
 		Widget = CreateWidget<URoadConstructionWidget>(GetWorld(), WidgetRef, "Road Mode Widget");
+
+		if (URoadConstructionWidget* RoadConstructionWidget = Cast<URoadConstructionWidget>(Widget)) {
+			RoadConstructionWidget->NewRoadSegmentButton->OnClicked.AddDynamic(this, &URoadConstructionMode::HandleNewSegmentButtonClick);
+			RoadConstructionWidget->CompleteCurrentSegmentButton->OnClicked.AddDynamic(this, &URoadConstructionMode::HandleCompleteSegmentButtonClick);
+			RoadConstructionWidget->UndoButton->OnClicked.AddDynamic(this, &URoadConstructionMode::HandleUndoButtonClick);
+		}
 	}
 }
 
@@ -27,6 +28,7 @@ void URoadConstructionMode::Cleanup() {
 	if (IsValid(RoadActor)) {
 		RoadActor->SetState(ERoadActorState::None);
 		RoadActor = nullptr;
+		RoadModeState = ERoadModeState::Free;
 	}
 }
 
@@ -42,14 +44,19 @@ void URoadConstructionMode::SetupInputMapping() {
 		UInputAction* DeleteKeyPressAction = NewObject<UInputAction>(this);
 		DeleteKeyPressAction->ValueType = EInputActionValueType::Boolean;
 
+		UInputAction* ZKeyPressAction = NewObject<UInputAction>(this);
+		ZKeyPressAction->ValueType = EInputActionValueType::Boolean;
+
 		InputMappingContext = NewObject<UInputMappingContext>(this);
 		InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
 		InputMappingContext->MapKey(NKeyPressAction, EKeys::N);
 		InputMappingContext->MapKey(DeleteKeyPressAction, EKeys::Delete);
+		InputMappingContext->MapKey(ZKeyPressAction, EKeys::Z);
 
 		EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleLeftClickAction);
 		EnhancedInputComponent->BindAction(NKeyPressAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleNKeyPressAction);
 		EnhancedInputComponent->BindAction(DeleteKeyPressAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleDeleteKeyPressAction);
+		EnhancedInputComponent->BindAction(ZKeyPressAction, ETriggerEvent::Completed, this, &URoadConstructionMode::HandleZKeyPressAction);
 	}
 }
 
@@ -75,7 +82,54 @@ void URoadConstructionMode::ExitMode() {
 	}
 }
 
+void URoadConstructionMode::HandleNewSegmentButtonClick() {
+	HandleNKeyPressAction();
+}
+
+void URoadConstructionMode::HandleCompleteSegmentButtonClick() {
+	if (IsValid(RoadActor)) {
+		RoadActor->SetState(ERoadActorState::Selected);
+		RoadModeState = ERoadModeState::Free;
+	}
+}
+
+void URoadConstructionMode::HandleUndoButtonClick() {
+	HandleZKeyPressAction();
+}
+
 void URoadConstructionMode::HandleLeftClickAction() {
+	switch (RoadModeState) {
+	case ERoadModeState::Free:
+		HandleFreeState();
+		break;
+	case ERoadModeState::OldEntity:
+		[[fallthrough]];
+	case ERoadModeState::NewEntity:
+		HandleNewEntityState();
+		break;
+	}
+}
+
+void URoadConstructionMode::HandleFreeState() {
+	FHitResult HitResult = GetHitResult();
+
+	if (IsValid(RoadActor)) {
+		RoadActor->SetState(ERoadActorState::None);
+		RoadActor = nullptr;
+	}
+
+	if (IsValid(HitResult.GetActor()) && HitResult.GetActor()->IsA(ARoadActor::StaticClass())) {
+		RoadActor = Cast<ARoadActor>(HitResult.GetActor());
+		RoadActor->SetState(ERoadActorState::Selected);
+		RoadModeState = ERoadModeState::Free;
+	}
+}
+
+void URoadConstructionMode::HandleOldEntityState() {
+	
+}
+
+void URoadConstructionMode::HandleNewEntityState() {
 	if (IsValid(RoadActor)) {
 		FHitResult HitResult{};
 
@@ -91,6 +145,15 @@ void URoadConstructionMode::HandleNKeyPressAction() {
 	Cleanup();
 
 	Setup();
+
+	if (IsValid(RoadActorRef) && !IsValid(RoadActor)) {
+		RoadActor = GetWorld()->SpawnActor<ARoadActor>(RoadActorRef, FTransform{});
+		RoadActor->SetState(ERoadActorState::Generating);
+		RoadModeState = ERoadModeState::NewEntity;
+
+		BindWidgetDelegates();
+	}
+
 }
 
 void URoadConstructionMode::HandleDeleteKeyPressAction() {
@@ -98,8 +161,17 @@ void URoadConstructionMode::HandleDeleteKeyPressAction() {
 		RoadActor->SetState(ERoadActorState::None);
 		RoadActor->SplineComponent->ClearSplinePoints();
 		RoadActor->DestroyActor();
+		RoadModeState = ERoadModeState::Free;
 
 		RoadActor = nullptr;
+	}
+}
+
+void URoadConstructionMode::HandleZKeyPressAction() {
+	if (IsValid(RoadActor)) {
+		RoadActor->SetState(ERoadActorState::Generating);
+		RoadActor->RemoveLastSplinePoint();
+		RoadModeState = ERoadModeState::OldEntity;
 	}
 }
 
@@ -109,6 +181,7 @@ void URoadConstructionMode::BindWidgetDelegates() {
 		RoadActor->PropertyPanel->DeleteRoadButton->OnClicked.AddDynamic(this, &URoadConstructionMode::HandleDeleteButtonClick);
 		RoadActor->PropertyPanel->ClosePanelRoadButton->OnClicked.AddDynamic(this, &URoadConstructionMode::HandleClosePanelButtonClick);
 		RoadActor->PropertyPanel->RoadTypeComboBox->OnSelectionChanged.AddDynamic(this, &URoadConstructionMode::HandleRoadTypeChange);
+		RoadActor->PropertyPanel->RoadWidthSpinBox->OnValueChanged.AddDynamic(this, &URoadConstructionMode::HandleRoadWidthChange);
 	}
 }
 
@@ -131,6 +204,10 @@ void URoadConstructionMode::HandleRoadTypeChange(FString Selectedtype, ESelectIn
 	else if (Selectedtype == TEXT("Sharp")) {
 		RoadActor->SetPointType(ERoadPointType::Sharp);
 	}
+}
+
+void URoadConstructionMode::HandleRoadWidthChange(float InWidth) {
+	RoadActor->Width = InWidth;
 
 	RoadActor->UpdateRoad();
 }

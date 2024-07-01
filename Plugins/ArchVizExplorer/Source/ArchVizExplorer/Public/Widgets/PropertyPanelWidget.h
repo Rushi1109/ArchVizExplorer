@@ -105,4 +105,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UComboBoxString* RoadTypeComboBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	USpinBox* RoadWidthSpinBox;
 };

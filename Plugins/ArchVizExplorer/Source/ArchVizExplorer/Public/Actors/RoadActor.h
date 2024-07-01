@@ -55,10 +55,12 @@ public:
 	
 	void HandleStateChange();
 
-	UFUNCTION(BlueprintCallable)
-	void GenerateRoadMesh();
+	//UFUNCTION(BlueprintCallable)
+	//void GenerateRoadMesh();
 
-	void GenerateRoadSegment(const FVector& StartLocation, const FVector& StartTangent, const FVector& EndLocation, const FVector& EndTangent);
+	// void GenerateRoadSegment(const FVector& StartLocation, const FVector& StartTangent, const FVector& EndLocation, const FVector& EndTangent);
+
+	// void GenerateRoadSegment(float StartDistance, float SegmentLength, int32 SegmentIndex, float MeshLength, float ScaleFactor, int32 SegmentPartIndex, int32 NumberOfSegments);
 
 	UFUNCTION(BlueprintCallable)
     void DestroyRoadMesh();
@@ -67,6 +69,9 @@ public:
 	bool RemoveLastSplinePoint();
 
 	void UpdateRoad();
+	//void ConfigureSplinePointTypes();
+	//void UpdateRoadMesh();
+	//void HideUnusedSegments(int32 StartIndex);
 
 	void SetState(ERoadActorState NewRoadActorState);
 	ERoadActorState GetState() const;

@@ -12,6 +12,13 @@
 class ARoadActor;
 class APlayerController;
 
+UENUM(BlueprintType)
+enum class ERoadModeState : uint8 {
+	Free,
+    OldEntity,
+    NewEntity
+};
+
 /**
  *
  */
@@ -33,9 +40,23 @@ public:
 
 private:
 	UFUNCTION()
+	void HandleNewSegmentButtonClick();
+
+	UFUNCTION()
+	void HandleCompleteSegmentButtonClick();
+
+	UFUNCTION()
+	void HandleUndoButtonClick();
+
+	UFUNCTION()
 	void HandleLeftClickAction();
+	void HandleFreeState();
+	void HandleOldEntityState();
+	void HandleNewEntityState();
+
 	void HandleNKeyPressAction();
 	void HandleDeleteKeyPressAction();
+	void HandleZKeyPressAction();
 	void BindWidgetDelegates();
 
 	UFUNCTION()
@@ -50,5 +71,11 @@ private:
 	UFUNCTION()
 	void HandleRoadTypeChange(FString Selectedtype, ESelectInfo::Type SelectionType);
 
+	UFUNCTION()
+	void HandleRoadWidthChange(float InWidth);
+
+	UPROPERTY()
 	ARoadActor* RoadActor;
+
+	ERoadModeState RoadModeState;
 };
