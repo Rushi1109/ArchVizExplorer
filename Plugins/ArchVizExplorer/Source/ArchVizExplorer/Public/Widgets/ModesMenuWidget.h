@@ -38,6 +38,9 @@ protected:
 	UFUNCTION()
 	void HandleInteriorModeButtonClick();
 
+	UFUNCTION()
+	void HandleSaveAndLoadModeButtonClick();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* Canvas;
 
@@ -55,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* InteriorDesignButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* SaveAndLoadButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, meta = (BindWidgetAnim))
 	UWidgetAnimation* ShowOptionMenu;

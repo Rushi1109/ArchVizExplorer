@@ -41,6 +41,12 @@ void AArchVizController::BeginPlay() {
 		InteriorDesignMode->Setup();
 		InteriorDesignMode->SetupInputMapping();
 	}
+	if (IsValid(SaveAndLoadModeRef)) {
+		SaveAndLoadMode = NewObject<USaveAndLoadMode>(this, SaveAndLoadModeRef);
+		SaveAndLoadMode->InitParam(this);
+		SaveAndLoadMode->Setup();
+		SaveAndLoadMode->SetupInputMapping();
+	}
 }
 
 void AArchVizController::Tick(float DeltaTime) {
@@ -68,6 +74,8 @@ void AArchVizController::HandleModeChange(EArchVizMode NewArchVizMode) {
 	case EArchVizMode::InteriorDesign:
 		SetArchVizMode(InteriorDesignMode);
 		break;
+	case EArchVizMode::SaveAndLoad:
+		SetArchVizMode(SaveAndLoadMode);
 	}
 }
 

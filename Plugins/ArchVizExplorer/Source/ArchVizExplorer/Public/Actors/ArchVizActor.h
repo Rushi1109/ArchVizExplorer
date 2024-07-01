@@ -35,9 +35,20 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	UPropertyPanelWidget* PropertyPanel;
 
+	int32 ActorID;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>{}) const;
+
+	int32 GetID() const;
+
+private:
+	static inline int32 ID = 0;
+
+	static int GenerateID() {
+		return ++ID;
+	}
 };

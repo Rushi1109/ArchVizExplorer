@@ -13,6 +13,7 @@ UCLASS()
 class ARCHVIZEXPLORER_API UArchVizSaveSlotName : public USaveGame {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY()
 	TArray<FString> SlotsName;
 };

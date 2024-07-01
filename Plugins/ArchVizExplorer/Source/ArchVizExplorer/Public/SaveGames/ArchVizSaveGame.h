@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/InteriorActor.h"
+#include "Actors/RoadActor.h"
 #include "GameFramework/SaveGame.h"
 #include "ArchVizSaveGame.generated.h"
 
@@ -23,10 +24,13 @@ struct FRoadData {
 	TArray<FVector> SplinePoints;
 
 	UPROPERTY()
-	float Width;
+	ERoadPointType PointType;
 
 	UPROPERTY()
-	UMaterialInterface* Material;
+	float Width;
+
+	//UPROPERTY()
+	//UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -44,10 +48,10 @@ struct FWallData {
 	FTransform Transform;
 
 	UPROPERTY()
-	int32 NumberOfWallSegments;
+	double Length;
 
-	UPROPERTY()
-	UMaterialInterface* Material;
+	//UPROPERTY()
+	//UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -67,7 +71,10 @@ struct FFloorData {
 	FVector Dimensions;
 
 	UPROPERTY()
-	UMaterialInterface* Material;
+	FVector Offset;
+
+	//UPROPERTY()
+	//UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -87,7 +94,10 @@ struct FRoofData {
 	FVector Dimensions;
 
 	UPROPERTY()
-	UMaterialInterface* Material;
+	FVector Offset;
+
+	//UPROPERTY()
+	//UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -104,11 +114,8 @@ struct FDoorData {
 	UPROPERTY()
 	FTransform Transform;
 
-	UPROPERTY()
-	UMaterialInterface* DoorMaterial;
-
-	UPROPERTY()
-	UMaterialInterface* FrameMaterial;
+	//UPROPERTY()
+	//UMaterialInterface* DoorMaterial;
 
 	UPROPERTY()
 	bool bIsOpen;

@@ -49,10 +49,10 @@ void AFloorActor::Tick(float DeltaTime) {
 	}
 }
 
-void AFloorActor::GenerateFloor(const FVector& Dimensions, const FVector& Offset) {
+void AFloorActor::GenerateFloor(const FVector& InDimensions, const FVector& InOffset) {
 	DestroyFloor();
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, InDimensions, InOffset);
 }
 
 void AFloorActor::DestroyFloor() {
@@ -87,8 +87,8 @@ void AFloorActor::HandleGeneratingState() {
 
 	double EdgeOffset{ 10.0 };
 
-	FVector Dimensions{ FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 2 };
-	FVector Offset{ FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength)/2, 1 };
+	Dimensions = { FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 2 };
+	Offset = { FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength)/2, 1 };
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
@@ -148,3 +148,20 @@ void AFloorActor::SetEndLocation(const FVector& NewEndLocation) {
 const FVector& AFloorActor::GetEndLocation() {
 	return EndLocation;
 }
+
+void AFloorActor::SetDimensions(const FVector& InDImensions) {
+	Dimensions = InDImensions;
+}
+
+const FVector& AFloorActor::GetDimensions() const {
+	return Dimensions;
+}
+
+void AFloorActor::SetOffset(const FVector& InOffset) {
+	Offset = InOffset;
+}
+
+const FVector& AFloorActor::GetOffset() const {
+	return Offset;
+}
+

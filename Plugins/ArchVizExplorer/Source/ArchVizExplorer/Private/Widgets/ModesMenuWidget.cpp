@@ -21,6 +21,9 @@ void UModesMenuWidget::NativeConstruct() {
 	if (IsValid(InteriorDesignButton)) {
 		InteriorDesignButton->OnClicked.AddDynamic(this, &UModesMenuWidget::HandleInteriorModeButtonClick);
 	}
+	if (IsValid(SaveAndLoadButton)) {
+		SaveAndLoadButton->OnClicked.AddDynamic(this, &UModesMenuWidget::HandleSaveAndLoadModeButtonClick);
+	}
 }
 
 void UModesMenuWidget::HandleShowModesButtonClick() {
@@ -45,4 +48,8 @@ void UModesMenuWidget::HandleBuildingModeButtonClick() {
 
 void UModesMenuWidget::HandleInteriorModeButtonClick() {
 	OnModeChanged.Broadcast(EArchVizMode::InteriorDesign);
+}
+
+void UModesMenuWidget::HandleSaveAndLoadModeButtonClick() {
+	OnModeChanged.Broadcast(EArchVizMode::SaveAndLoad);
 }

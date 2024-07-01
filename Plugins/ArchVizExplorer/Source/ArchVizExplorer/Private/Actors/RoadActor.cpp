@@ -89,19 +89,30 @@ void ARoadActor::UpdateRoad() {
 		return;
 	}
 
+	UpdateSplinePoints();
+	ConfigureSplinePointTypes();
+	UpdateRoadMesh();
+}
+
+void ARoadActor::UpdateSplinePoints() {
 	SplineComponent->SetSplinePoints(SplinePoints, ESplineCoordinateSpace::World);
+}
 
+void ARoadActor::ConfigureSplinePointTypes() {
 	const int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
-	const FVector MeshBounds = RoadMesh->GetBounds().BoxExtent * 2.0f;
-	const float MeshWidth = MeshBounds.Y;
-	const float MeshLength = MeshBounds.X;
-	const float ScaleFactor = Width / MeshWidth;
-
 	if (RoadPointType == ERoadPointType::Sharp) {
 		for (int32 i = 0; i < NumPoints; ++i) {
 			SplineComponent->SetSplinePointType(i, ESplinePointType::CurveClamped, true);
 		}
 	}
+}
+
+void ARoadActor::UpdateRoadMesh() {
+	const int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
+	const FVector MeshBounds = RoadMesh->GetBounds().BoxExtent * 2.0f;
+	const float MeshWidth = MeshBounds.Y;
+	const float MeshLength = MeshBounds.X;
+	const float ScaleFactor = Width / MeshWidth;
 
 	int32 SegmentIndex = 0;
 
@@ -112,46 +123,49 @@ void ARoadActor::UpdateRoad() {
 		const int32 NumberOfSegments = FMath::CeilToInt(SegmentLength / MeshLength);
 
 		for (int32 j = 0; j < NumberOfSegments; ++j) {
-			if (SegmentIndex >= RoadComponents.Num()) {
-				USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-				SplineMeshComponent->AttachToComponent(SplineComponent, FAttachmentTransformRules::KeepRelativeTransform);
-				SplineMeshComponent->SetStaticMesh(RoadMesh);
-				SplineMeshComponent->RegisterComponent();
-
-				SplineMeshComponent->SetRenderCustomDepth(true);
-				SplineMeshComponent->CustomDepthStencilValue = 2;
-
-				RoadComponents.Add(SplineMeshComponent);
-			}
-
-			USplineMeshComponent* SplineMeshComponent = RoadComponents[SegmentIndex];
-
-			SplineMeshComponent->SetVisibility(true);
-
-			float StrechedMeshLength = SegmentLength / NumberOfSegments;
-
-			float LocalStartDistance = StartDistance + j * StrechedMeshLength - 200;
-			float LocalEndDistance = StartDistance + (j + 1) * StrechedMeshLength - 200;
-
-			const FVector StartLocation = SplineComponent->GetLocationAtDistanceAlongSpline(LocalStartDistance, ESplineCoordinateSpace::Local);
-			const FVector StartTangent = SplineComponent->GetTangentAtDistanceAlongSpline(LocalStartDistance, ESplineCoordinateSpace::Local).GetClampedToMaxSize(MeshLength);
-			const FVector EndLocation = SplineComponent->GetLocationAtDistanceAlongSpline(LocalEndDistance, ESplineCoordinateSpace::Local);
-			const FVector EndTangent = SplineComponent->GetTangentAtDistanceAlongSpline(LocalEndDistance, ESplineCoordinateSpace::Local).GetClampedToMaxSize(MeshLength);
-
-			SplineMeshComponent->SetStartAndEnd(StartLocation, StartTangent, EndLocation, EndTangent, true);
-			SplineMeshComponent->SetStartScale(FVector2D(ScaleFactor, 1));
-			SplineMeshComponent->SetEndScale(FVector2D(ScaleFactor, 1));
-			SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			SplineMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
-			
-			// TODO:: Material
-
+			UpdateOrCreateSegment(SegmentIndex, StartDistance, SegmentLength, MeshLength, ScaleFactor, j, NumberOfSegments);
 			++SegmentIndex;
 		}
 	}
 
-	for (int32 i = SegmentIndex; i < RoadComponents.Num(); ++i) {
+	HideUnusedSegments(SegmentIndex);
+}
+
+void ARoadActor::UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, float SegmentLength, float MeshLength, float ScaleFactor, int32 SegmentPartIndex, int32 NumberOfSegments) {
+	if (SegmentIndex >= RoadComponents.Num()) {
+		USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+		SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+		SplineMeshComponent->AttachToComponent(SplineComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		SplineMeshComponent->SetStaticMesh(RoadMesh);
+		SplineMeshComponent->RegisterComponent();
+
+		SplineMeshComponent->SetRenderCustomDepth(true);
+		SplineMeshComponent->CustomDepthStencilValue = 2;
+
+		RoadComponents.Add(SplineMeshComponent);
+	}
+
+	USplineMeshComponent* SplineMeshComponent = RoadComponents[SegmentIndex];
+	SplineMeshComponent->SetVisibility(true);
+
+	float StretchedMeshLength = SegmentLength / NumberOfSegments;
+	float LocalStartDistance = StartDistance + SegmentPartIndex * StretchedMeshLength - 200;
+	float LocalEndDistance = StartDistance + (SegmentPartIndex + 1) * StretchedMeshLength - 200;
+
+	const FVector StartLocation = SplineComponent->GetLocationAtDistanceAlongSpline(LocalStartDistance, ESplineCoordinateSpace::Local);
+	const FVector StartTangent = SplineComponent->GetTangentAtDistanceAlongSpline(LocalStartDistance, ESplineCoordinateSpace::Local).GetClampedToMaxSize(MeshLength);
+	const FVector EndLocation = SplineComponent->GetLocationAtDistanceAlongSpline(LocalEndDistance, ESplineCoordinateSpace::Local);
+	const FVector EndTangent = SplineComponent->GetTangentAtDistanceAlongSpline(LocalEndDistance, ESplineCoordinateSpace::Local).GetClampedToMaxSize(MeshLength);
+
+	SplineMeshComponent->SetStartAndEnd(StartLocation, StartTangent, EndLocation, EndTangent, true);
+	SplineMeshComponent->SetStartScale(FVector2D(ScaleFactor, 1));
+	SplineMeshComponent->SetEndScale(FVector2D(ScaleFactor, 1));
+	SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SplineMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+}
+
+void ARoadActor::HideUnusedSegments(int32 StartIndex) {
+	for (int32 i = StartIndex; i < RoadComponents.Num(); ++i) {
 		RoadComponents[i]->SetVisibility(false);
 	}
 }
@@ -174,4 +188,20 @@ void ARoadActor::SetPointType(ERoadPointType NewRoadPointType) {
 
 ERoadPointType ARoadActor::GetPointType() const {
 	return RoadPointType;
+}
+
+TArray<FVector> ARoadActor::GetSplinePoints() const {
+	return SplinePoints;
+}
+
+void ARoadActor::SetSplinePoints(TArray<FVector> InSplinePoints) {
+	SplinePoints = InSplinePoints;
+}
+
+float ARoadActor::GetWidth() const {
+	return Width;
+}
+
+void ARoadActor::SetWidth(float InWidth) {
+	Width = InWidth;
 }

@@ -20,6 +20,7 @@ public:
 	ADoorActor();
 
 	bool bIsOpen;
+	int32 ParentWallComponentIndex = -1;
 
 protected:
 	// Called when the game starts or when spawned

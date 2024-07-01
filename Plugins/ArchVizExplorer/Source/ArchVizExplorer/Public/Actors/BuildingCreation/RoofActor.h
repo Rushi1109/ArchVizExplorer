@@ -17,6 +17,7 @@ class ARCHVIZEXPLORER_API ARoofActor : public ABuildingCreationActor {
 
 public:
 	friend class URoofPlacementMode;
+	friend class USaveAndLoadMode;
 
 	// Sets default values for this actor's properties
 	ARoofActor();
@@ -35,6 +36,12 @@ public:
 	void SetEndLocation(const FVector& NewEndLocation); 
 	const FVector& GetEndLocation();
 
+	void SetDimensions(const FVector& InDImensions);
+	const FVector& GetDimensions() const;
+
+	void SetOffset(const FVector& InOffset);
+	const FVector& GetOffset() const;
+
 	void UpdateRoofDimensionSlider();
 
 private:
@@ -43,6 +50,8 @@ private:
 
 	FVector StartLocation;
 	FVector EndLocation;
+	FVector Dimensions;
+	FVector Offset;
 
 	void GenerateRoof(const FVector& Dimensions, const FVector& Offset);
 	void DestroyRoof();

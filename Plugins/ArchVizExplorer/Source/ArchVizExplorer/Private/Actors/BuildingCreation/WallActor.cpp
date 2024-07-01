@@ -42,7 +42,9 @@ void AWallActor::Tick(float DeltaTime) {
 	}
 }
 
-void AWallActor::GenerateSegments(double Length /*= 0.0*/) {
+void AWallActor::GenerateSegments(double InLength /*= 0.0*/) {
+	SetLength(InLength);
+
 	DestroySegments();
 
 	int32 NumberOfSegments{};
@@ -190,6 +192,7 @@ void AWallActor::AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, AD
 		int32 SegmentIndex = WallSegments.Find(SegmentStaticMesh);
 
 		if (SegmentIndex != INDEX_NONE) {
+			DoorActor->ParentWallComponentIndex = SegmentIndex;
 			WallSegments[SegmentIndex]->SetStaticMesh(DoorAttachableWallMesh);
 			IndexDoorMapping.Add(TTuple<int32, ADoorActor*>{SegmentIndex, DoorActor});
 
@@ -219,6 +222,14 @@ void AWallActor::DestroyDoorComponents() {
 	}
 
 	IndexDoorMapping.Empty();
+}
+
+double AWallActor::GetLength() const {
+	return Length;
+}
+
+void AWallActor::SetLength(double InValue) {
+	Length = InValue;
 }
 
 void AWallActor::SetStartLocation(const FVector& NewStartLocation) {

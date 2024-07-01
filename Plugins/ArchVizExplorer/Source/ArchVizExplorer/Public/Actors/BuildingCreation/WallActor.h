@@ -15,6 +15,7 @@ class ARCHVIZEXPLORER_API AWallActor : public ABuildingCreationActor {
 
 public:
 	friend class UWallPlacementMode;
+	friend class USaveAndLoadMode;
 	
 	// Sets default values for this actor's properties
 	AWallActor();
@@ -47,9 +48,14 @@ public:
 	
 	TMap<int32, ADoorActor*> IndexDoorMapping;
 
+	double GetLength() const;
+	void SetLength(double InValue);
+
 private:
 	FVector StartLocation;
 	FVector EndLocation;
+
+	double Length;
 
 	void GenerateSegments(double Length = 0.0);
 	void DestroySegments();

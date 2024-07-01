@@ -10,12 +10,14 @@
 class USplineMeshComponent;
 class USplineComponent;
 
+UENUM()
 enum class ERoadActorState : uint8 {
 	None,
 	Generating,
 	Selected
 };
 
+UENUM()
 enum class ERoadPointType : uint8 {
 	Sharp,
 	Curved
@@ -55,13 +57,6 @@ public:
 	
 	void HandleStateChange();
 
-	//UFUNCTION(BlueprintCallable)
-	//void GenerateRoadMesh();
-
-	// void GenerateRoadSegment(const FVector& StartLocation, const FVector& StartTangent, const FVector& EndLocation, const FVector& EndTangent);
-
-	// void GenerateRoadSegment(float StartDistance, float SegmentLength, int32 SegmentIndex, float MeshLength, float ScaleFactor, int32 SegmentPartIndex, int32 NumberOfSegments);
-
 	UFUNCTION(BlueprintCallable)
     void DestroyRoadMesh();
 
@@ -69,15 +64,23 @@ public:
 	bool RemoveLastSplinePoint();
 
 	void UpdateRoad();
-	//void ConfigureSplinePointTypes();
-	//void UpdateRoadMesh();
-	//void HideUnusedSegments(int32 StartIndex);
+	void UpdateSplinePoints();
+	void ConfigureSplinePointTypes();
+	void UpdateRoadMesh();
+	void UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, float SegmentLength, float MeshLength, float ScaleFactor, int32 SegmentPartIndex, int32 NumberOfSegments);
+	void HideUnusedSegments(int32 StartIndex);
 
 	void SetState(ERoadActorState NewRoadActorState);
 	ERoadActorState GetState() const;
 
 	void SetPointType(ERoadPointType NewRoadPointType);
 	ERoadPointType GetPointType() const;
+
+	TArray<FVector> GetSplinePoints() const;
+	void SetSplinePoints(TArray<FVector> InSplinePoints);
+
+	float GetWidth() const;
+	void SetWidth(float InWidth);
 
 private:
 	ERoadActorState RoadActorState;

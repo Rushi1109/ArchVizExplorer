@@ -15,6 +15,7 @@ class ARCHVIZEXPLORER_API AFloorActor : public ABuildingCreationActor {
 
 public:
 	friend class UFloorPlacementMode;
+	friend class USaveAndLoadMode;
 
 	// Sets default values for this actor's properties
 	AFloorActor();
@@ -33,14 +34,21 @@ public:
 	void SetEndLocation(const FVector& NewEndLocation); 
 	const FVector& GetEndLocation();
 
+	void SetDimensions(const FVector& InDImensions);
+	const FVector& GetDimensions() const;
+
+	void SetOffset(const FVector& InOffset);
+	const FVector& GetOffset() const;
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Floor")
 	UProceduralMeshComponent* ProceduralMeshComponent;
 
 	FVector StartLocation;
 	FVector EndLocation;
+	FVector Dimensions;
+	FVector Offset;
 
-	void GenerateFloor(const FVector& Dimensions, const FVector& Offset);
+	void GenerateFloor(const FVector& InDimensions, const FVector& InOffset);
 	void DestroyFloor();
 	void HandlePreviewingState();
 	void HandleMovingState();

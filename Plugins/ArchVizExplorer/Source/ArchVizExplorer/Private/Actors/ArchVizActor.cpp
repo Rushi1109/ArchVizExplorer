@@ -14,6 +14,8 @@ AArchVizActor::AArchVizActor() {
 void AArchVizActor::BeginPlay() {
 	Super::BeginPlay();
 
+	ActorID = GenerateID();
+
 }
 
 void AArchVizActor::DestroyActor() {
@@ -81,6 +83,10 @@ FHitResult AArchVizActor::GetHitResult(const TArray<AActor*>& ActorsToIgnore) co
 	}
 
 	return HitResult;
+}
+
+int32 AArchVizActor::GetID() const {
+	return ActorID;
 }
 
 // Called every frame

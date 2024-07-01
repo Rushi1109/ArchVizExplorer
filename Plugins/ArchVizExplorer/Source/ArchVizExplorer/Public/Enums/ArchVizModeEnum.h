@@ -10,5 +10,6 @@ enum class EArchVizMode : uint8 {
 	ViewMode,
 	RoadConstruction,
 	BuildingCreation,
-	InteriorDesign
+	InteriorDesign,
+	SaveAndLoad,
 };

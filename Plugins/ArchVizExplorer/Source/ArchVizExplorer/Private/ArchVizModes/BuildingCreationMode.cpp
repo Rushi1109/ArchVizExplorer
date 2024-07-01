@@ -10,7 +10,7 @@
 UBuildingCreationMode::UBuildingCreationMode() : CurrentBuildingCreationSubMode{ nullptr }, BuildingModeEntity{ EBuildingModeEntity::WallPlacement }, WallPlacementMode{ nullptr }, DoorPlacementMode{ nullptr }, FloorPlacementMode{ nullptr }, RoofPlacementMode{ nullptr } {}
 
 void UBuildingCreationMode::Setup() {
-	if (IsValid(WidgetRef)) {
+	if (IsValid(WidgetRef) && !IsValid(Widget)) {
 		Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetRef, TEXT("Building Creation Widget"));
 		if (auto* BuildingCreationWidget = Cast<UBuildingCreationWidget>(Widget)) {
 			BuildingCreationWidget->OnBuildingModeEntityChange.AddUObject(this, &UBuildingCreationMode::HandleBuildingSubModeChange);

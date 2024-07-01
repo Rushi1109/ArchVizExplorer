@@ -14,6 +14,7 @@
 #include "Widgets/RoadConstructionWidget.h"
 #include "Widgets/BuildingCreationWidget.h"
 #include "Widgets/InteriorDesignWidget.h"
+#include "ArchVizModes/SaveAndLoadMode.h"
 #include "ArchVizController.generated.h"
 
 class ARoadActor;
@@ -51,26 +52,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InteriorDesign | Mode")
 	TSubclassOf<UInteriorDesignMode> InteriorDesignModeRef;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SaveAndLoad | Mode")
+	TSubclassOf<USaveAndLoadMode> SaveAndLoadModeRef;
+
 private:
 	UFUNCTION()
 	void HandleModeChange(EArchVizMode ArchVizMode);
 
 	void SetArchVizMode(UArchVizMode* NewMode);
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode | ModesMenu")
 	UModesMenuWidget* ModesMenuWidget;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
 	EArchVizMode ArchVizMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "RoadConstruction | Mode")
+	UPROPERTY()
 	URoadConstructionMode* RoadConstructionMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "BuildingCreation | Mode")
+	UPROPERTY()
 	UBuildingCreationMode* BuildingCreationMode;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "InteriorDesign | Mode")
+	UPROPERTY()
 	UInteriorDesignMode* InteriorDesignMode;
+
+	UPROPERTY()
+	USaveAndLoadMode* SaveAndLoadMode;
 
 	FInputModeGameAndUI InputMode;
 };

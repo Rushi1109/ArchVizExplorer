@@ -2,6 +2,35 @@
 
 
 #include "Widgets/SaveAndLoadWidget.h"
+#include "UMG/Public/Components/ScrollBoxSlot.h"
+
+void USaveAndLoadWidget::PopulateSavedSlots(TArray<FString> SaveSlots) {
+	if (IsValid(SaveSlotScrollBox)) {
+		SaveSlotScrollBox->ClearChildren();
+
+		for (const auto& SaveSlot : SaveSlots) {
+			if (SaveSlotItemRef) {
+				if (USaveSlotItem* ItemWidget = CreateWidget<USaveSlotItem>(this, SaveSlotItemRef)) {
+					ItemWidget->SetItemData(SaveSlot);
+					ItemWidget->OnItemSelectButtonClicked.BindLambda(
+						[this](const FString& SlotName) {
+							OnSaveSlotReceived.ExecuteIfBound(SlotName);
+						});
+
+					ItemWidget->OnItemDeleteButtonClicked.BindLambda(
+						[this](const FString& SlotName) {
+							OnSaveSlotDeleteReceived.ExecuteIfBound(SlotName);
+						});
+
+					auto* PanelSlot = SaveSlotScrollBox->AddChild(ItemWidget);
+					if (auto* ScrollBoxSlot = Cast<UScrollBoxSlot>(PanelSlot)) {
+						ScrollBoxSlot->SetPadding(FMargin{ 6.0 });
+					}
+				}
+			}
+		}
+	}
+}
 
 void USaveAndLoadWidget::NativeConstruct() {
 	Super::NativeConstruct();
