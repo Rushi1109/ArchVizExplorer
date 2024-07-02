@@ -187,6 +187,8 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		FloorData.Material = FloorActor->GetMaterial();
 		FloorData.Dimensions = FloorActor->GetDimensions();
 		FloorData.Dimensions = FloorActor->GetOffset();
+		FloorData.StartLocation = FloorActor->GetStartLocation();
+		FloorData.EndLocation = FloorActor->GetEndLocation();
 		if (IsValid(FloorActor->GetAttachParentActor())) {
 			if (auto ParentActor = Cast<AArchVizActor>(FloorActor->GetAttachParentActor())) {
 				FloorData.ParentActorId = ParentActor->GetID();
@@ -209,6 +211,8 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		RoofData.Material = RoofActor->GetMaterial();
 		RoofData.Dimensions = RoofActor->GetDimensions();
 		RoofData.Offset = RoofActor->GetOffset();
+		RoofData.StartLocation = RoofActor->GetStartLocation();
+		RoofData.EndLocation = RoofActor->GetEndLocation();
 		if (IsValid(RoofActor->GetAttachParentActor())) {
 			if (auto ParentActor = Cast<AArchVizActor>(RoofActor->GetAttachParentActor())) {
 				RoofData.ParentActorId = ParentActor->GetID();
@@ -329,8 +333,11 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			AFloorActor* FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, FloorData.Transform, SpawnParams);
 			FloorActor->SetActorTransform(FloorData.Transform);
 			FloorActor->SetDimensions(FloorData.Dimensions);
+			FloorActor->SetOffset(FloorData.Offset);
 			FloorActor->SetMaterial(FloorData.Material);
 			// FloorActor->SynchronizePropertyPanel();
+			FloorActor->SetStartLocation(FloorData.StartLocation);
+			FloorActor->SetEndLocation(FloorData.EndLocation);
 			FloorActor->GenerateFloor(FloorData.Dimensions, FloorData.Offset);
 			IDToActorMap.Add(FloorData.ID, FloorActor);
 
@@ -343,7 +350,10 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			ARoofActor* RoofActor = GetWorld()->SpawnActor<ARoofActor>(RoofActorRef, RoofData.Transform, SpawnParams);
 			RoofActor->SetActorTransform(RoofData.Transform);
 			RoofActor->SetDimensions(RoofData.Dimensions);
+			RoofActor->SetOffset(RoofData.Offset);
 			RoofActor->SetMaterial(RoofData.Material);
+			RoofActor->SetStartLocation(RoofData.StartLocation);
+			RoofActor->SetEndLocation(RoofData.EndLocation);
 			// FloorActor->SynchronizePropertyPanel();
 			RoofActor->GenerateRoof(RoofData.Dimensions, RoofData.Offset);
 			IDToActorMap.Add(RoofData.ID, RoofActor);

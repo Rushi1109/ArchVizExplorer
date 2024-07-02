@@ -80,6 +80,12 @@ struct FFloorData {
 	FVector Offset;
 
 	UPROPERTY()
+	FVector StartLocation;
+
+	UPROPERTY()
+	FVector EndLocation;
+
+	UPROPERTY()
 	UMaterialInterface* Material;
 
 	UPROPERTY()
@@ -103,6 +109,12 @@ struct FRoofData {
 
 	UPROPERTY()
 	FVector Offset;
+
+	UPROPERTY()
+	FVector StartLocation;
+
+	UPROPERTY()
+	FVector EndLocation;
 
 	UPROPERTY()
 	UMaterialInterface* Material;

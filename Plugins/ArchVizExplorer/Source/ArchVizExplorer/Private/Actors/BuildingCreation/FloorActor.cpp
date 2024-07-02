@@ -119,23 +119,6 @@ void AFloorActor::HandleGeneratingState() {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
 	}
 
-	//FVector NewStartLocation{ StartLocation };
-
-	//if (XFloorLength >= 0.0) {
-	//	NewStartLocation.X -= EdgeOffset;
-	//}
-	//else {
-	//	NewStartLocation.X += EdgeOffset;
-	//}
-	//if (YFloorLength >= 0.0) {
-	//	NewStartLocation.Y -= EdgeOffset;
-	//}
-	//else {
-	//	NewStartLocation.Y += EdgeOffset;
-	//}
-
-	//SetActorLocation(NewStartLocation);
-
 	GenerateFloor(Dimensions, Offset);
 }
 
