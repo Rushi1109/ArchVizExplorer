@@ -54,4 +54,6 @@ private:
 	void HandleMovingState();
 	void HandleGeneratingState();
 	void UpdateFloorDimensionSlider();
+
+	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 };

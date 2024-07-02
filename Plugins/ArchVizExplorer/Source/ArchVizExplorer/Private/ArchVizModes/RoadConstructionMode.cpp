@@ -207,7 +207,9 @@ void URoadConstructionMode::HandleRoadTypeChange(FString Selectedtype, ESelectIn
 }
 
 void URoadConstructionMode::HandleRoadWidthChange(float InWidth) {
-	RoadActor->Width = InWidth;
+	if (IsValid(RoadActor)) {
+		RoadActor->Width = InWidth;
 
-	RoadActor->UpdateRoad();
+		RoadActor->UpdateRoad();
+	}
 }

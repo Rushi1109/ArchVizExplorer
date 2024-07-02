@@ -47,12 +47,26 @@ void AArchVizActor::ShowPropertyPanel() {
 	if (IsValid(PropertyPanel)) {
 		PropertyPanel->AddToViewport();
 	}
+	if (IsValid(MaterialWidget)) {
+		MaterialWidget->AddToViewport();
+	}
 }
 
 void AArchVizActor::HidePropertyPanel() {
 	if (IsValid(PropertyPanel)) {
 		PropertyPanel->RemoveFromParent();
 	}
+	if (IsValid(MaterialWidget)) {
+		MaterialWidget->RemoveFromParent();
+	}
+}
+
+void AArchVizActor::SetMaterial(UMaterialInterface* InMaterial) {
+	Material = InMaterial;
+}
+
+UMaterialInterface* AArchVizActor::GetMaterial() const {
+	return Material;
 }
 
 void AArchVizActor::RotateActor(double Degrees) {

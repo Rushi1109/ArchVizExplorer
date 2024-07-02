@@ -41,6 +41,5 @@ private:
 	UStaticMeshComponent* DoorComponent;
 
 	void HandlePreviewState();
-	void HandleGeneratingState();
 	void HandleMovingState();
 };

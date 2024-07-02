@@ -65,4 +65,6 @@ private:
 	void HandleGeneratingState();
 	void AdjustEdgeOffset();
 	void UpdateWallLenghSlider();
+
+	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 };

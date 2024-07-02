@@ -25,6 +25,16 @@ void AWallActor::BeginPlay() {
 		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
 		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(0);
 	}
+
+
+	if (IsValid(MaterialWidgetRef)) {
+		MaterialWidget = CreateWidget<UMaterialWidget>(GetWorld(), MaterialWidgetRef);
+
+		if (IsValid(MaterialWidget->MaterialScrollBox)) {
+			MaterialWidget->MaterialScrollBox->PopulateWidget(MaterialWidget->WallMaterialDataAsset);
+			MaterialWidget->MaterialScrollBox->OnItemSelected.BindUObject(this, &AWallActor::HandleMaterialChange);
+		}
+	}
 }
 
 // Called every frame
@@ -64,6 +74,10 @@ void AWallActor::GenerateSegments(double InLength /*= 0.0*/) {
 		if (IsValid(WallMesh)) {
 			StaticMeshComponent->SetStaticMesh(WallMesh);
 			WallSegments.Add(StaticMeshComponent);
+		}
+
+		if (IsValid(Material)) {
+			StaticMeshComponent->SetMaterial(0, Material);
 		}
 	}
 
@@ -246,4 +260,11 @@ void AWallActor::SetEndLocation(const FVector& NewEndLocation) {
 
 const FVector& AWallActor::GetEndLocation() const {
 	return EndLocation;
+}
+
+void AWallActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
+	if (IsValid(MaterialAsset.Material)) {
+		Material = MaterialAsset.Material;
+		GenerateSegments(Length);
+	}
 }

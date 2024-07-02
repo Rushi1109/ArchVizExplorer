@@ -58,4 +58,6 @@ private:
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
+
+	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 };

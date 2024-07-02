@@ -85,4 +85,6 @@ public:
 private:
 	ERoadActorState RoadActorState;
 	ERoadPointType RoadPointType;
+
+	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 };

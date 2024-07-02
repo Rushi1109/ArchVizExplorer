@@ -28,6 +28,15 @@ void ARoadActor::BeginPlay() {
 		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
 		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(5);
 	}
+
+	if (IsValid(MaterialWidgetRef)) {
+		MaterialWidget = CreateWidget<UMaterialWidget>(GetWorld(), MaterialWidgetRef);
+
+		if (IsValid(MaterialWidget->MaterialScrollBox)) {
+			MaterialWidget->MaterialScrollBox->PopulateWidget(MaterialWidget->RoadMaterialDataAsset);
+			MaterialWidget->MaterialScrollBox->OnItemSelected.BindUObject(this, &ARoadActor::HandleMaterialChange);
+		}
+	}
 }
 
 // Called every frame
@@ -162,6 +171,10 @@ void ARoadActor::UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, 
 	SplineMeshComponent->SetEndScale(FVector2D(ScaleFactor, 1));
 	SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SplineMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+
+	if (IsValid(Material)) {
+		SplineMeshComponent->SetMaterial(0, Material);
+	}
 }
 
 void ARoadActor::HideUnusedSegments(int32 StartIndex) {
@@ -204,4 +217,11 @@ float ARoadActor::GetWidth() const {
 
 void ARoadActor::SetWidth(float InWidth) {
 	Width = InWidth;
+}
+
+void ARoadActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
+	if (IsValid(MaterialAsset.Material)) {
+		Material = MaterialAsset.Material;
+		UpdateRoad();
+	}
 }

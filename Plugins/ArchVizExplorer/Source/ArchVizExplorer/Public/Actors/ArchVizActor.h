@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Widgets/PropertyPanelWidget.h"
+#include "Widgets/MaterialWidget.h"
 #include "ArchVizActor.generated.h"
 
 UCLASS()
@@ -24,6 +25,9 @@ protected:
 	void ShowPropertyPanel();
 	void HidePropertyPanel();
 
+	void SetMaterial(UMaterialInterface* InMaterial);
+	UMaterialInterface* GetMaterial() const;
+
 	void HighlightSelectedActor();
 	void UnHighlightDeselectedActor();
 
@@ -34,6 +38,15 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | PropertyWidget")
 	UPropertyPanelWidget* PropertyPanel;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UMaterialWidget> MaterialWidgetRef;
+	
+	UPROPERTY()
+	UMaterialWidget* MaterialWidget;
+
+	UPROPERTY()
+	UMaterialInterface* Material;
 
 	int32 ActorID;
 

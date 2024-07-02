@@ -27,6 +27,15 @@ void ARoofActor::BeginPlay() {
 		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
 		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(3);
 	}
+
+	if (IsValid(MaterialWidgetRef)) {
+		MaterialWidget = CreateWidget<UMaterialWidget>(GetWorld(), MaterialWidgetRef);
+
+		if (IsValid(MaterialWidget->MaterialScrollBox)) {
+			MaterialWidget->MaterialScrollBox->PopulateWidget(MaterialWidget->RoofMaterialDataAsset);
+			MaterialWidget->MaterialScrollBox->OnItemSelected.BindUObject(this, &ARoofActor::HandleMaterialChange);
+		}
+	}
 }
 
 // Called every frame
@@ -118,6 +127,13 @@ void ARoofActor::HandleGeneratingState() {
 	//SetActorLocation(NewStartLocation);
 
 	GenerateRoof(Dimensions, Offset);
+}
+
+void ARoofActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
+	if (IsValid(MaterialAsset.Material)) {
+		Material = MaterialAsset.Material;
+		ProceduralMeshComponent->SetMaterial(0, Material);
+	}
 }
 
 void ARoofActor::UpdateRoofDimensionSlider() {

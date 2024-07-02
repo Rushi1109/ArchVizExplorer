@@ -32,6 +32,16 @@ void AFloorActor::BeginPlay() {
 		PropertyPanel = CreateWidget<UPropertyPanelWidget>(GetWorld(), PropertyPanelRef);
 		PropertyPanel->WidgetSwitcher->SetActiveWidgetIndex(2);
 	}
+
+
+	if (IsValid(MaterialWidgetRef)) {
+		MaterialWidget = CreateWidget<UMaterialWidget>(GetWorld(), MaterialWidgetRef);
+
+		if (IsValid(MaterialWidget->MaterialScrollBox)) {
+			MaterialWidget->MaterialScrollBox->PopulateWidget(MaterialWidget->FloorMaterialDataAsset);
+			MaterialWidget->MaterialScrollBox->OnItemSelected.BindUObject(this, &AFloorActor::HandleMaterialChange);
+		}
+	}
 }
 
 // Called every frame
@@ -130,6 +140,13 @@ void AFloorActor::UpdateFloorDimensionSlider() {
 		PropertyPanel->FloorLengthSpinBox->SetValue(FMath::Abs(EndLocation.X - StartLocation.X));
 		PropertyPanel->FloorWidthSpinBox->SetValue(FMath::Abs(EndLocation.Y - StartLocation.Y));
 		PropertyPanel->FloorHeightSpinBox->SetValue(FMath::Abs(2));
+	}
+}
+
+void AFloorActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
+	if (IsValid(MaterialAsset.Material)) {
+		Material = MaterialAsset.Material;
+		ProceduralMeshComponent->SetMaterial(0, Material);
 	}
 }
 
