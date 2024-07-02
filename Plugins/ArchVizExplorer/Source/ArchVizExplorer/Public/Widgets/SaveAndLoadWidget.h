@@ -78,9 +78,12 @@ public:
 
 	UFUNCTION()
 	void HandleCancelLoadButtonClick();
-
 	// BackGround Blur
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UBackgroundBlur* BgBlur;
 
+	void ShowLoadPopup();
+	void HideLoadPopup();
+	void ShowSavePopup();
+	void HideSavePopup();
 };

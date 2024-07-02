@@ -55,25 +55,41 @@ void USaveAndLoadWidget::NativeConstruct() {
 
 
 void USaveAndLoadWidget::HandleLoadMenuButtonClick() {
+	ShowLoadPopup();
+}
+
+void USaveAndLoadWidget::HandleSaveMenuButtonClick() {
+	ShowSavePopup();
+}
+
+void USaveAndLoadWidget::HandleCancelSaveButtonClick() {
+	HideSavePopup();
+}
+
+void USaveAndLoadWidget::HandleCancelLoadButtonClick() {
+	HideLoadPopup();
+}
+
+void USaveAndLoadWidget::ShowLoadPopup() {
 	LoadPopup->SetVisibility(ESlateVisibility::Visible);
 	BgBlur->SetIsEnabled(true);
 	BgBlur->SetBlurStrength(2.0f);
 }
 
-void USaveAndLoadWidget::HandleSaveMenuButtonClick() {
+void USaveAndLoadWidget::HideLoadPopup() {
+	LoadPopup->SetVisibility(ESlateVisibility::Hidden);
+	BgBlur->SetIsEnabled(false);
+	BgBlur->SetBlurStrength(0.0f);
+}
+
+void USaveAndLoadWidget::ShowSavePopup() {
 	SavePopup->SetVisibility(ESlateVisibility::Visible);
 	BgBlur->SetIsEnabled(true);
 	BgBlur->SetBlurStrength(2.0f);
 }
 
-void USaveAndLoadWidget::HandleCancelSaveButtonClick() {
+void USaveAndLoadWidget::HideSavePopup() {
 	SavePopup->SetVisibility(ESlateVisibility::Hidden);
-	BgBlur->SetIsEnabled(false);
-	BgBlur->SetBlurStrength(0.0f);
-}
-
-void USaveAndLoadWidget::HandleCancelLoadButtonClick() {
-	LoadPopup->SetVisibility(ESlateVisibility::Hidden);
 	BgBlur->SetIsEnabled(false);
 	BgBlur->SetBlurStrength(0.0f);
 }

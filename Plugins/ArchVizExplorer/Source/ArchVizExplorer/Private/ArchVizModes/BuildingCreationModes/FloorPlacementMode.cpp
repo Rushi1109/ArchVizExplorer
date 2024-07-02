@@ -3,6 +3,7 @@
 
 #include "ArchVizModes/BuildingCreationModes/FloorPlacementMode.h"
 #include "Actors/BuildingCreation/FloorActor.h"
+#include "ArchVizController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Widgets/PropertyPanelWidget.h"
@@ -155,6 +156,8 @@ void UFloorPlacementMode::HandleNewEntityState() {
 			FloorActor->UpdateFloorDimensionSlider();
 			FloorActor->SetState(EBuildingActorState::Selected);
 			SubModeState = EBuildingSubModeState::Free;
+
+			PlayerController->SetSuccess(FText::FromString("Completed The Floor Segment."));
 		}
 	}
 }
@@ -193,6 +196,8 @@ void UFloorPlacementMode::HandleDeleteKeyPressAction() {
 		FloorActor->SetState(EBuildingActorState::None);
 		FloorActor->DestroyActor();
 		FloorActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted The Floor Segment."));
 	}
 }
 

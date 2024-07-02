@@ -8,6 +8,7 @@ void UInteriorDesignWidget::NativeConstruct() {
 
 	if(IsValid(ChairButton)) {
 		ChairButton->OnClicked.AddDynamic(this, &UInteriorDesignWidget::HandleChairButtonClick);
+		InteriorScrollBox->PopulateWidget(ChairDataAsset);
 	}
 	if (IsValid(TableButton)) {
 		TableButton->OnClicked.AddDynamic(this, &UInteriorDesignWidget::HandleTableButtonClick);

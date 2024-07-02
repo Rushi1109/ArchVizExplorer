@@ -4,6 +4,7 @@
 #include "ArchVizModes/BuildingCreationModes/DoorPlacementMode.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "ArchVizController.h"
 #include "Widgets/PropertyPanelWidget.h"
 #include "Actors/BuildingCreation/WallActor.h"
 #include "Actors/BuildingCreation/FloorActor.h"
@@ -141,7 +142,12 @@ void UDoorPlacementMode::HandleNewEntityState() {
 				DoorActor->SetState(EBuildingActorState::Selected);
 				WallActor->AttachDoorComponent(HitResult.GetComponent(), DoorActor);
 				SubModeState = EBuildingSubModeState::Free;
+
+				PlayerController->SetSuccess(FText::FromString("Attached The Door To Wall Segment."));
 			}
+		}
+		else {
+			PlayerController->SetError(FText::FromString("The Door Can Only Be Placed On Walls."));
 		}
 	}
 }
@@ -200,6 +206,8 @@ void UDoorPlacementMode::HandleDeleteKeyPressAction() {
 
 		DoorActor->DestroyActor();
 		DoorActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted The Door."));
 	}
 }
 

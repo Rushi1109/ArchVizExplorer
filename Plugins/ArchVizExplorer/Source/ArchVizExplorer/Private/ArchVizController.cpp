@@ -23,6 +23,11 @@ void AArchVizController::BeginPlay() {
 		ModesMenuWidget->OnModeChanged.AddUObject(this, &AArchVizController::HandleModeChange);
 	}
 
+	if (IsValid(NotificationWidgetRef)) {
+		NotificationWidget = CreateWidget<UNotificationWidget>(this, NotificationWidgetRef);
+		NotificationWidget->AddToViewport(1);
+	}
+
 	if (IsValid(RoadConstructionModeRef)) {
 		RoadConstructionMode = NewObject<URoadConstructionMode>(this, RoadConstructionModeRef);
 		RoadConstructionMode->InitParam(this);
@@ -88,5 +93,17 @@ void AArchVizController::SetArchVizMode(UArchVizMode* NewArchVizMode) {
 
 	if (CurrentMode) {
 		CurrentMode->EnterMode();
+	}
+}
+
+void AArchVizController::SetSuccess(FText SuccessText) {
+	if (IsValid(NotificationWidget)) {
+		NotificationWidget->SetSuccess(SuccessText);
+	}
+}
+
+void AArchVizController::SetError(FText ErrorText) {
+	if (IsValid(NotificationWidget)) {
+		NotificationWidget->SetError(ErrorText);
 	}
 }

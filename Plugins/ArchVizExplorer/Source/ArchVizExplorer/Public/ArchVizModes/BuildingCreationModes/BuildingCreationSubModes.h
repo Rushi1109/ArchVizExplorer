@@ -7,7 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "BuildingCreationSubModes.generated.h"
 
-class APlayerController;
+class AArchVizController;
 class UInputMappingContext;
 
 UENUM(BlueprintType)
@@ -33,7 +33,7 @@ public:
 	virtual void EnterSubMode() PURE_VIRTUAL(UBuildingCreationSubMode::EnterSubMode(), );
 	virtual void ExitSubMode() PURE_VIRTUAL(UBuildingCreationSubMode::ExitSubMode(), );
 
-	virtual void InitParams(APlayerController* Controller);
+	virtual void InitParams(AArchVizController* Controller);
 
 	FOnOtherBuildingActorSelected OnOtherBuildingActorSelected;
 
@@ -45,7 +45,7 @@ protected:
 	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>{}) const;
 
 	UPROPERTY()
-	APlayerController* PlayerController;
+	AArchVizController* PlayerController;
 
 	UPROPERTY()
 	UInputMappingContext* InputMappingContext;

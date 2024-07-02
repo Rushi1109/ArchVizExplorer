@@ -9,6 +9,7 @@
 
 class APlayerController;
 class UInputMappingContext;
+class AArchVizController;
 
 /**
  *
@@ -25,7 +26,7 @@ public:
 	virtual void EnterMode() PURE_VIRTUAL(UArchVizMode::EnterMode(), );
 	virtual void ExitMode() PURE_VIRTUAL(UArchVizMode::ExitMode(), );
 
-	virtual void InitParam(APlayerController* Controller);
+	virtual void InitParam(AArchVizController* Controller);
 	virtual void ShowWidget();
 	virtual void HideWidget();
 
@@ -33,7 +34,7 @@ protected:
 	FHitResult GetHitResult(const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>{}) const;
 	
 	UPROPERTY()
-	APlayerController* PlayerController;
+	AArchVizController* PlayerController;
 
 	UPROPERTY()
 	UInputMappingContext* InputMappingContext;

@@ -3,6 +3,7 @@
 
 #include "ArchVizModes/BuildingCreationModes/WallPlacementMode.h"
 #include "Actors/BuildingCreation/WallActor.h"
+#include "ArchVizController.h"
 #include "Utilities/ArchVizUtility.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "EnhancedInputComponent.h"
@@ -127,9 +128,9 @@ void UWallPlacementMode::HandleFreeState() {
 			WallActor->GenerateSegments();
 			WallActor->SetState(EBuildingActorState::Previewing);
 			SubModeState = EBuildingSubModeState::NewEntity;
-			// Material
+			
+			// TODO:: Preview Material
 		}
-	
 	}
 }
 
@@ -160,6 +161,8 @@ void UWallPlacementMode::HandleNewEntityState() {
 
 			WallActor->SetState(EBuildingActorState::Selected);
 			SubModeState = EBuildingSubModeState::Free;
+
+			PlayerController->SetSuccess(FText::FromString("Completed The Wall Segment."));
 		}
 	}
 }
@@ -200,6 +203,8 @@ void UWallPlacementMode::HandleDeleteKeyPressAction() {
 		WallActor->DestroyDoorComponents();
 		WallActor->DestroyActor();
 		WallActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted The Wall Segment."));
 	}
 }
 

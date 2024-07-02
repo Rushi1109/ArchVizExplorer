@@ -2,8 +2,9 @@
 
 
 #include "ArchVizModes/ArchVizMode.h"
+#include "ArchVizController.h"
 
-void UArchVizMode::InitParam(APlayerController* Controller) {
+void UArchVizMode::InitParam(AArchVizController* Controller) {
 	PlayerController = Controller;
 }
 

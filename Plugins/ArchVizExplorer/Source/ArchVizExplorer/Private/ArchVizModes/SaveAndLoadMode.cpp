@@ -2,6 +2,7 @@
 
 
 #include "ArchVizModes/SaveAndLoadMode.h"
+#include "ArchVizController.h"
 #include "Widgets/SaveAndLoadWidget.h"
 #include "Actors/ArchVizActor.h"
 #include "EngineUtils.h"
@@ -15,9 +16,7 @@
 #include "Actors/InteriorActor.h"
 #include "SaveGames/ArchVizSaveSlotName.h"
 
-USaveAndLoadMode::USaveAndLoadMode() : CurrentSlotName{TEXT("")} {
-
-}
+USaveAndLoadMode::USaveAndLoadMode() : CurrentSlotName{ TEXT("") } {}
 
 void USaveAndLoadMode::Setup() {
 	SlotsList = GetSaveSlots();
@@ -44,6 +43,8 @@ void USaveAndLoadMode::SetupInputMapping() {
 
 void USaveAndLoadMode::EnterMode() {
 	ShowWidget();
+
+	PlayerController->SetSuccess(FText::FromString("Switched To Save/Load Mode."));
 }
 
 void USaveAndLoadMode::ExitMode() {
@@ -55,37 +56,44 @@ void USaveAndLoadMode::HandleSaveButtonClick() {
 		FString SlotName = SaveAndLoadWidget->SaveSlotName->GetText().ToString();
 
 		if (SlotName.IsEmpty()) {
-			// TODO :: Notify the name is empty
+			PlayerController->SetError(FText::FromString("Project Name is Empty."));
 			return;
 		}
 
 		if (GetSaveSlots().Contains(SlotName)) {
-			// TODO :: Notify("This Name Already Exists. Please Choose Differnet Name");
+			PlayerController->SetError(FText::FromString("This Name Already Exists. Please Choose Different Name"));
 			return;
 		}
 
 		CurrentSlotName = SlotName;
 		SaveGame(CurrentSlotName);
 
+		PlayerController->SetSuccess(FText::FromString("Successfully Saved the Project."));
+
+		SaveAndLoadWidget->HideSavePopup();
 		SaveAndLoadWidget->SaveSlotName->SetText(FText{});
 	}
 }
 
 void USaveAndLoadMode::HandleSlotLoadClick(const FString& SlotName) {
-	if (CurrentSlotName == SlotName) {
-		// Notify("Project is Already Opened.");
-		return;
+	if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
+		if (CurrentSlotName == SlotName) {
+			PlayerController->SetError(FText::FromString("Project " + SlotName + " is Currently Opened."));
+			return;
+		}
+
+		CurrentSlotName = SlotName;
+		LoadGame(CurrentSlotName);
+
+		PlayerController->SetSuccess(FText::FromString("Project " + SlotName + " Loaded."));
+
+		SaveAndLoadWidget->HideLoadPopup();
 	}
-
-	CurrentSlotName = SlotName;
-	LoadGame(CurrentSlotName);
-
-	// TODO :: Success
 }
 
 void USaveAndLoadMode::HandleSlotDeleteClick(const FString& SlotName) {
 	if (SlotName == CurrentSlotName) {
-		// TOdo :: Notify("Can Not Delete Running Project.");
+		PlayerController->SetError(FText::FromString("Can Not Delete Currently Loaded Project."));
 		return;
 	}
 
@@ -93,14 +101,14 @@ void USaveAndLoadMode::HandleSlotDeleteClick(const FString& SlotName) {
 		if (UGameplayStatics::DeleteGameInSlot(SlotName, 0)) {
 			DeleteSlotData(SlotName);
 
-			// TODO :: Notify("Project " + SlotInfo + " Deleted");
+			PlayerController->SetSuccess(FText::FromString("Project " + SlotName + " Deleted."));
 		}
 	}
 }
 
 void USaveAndLoadMode::DeleteSlotData(const FString& SlotName) {
 	UArchVizSaveSlotName* ArchVizSaveSlotName = Cast<UArchVizSaveSlotName>(UGameplayStatics::LoadGameFromSlot("SavedSlotNames", 0));
-	
+
 	if (IsValid(ArchVizSaveSlotName)) {
 		ArchVizSaveSlotName->SlotsName.Remove(SlotName);
 		SlotsList = ArchVizSaveSlotName->SlotsName;
@@ -413,7 +421,7 @@ TArray<FString> USaveAndLoadMode::GetSaveSlots() {
 
 
 void USaveAndLoadMode::ClearWholeWorld() {
-	for (TActorIterator<AArchVizActor> It{GetWorld()}; It; ++It) {
+	for (TActorIterator<AArchVizActor> It{ GetWorld() }; It; ++It) {
 		if (AArchVizActor* Actor = *It; IsValid(Actor)) {
 			Actor->Destroy();
 		}

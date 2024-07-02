@@ -3,6 +3,7 @@
 
 #include "ArchVizModes/BuildingCreationModes/RoofPlacementMode.h"
 #include "Actors/BuildingCreation/RoofActor.h"
+#include "ArchVizController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Utilities/ArchVizUtility.h"
@@ -156,7 +157,12 @@ void URoofPlacementMode::HandleNewEntityState() {
 				RoofActor->UpdateRoofDimensionSlider();
 				RoofActor->SetState(EBuildingActorState::Selected);
 				SubModeState = EBuildingSubModeState::Free;
+
+				PlayerController->SetSuccess(FText::FromString("Completed The Roof Segment."));
 			}
+		}
+		else {
+			PlayerController->SetError(FText::FromString("The Roof Can Only Be Placed On Walls."));
 		}
 	}
 }
@@ -195,6 +201,8 @@ void URoofPlacementMode::HandleDeleteKeyPressAction() {
 		RoofActor->SetState(EBuildingActorState::None);
 		RoofActor->DestroyActor();
 		RoofActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted The Roof Segment."));
 	}
 }
 

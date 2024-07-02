@@ -16,10 +16,10 @@ enum class EInteriorActorState : uint8 {
 
 UENUM(BlueprintType)
 enum class EInteriorAssetType : uint8 {
-	FloorPlaceable,
-	WallPlaceable,
-	RoofPlaceable,
-	InteriorPlaceable
+	FloorPlaceable UMETA(DisplayName = "Floor"),
+	WallPlaceable UMETA(DisplayName = "Wall"),
+	RoofPlaceable UMETA(DisplayName = "Roof"),
+	InteriorPlaceable UMETA(DisplayName = "Interior")
 };
 
 /**

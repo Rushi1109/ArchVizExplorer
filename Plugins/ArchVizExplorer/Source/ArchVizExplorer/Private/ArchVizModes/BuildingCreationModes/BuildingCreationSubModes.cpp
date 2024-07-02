@@ -2,8 +2,9 @@
 
 
 #include "ArchVizModes/BuildingCreationModes/BuildingCreationSubModes.h"
+#include "ArchVizController.h"
 
-void UBuildingCreationSubMode::InitParams(APlayerController* Controller) {
+void UBuildingCreationSubMode::InitParams(AArchVizController* Controller) {
 	PlayerController = Controller;
 }
 

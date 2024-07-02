@@ -3,6 +3,7 @@
 
 #include "ArchVizModes/InteriorDesignMode.h"
 #include "Actors/RoadActor.h"
+#include "ArchVizController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "DataAssets/InteriorDataAsset.h"
@@ -74,6 +75,8 @@ void UInteriorDesignMode::EnterMode() {
 
 		ShowWidget();
 		Setup();
+
+		PlayerController->SetSuccess(FText::FromString("Switched To Interior Design Mode."));
 	}
 }
 
@@ -142,6 +145,9 @@ void UInteriorDesignMode::HandleNewEntityState() {
 				InteriorActor->SetState(EInteriorActorState::Selected);
 				InteriorModeState = EInteriorModeState::Free;
 			}
+			else {
+				PlayerController->SetError(FText::FromString("The Item can only be placed on " + UEnum::GetDisplayValueAsText(InteriorActor->GetAssetType()).ToString()));
+			}
 		}
 	}
 }
@@ -177,6 +183,8 @@ void UInteriorDesignMode::HandleDeleteKeyPressAction() {
 		InteriorActor->SetState(EInteriorActorState::None);
 		InteriorActor->DestroyActor();
 		InteriorActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted The Interior Item."));
 	}
 }
 

@@ -2,6 +2,7 @@
 
 
 #include "ArchVizModes/RoadConstructionMode.h"
+#include "ArchVizController.h"
 #include "Actors/RoadActor.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -68,6 +69,8 @@ void URoadConstructionMode::EnterMode() {
 
 		ShowWidget();
 		Setup();
+
+		PlayerController->SetSuccess(FText::FromString("Switched To Road Construction Mode."));
 	}
 }
 
@@ -90,6 +93,8 @@ void URoadConstructionMode::HandleCompleteSegmentButtonClick() {
 	if (IsValid(RoadActor)) {
 		RoadActor->SetState(ERoadActorState::Selected);
 		RoadModeState = ERoadModeState::Free;
+
+		PlayerController->SetSuccess(FText::FromString("Successfully Completed Road Segment."));
 	}
 }
 
@@ -139,6 +144,9 @@ void URoadConstructionMode::HandleNewEntityState() {
 		HitResult = RoadActor->GetHitResult(IgnoredActors);
 		RoadActor->AddNewPoint(HitResult.Location);
 	}
+	else {
+		PlayerController->SetError(FText::FromString("Create New Road Segment First."));
+	}
 }
 
 void URoadConstructionMode::HandleNKeyPressAction() {
@@ -152,6 +160,8 @@ void URoadConstructionMode::HandleNKeyPressAction() {
 		RoadModeState = ERoadModeState::NewEntity;
 
 		BindWidgetDelegates();
+
+		PlayerController->SetSuccess(FText::FromString("New Road Segment Started."));
 	}
 
 }
@@ -164,6 +174,8 @@ void URoadConstructionMode::HandleDeleteKeyPressAction() {
 		RoadModeState = ERoadModeState::Free;
 
 		RoadActor = nullptr;
+
+		PlayerController->SetSuccess(FText::FromString("Deleted Road Segment."));
 	}
 }
 

@@ -2,6 +2,7 @@
 
 
 #include "ArchVizModes/BuildingCreationMode.h"
+#include "ArchVizController.h"
 #include "Actors/BuildingCreation/WallActor.h"
 #include "Actors/BuildingCreation/DoorActor.h"
 #include "Actors/BuildingCreation/RoofActor.h"
@@ -153,6 +154,8 @@ void UBuildingCreationMode::EnterMode() {
 	if (CurrentBuildingCreationSubMode) {
 		CurrentBuildingCreationSubMode->EnterSubMode();
 		CurrentBuildingCreationSubMode->Setup();
+
+		PlayerController->SetSuccess(FText::FromString("Switched To Building Construction Mode."));
 	}
 }
 

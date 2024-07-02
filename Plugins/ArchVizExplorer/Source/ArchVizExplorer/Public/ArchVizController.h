@@ -15,6 +15,7 @@
 #include "Widgets/BuildingCreationWidget.h"
 #include "Widgets/InteriorDesignWidget.h"
 #include "ArchVizModes/SaveAndLoadMode.h"
+#include "Widgets/NotificationWidget.h"
 #include "ArchVizController.generated.h"
 
 class ARoadActor;
@@ -34,6 +35,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 
+	void SetSuccess(FText SuccessText);
+	void SetError(FText ErrorText);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -42,6 +46,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizMode | ModesMenu")
 	TSubclassOf<UModesMenuWidget> ModesMenuWidgetRef;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizMode | NotificationWidget")
+	TSubclassOf<UNotificationWidget> NotificationWidgetRef;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstruction | Mode")
 	TSubclassOf<URoadConstructionMode> RoadConstructionModeRef;
@@ -61,7 +68,11 @@ private:
 
 	void SetArchVizMode(UArchVizMode* NewMode);
 
+	UPROPERTY()
 	UModesMenuWidget* ModesMenuWidget;
+
+	UPROPERTY()
+	UNotificationWidget* NotificationWidget;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "ArchVizMode")
 	EArchVizMode ArchVizMode;
