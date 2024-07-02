@@ -14,6 +14,8 @@ struct FRoadData {
 
 	GENERATED_BODY()
 
+	FRoadData();
+
 	UPROPERTY()
 	int32 ID;
 
@@ -29,8 +31,8 @@ struct FRoadData {
 	UPROPERTY()
 	float Width;
 
-	//UPROPERTY()
-	//UMaterialInterface* Material;
+	UPROPERTY()
+	UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -41,6 +43,8 @@ struct FWallData {
 
 	GENERATED_BODY()
 
+	FWallData();
+
 	UPROPERTY()
 	int32 ID;
 
@@ -50,8 +54,8 @@ struct FWallData {
 	UPROPERTY()
 	double Length;
 
-	//UPROPERTY()
-	//UMaterialInterface* Material;
+	UPROPERTY()
+	UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -61,6 +65,8 @@ USTRUCT()
 struct FFloorData {
 	GENERATED_BODY()
 
+	FFloorData();
+
 	UPROPERTY()
 	int32 ID;
 
@@ -73,8 +79,8 @@ struct FFloorData {
 	UPROPERTY()
 	FVector Offset;
 
-	//UPROPERTY()
-	//UMaterialInterface* Material;
+	UPROPERTY()
+	UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -84,6 +90,8 @@ USTRUCT()
 struct FRoofData {
 	GENERATED_BODY()
 
+	FRoofData();
+
 	UPROPERTY()
 	int32 ID;
 
@@ -96,8 +104,8 @@ struct FRoofData {
 	UPROPERTY()
 	FVector Offset;
 
-	//UPROPERTY()
-	//UMaterialInterface* Material;
+	UPROPERTY()
+	UMaterialInterface* Material;
 
 	UPROPERTY()
 	int32 ParentActorId;
@@ -113,9 +121,6 @@ struct FDoorData {
 
 	UPROPERTY()
 	FTransform Transform;
-
-	//UPROPERTY()
-	//UMaterialInterface* DoorMaterial;
 
 	UPROPERTY()
 	bool bIsOpen;

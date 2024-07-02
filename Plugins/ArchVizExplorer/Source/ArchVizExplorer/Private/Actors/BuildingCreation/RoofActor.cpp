@@ -57,6 +57,10 @@ void ARoofActor::GenerateRoof(const FVector& InDimensions, const FVector& InOffs
 	DestroyRoof();
 
 	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, InDimensions, InOffset);
+
+	if (IsValid(Material)) {
+		ProceduralMeshComponent->SetMaterial(0, Material);
+	}
 }
 
 void ARoofActor::DestroyRoof() {

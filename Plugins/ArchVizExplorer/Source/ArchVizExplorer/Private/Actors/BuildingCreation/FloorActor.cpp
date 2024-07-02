@@ -63,6 +63,10 @@ void AFloorActor::GenerateFloor(const FVector& InDimensions, const FVector& InOf
 	DestroyFloor();
 
 	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, InDimensions, InOffset);
+
+	if (IsValid(Material)) {
+		ProceduralMeshComponent->SetMaterial(0, Material);
+	}
 }
 
 void AFloorActor::DestroyFloor() {

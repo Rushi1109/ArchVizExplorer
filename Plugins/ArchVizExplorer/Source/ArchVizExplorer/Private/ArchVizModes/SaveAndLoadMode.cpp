@@ -135,7 +135,7 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		RoadData.SplinePoints = RoadActor->GetSplinePoints();
 		RoadData.PointType = RoadActor->GetPointType();
 		RoadData.Width = RoadActor->GetWidth();
-		//RoadData.Material = RoadActor->GetMaterial();
+		RoadData.Material = RoadActor->GetMaterial();
 		if (IsValid(RoadActor->GetAttachParentActor())) {
 			if (auto ParentActor = Cast<AArchVizActor>(RoadActor->GetAttachParentActor())) {
 				RoadData.ParentActorId = ParentActor->GetID();
@@ -154,7 +154,7 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		WallData.ID = WallActor->GetID();
 		WallData.Transform = WallActor->GetActorTransform();
 		WallData.Length = WallActor->GetLength();
-		//WallData.Material = WallActor->GetMaterial();
+		WallData.Material = WallActor->GetMaterial();
 
 		if (IsValid(WallActor->GetAttachParentActor())) {
 			if (auto ParentActor = Cast<AArchVizActor>(WallActor->GetAttachParentActor())) {
@@ -176,7 +176,7 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		FloorData.ID = FloorActor->GetID();
 
 		FloorData.Transform = FloorActor->GetActorTransform();
-		//FloorData.Material = FloorActor->GetMaterial();
+		FloorData.Material = FloorActor->GetMaterial();
 		FloorData.Dimensions = FloorActor->GetDimensions();
 		FloorData.Dimensions = FloorActor->GetOffset();
 		if (IsValid(FloorActor->GetAttachParentActor())) {
@@ -198,7 +198,7 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		RoofData.ID = RoofActor->GetID();
 
 		RoofData.Transform = RoofActor->GetActorTransform();
-		//RoofData.Material = RoofActor->GetMaterial();
+		RoofData.Material = RoofActor->GetMaterial();
 		RoofData.Dimensions = RoofActor->GetDimensions();
 		RoofData.Offset = RoofActor->GetOffset();
 		if (IsValid(RoofActor->GetAttachParentActor())) {
@@ -219,7 +219,6 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		FDoorData DoorData;
 		DoorData.ID = DoorActor->GetID();
 		DoorData.Transform = DoorActor->GetActorTransform();
-		//DoorData.DoorMaterial = DoorActor->GetDoorMaterial();
 		DoorData.bIsOpen = DoorActor->bIsOpen;
 		DoorData.ParentComponentIndex = DoorActor->ParentWallComponentIndex;
 
@@ -292,7 +291,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			RoadActor->SetSplinePoints(RoadData.SplinePoints);
 			RoadActor->SetPointType(RoadData.PointType);
 			RoadActor->SetWidth(RoadData.Width);
-			//RoadActor->SetMaterial(RoadData.Material);
+			RoadActor->SetMaterial(RoadData.Material);
 			//RoadActor->SynchronizePropertyPanel();
 			RoadActor->UpdateRoad();
 			//RoadActor->UnHighLightBorder();
@@ -308,7 +307,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			AWallActor* WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, WallData.Transform, SpawnParams);
 			WallActor->SetActorTransform(WallData.Transform);
 			WallActor->SetLength(WallData.Length);
-			//WallActor->SetMaterial(WallData.Material);
+			WallActor->SetMaterial(WallData.Material);
 			WallActor->GenerateSegments(WallActor->GetLength());
 			//WallActor->SynchronizePropertyPanel();
 			IDToActorMap.Add(WallData.ID, WallActor);
@@ -322,7 +321,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			AFloorActor* FloorActor = GetWorld()->SpawnActor<AFloorActor>(FloorActorRef, FloorData.Transform, SpawnParams);
 			FloorActor->SetActorTransform(FloorData.Transform);
 			FloorActor->SetDimensions(FloorData.Dimensions);
-			// FloorActor->SetBottomMaterial(FloorData.BottomMaterial);
+			FloorActor->SetMaterial(FloorData.Material);
 			// FloorActor->SynchronizePropertyPanel();
 			FloorActor->GenerateFloor(FloorData.Dimensions, FloorData.Offset);
 			IDToActorMap.Add(FloorData.ID, FloorActor);
@@ -336,7 +335,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			ARoofActor* RoofActor = GetWorld()->SpawnActor<ARoofActor>(RoofActorRef, RoofData.Transform, SpawnParams);
 			RoofActor->SetActorTransform(RoofData.Transform);
 			RoofActor->SetDimensions(RoofData.Dimensions);
-			// FloorActor->SetBottomMaterial(FloorData.BottomMaterial);
+			RoofActor->SetMaterial(RoofData.Material);
 			// FloorActor->SynchronizePropertyPanel();
 			RoofActor->GenerateRoof(RoofData.Dimensions, RoofData.Offset);
 			IDToActorMap.Add(RoofData.ID, RoofActor);
@@ -350,7 +349,6 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 		for (const FDoorData& DoorData : LoadGameInstance->DoorActorArray) {
 			ADoorActor* DoorActor = GetWorld()->SpawnActor<ADoorActor>(DoorActorRef, DoorData.Transform, SpawnParams);
 			DoorActor->SetActorTransform(DoorData.Transform);
-			//DoorActor->SetDoorMaterial(DoorData.DoorMaterial);
 			DoorActor->ParentWallComponentIndex = DoorData.ParentComponentIndex;
 			DoorActor->bIsOpen = DoorData.bIsOpen;
 			//DoorActor->SynchronizePropertyPanel();

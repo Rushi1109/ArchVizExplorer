@@ -13,6 +13,7 @@ class ARCHVIZEXPLORER_API AArchVizActor : public AActor {
 	GENERATED_BODY()
 
 public:
+	friend class USaveAndLoadMode;
 	// Sets default values for this actor's properties
 	AArchVizActor();
 
