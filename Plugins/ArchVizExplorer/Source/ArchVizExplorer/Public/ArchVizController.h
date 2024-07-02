@@ -30,6 +30,8 @@ class ARCHVIZEXPLORER_API AArchVizController : public APlayerController {
 	GENERATED_BODY()
 
 public:
+	friend class USaveAndLoadMode;
+
 	AArchVizController();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

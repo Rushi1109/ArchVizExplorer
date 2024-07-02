@@ -145,6 +145,13 @@ void UInteriorDesignMode::HandleNewEntityState() {
 				InteriorActor->SetState(EInteriorActorState::Selected);
 				InteriorModeState = EInteriorModeState::Free;
 			}
+			else if ((InteriorActor->GetAssetType() == EInteriorAssetType::InteriorPlaceable) && HitResult.GetActor()->IsA(AInteriorActor::StaticClass())) {
+				InteriorActor->SetActorLocation(HitResult.Location);
+				InteriorActor->AttachToComponent(HitResult.GetActor()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+
+				InteriorActor->SetState(EInteriorActorState::Selected);
+				InteriorModeState = EInteriorModeState::Free;
+			}
 			else {
 				PlayerController->SetError(FText::FromString("The Item can only be placed on " + UEnum::GetDisplayValueAsText(InteriorActor->GetAssetType()).ToString()));
 			}
