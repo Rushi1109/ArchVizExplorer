@@ -13,10 +13,7 @@ void UNotificationWidget::SetError(FText ErrorText) {
 	NotificationText->SetText(ErrorText);
 	NotificationText->SetColorAndOpacity(FSlateColor{FLinearColor{1.f, 0.f, 0.f, 1.f}});
 
-	FTimerHandle UnusedHandle;
-
-	GetWorld()->GetTimerManager().SetTimer(
-		UnusedHandle, this, &UNotificationWidget::HideTextBox, 2.5, false);
+	HideNotificationAfter(2.5);
 }
 
 void UNotificationWidget::SetSuccess(FText SuccessText) {
@@ -25,10 +22,7 @@ void UNotificationWidget::SetSuccess(FText SuccessText) {
 	NotificationText->SetText(SuccessText);
 	NotificationText->SetColorAndOpacity(FSlateColor{ FLinearColor{0.f, 1.f, 0.f, 1.f} });
 
-	FTimerHandle UnusedHandle;
-
-	GetWorld()->GetTimerManager().SetTimer(
-		UnusedHandle, this, &UNotificationWidget::HideTextBox, 2.5, false);
+	HideNotificationAfter(2.5);
 }
 
 
@@ -38,4 +32,12 @@ void UNotificationWidget::ShowTextBox() {
 
 void UNotificationWidget::HideTextBox() {
 	NotificationSizeBox->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UNotificationWidget::HideNotificationAfter(float Seconds) {
+	if (GetWorld()->GetTimerManager().GetTimerElapsed(TimerHandle) != -1.f) {
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UNotificationWidget::HideTextBox, Seconds, false);
 }

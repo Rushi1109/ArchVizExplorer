@@ -8,7 +8,7 @@
 #include "Widgets/PropertyPanelWidget.h"
 
 // Sets default values
-ARoofActor::ARoofActor() {
+ARoofActor::ARoofActor() : Dimensions{100, 100, 10}, Offset{50, 50, 5} {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -53,10 +53,12 @@ void ARoofActor::Tick(float DeltaTime) {
 	}
 }
 
-void ARoofActor::GenerateRoof(const FVector& InDimensions, const FVector& InOffset) {
+void ARoofActor::GenerateRoof() {
 	DestroyRoof();
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, InDimensions, InOffset);
+	AdjustDirection();
+
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
 
 	if (IsValid(Material)) {
 		ProceduralMeshComponent->SetMaterial(0, Material);
@@ -98,6 +100,15 @@ void ARoofActor::HandleGeneratingState() {
 	Dimensions = { FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 20 };
 	Offset = { FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength) / 2, 10 };
 
+	GenerateRoof();
+}
+
+void ARoofActor::AdjustDirection() {
+	double XFloorLength = EndLocation.X - StartLocation.X;
+	double YFloorLength = EndLocation.Y - StartLocation.Y;
+
+	double EdgeOffset{ 10.0 };
+
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
 	}
@@ -112,8 +123,6 @@ void ARoofActor::HandleGeneratingState() {
 	else {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
 	}
-
-	GenerateRoof(Dimensions, Offset);
 }
 
 void ARoofActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {

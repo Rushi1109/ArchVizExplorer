@@ -122,11 +122,9 @@ void URoofPlacementMode::HandleFreeState() {
 
 		BindWidgetDelegates();
 
-		RoofActor->GenerateRoof(FVector{ 100, 100, 10 }, FVector{ 50, 50, 5 });
+		RoofActor->GenerateRoof();
 		RoofActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
-
-		// TODO:: Material
 	}
 }
 
@@ -230,7 +228,7 @@ void URoofPlacementMode::HandleNewButtonClick() {
 
 			BindWidgetDelegates();
 
-			RoofActor->GenerateRoof(FVector{ 100, 100, 10 }, FVector{ 50, 50, 5 });
+			RoofActor->GenerateRoof();
 			RoofActor->SetState(EBuildingActorState::Previewing);
 			SubModeState = EBuildingSubModeState::NewEntity;
 		}
@@ -260,16 +258,16 @@ void URoofPlacementMode::HandleDimensionSliderValueChange(float InValue) {
 		double XFloorLength = RoofActor->GetEndLocation().X - RoofActor->GetStartLocation().X;
 		double YFloorLength = RoofActor->GetEndLocation().Y - RoofActor->GetStartLocation().Y;
 
-		FVector RoofDimensions{ RoofLength + (2 * EdgeOffset), RoofWidth + (2 * EdgeOffset), RoofHeight };
-		FVector Offset{ RoofLength / 2, RoofWidth / 2, RoofHeight / 2 };
+		RoofActor->Dimensions = FVector{ RoofLength + (2 * EdgeOffset), RoofWidth + (2 * EdgeOffset), RoofHeight };
+		RoofActor->Offset = FVector{ RoofLength / 2, RoofWidth / 2, RoofHeight / 2 };
 
 		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
-			Offset.Z *= -1.0;
+			RoofActor->Offset.Z *= -1.0;
 		}
 		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
-			Offset.Z *= -1.0;
+			RoofActor->Offset.Z *= -1.0;
 		}
 
-		RoofActor->GenerateRoof( RoofDimensions, Offset);
+		RoofActor->GenerateRoof();
 	}
 }

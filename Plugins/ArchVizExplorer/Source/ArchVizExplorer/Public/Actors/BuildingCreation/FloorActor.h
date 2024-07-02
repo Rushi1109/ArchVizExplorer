@@ -48,11 +48,12 @@ private:
 	FVector Dimensions;
 	FVector Offset;
 
-	void GenerateFloor(const FVector& InDimensions, const FVector& InOffset);
+	void GenerateFloor();
 	void DestroyFloor();
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
+	void AdjustDirection();
 	void UpdateFloorDimensionSlider();
 
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);

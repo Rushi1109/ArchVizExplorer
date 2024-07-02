@@ -8,7 +8,7 @@
 #include "Widgets/PropertyPanelWidget.h"
 
 // Sets default values
-AFloorActor::AFloorActor() {
+AFloorActor::AFloorActor() : Dimensions{100, 100, 2}, Offset{50, 50,1} {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -59,10 +59,12 @@ void AFloorActor::Tick(float DeltaTime) {
 	}
 }
 
-void AFloorActor::GenerateFloor(const FVector& InDimensions, const FVector& InOffset) {
+void AFloorActor::GenerateFloor() {
 	DestroyFloor();
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, InDimensions, InOffset);
+	AdjustDirection();
+
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
 
 	if (IsValid(Material)) {
 		ProceduralMeshComponent->SetMaterial(0, Material);
@@ -102,7 +104,16 @@ void AFloorActor::HandleGeneratingState() {
 	double EdgeOffset{ 10.0 };
 
 	Dimensions = { FMath::Abs(XFloorLength) + (2 * EdgeOffset), FMath::Abs(YFloorLength) + (2 * EdgeOffset), 2 };
-	Offset = { FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength)/2, 1 };
+	Offset = { FMath::Abs(XFloorLength) / 2, FMath::Abs(YFloorLength) / 2, 1 };
+
+	GenerateFloor();
+}
+
+void AFloorActor::AdjustDirection() {
+	double XFloorLength = EndLocation.X - StartLocation.X;
+	double YFloorLength = EndLocation.Y - StartLocation.Y;
+
+	double EdgeOffset{ 10.0 };
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
@@ -118,8 +129,6 @@ void AFloorActor::HandleGeneratingState() {
 	else {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
 	}
-
-	GenerateFloor(Dimensions, Offset);
 }
 
 void AFloorActor::UpdateFloorDimensionSlider() {

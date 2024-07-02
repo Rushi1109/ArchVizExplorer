@@ -122,7 +122,7 @@ void UFloorPlacementMode::HandleFreeState() {
 
 		BindWidgetDelegates();
 
-		FloorActor->GenerateFloor(FVector{ 100, 100, 2 }, FVector{ 50, 50, 1 });
+		FloorActor->GenerateFloor();
 		FloorActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
 
@@ -225,7 +225,7 @@ void UFloorPlacementMode::HandleNewButtonClick() {
 
 			BindWidgetDelegates();
 
-			FloorActor->GenerateFloor(FVector{ 100, 100, 2 }, FVector{ 50, 50, 1 });
+			FloorActor->GenerateFloor();
 			FloorActor->SetState(EBuildingActorState::Previewing);
 			SubModeState = EBuildingSubModeState::NewEntity;
 		}
@@ -255,16 +255,16 @@ void UFloorPlacementMode::HandleDimensionSliderValueChange(float InValue) {
 		double XFloorLength = FloorActor->GetEndLocation().X - FloorActor->GetStartLocation().X;
 		double YFloorLength = FloorActor->GetEndLocation().Y - FloorActor->GetStartLocation().Y;
 
-		FVector RoofDimensions{ FloorLength + (2 * EdgeOffset), FloorWidth + (2 * EdgeOffset), FloorHeight };
-		FVector Offset{ FloorLength / 2, FloorWidth / 2, FloorHeight / 2 };
+		FloorActor->Dimensions = FVector{ FloorLength + (2 * EdgeOffset), FloorWidth + (2 * EdgeOffset), FloorHeight };
+		FloorActor->Offset = FVector{ FloorLength / 2, FloorWidth / 2, FloorHeight / 2 };
 
 		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
-			Offset.Z *= -1.0;
+			FloorActor->Offset.Z *= -1.0;
 		}
 		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
-			Offset.Z *= -1.0;
+			FloorActor->Offset.Z *= -1.0;
 		}
 
-		FloorActor->GenerateFloor(RoofDimensions, Offset);
+		FloorActor->GenerateFloor();
 	}
 }

@@ -186,7 +186,7 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		FloorData.Transform = FloorActor->GetActorTransform();
 		FloorData.Material = FloorActor->GetMaterial();
 		FloorData.Dimensions = FloorActor->GetDimensions();
-		FloorData.Dimensions = FloorActor->GetOffset();
+		FloorData.Offset = FloorActor->GetOffset();
 		FloorData.StartLocation = FloorActor->GetStartLocation();
 		FloorData.EndLocation = FloorActor->GetEndLocation();
 		if (IsValid(FloorActor->GetAttachParentActor())) {
@@ -338,7 +338,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			// FloorActor->SynchronizePropertyPanel();
 			FloorActor->SetStartLocation(FloorData.StartLocation);
 			FloorActor->SetEndLocation(FloorData.EndLocation);
-			FloorActor->GenerateFloor(FloorData.Dimensions, FloorData.Offset);
+			FloorActor->GenerateFloor();
 			IDToActorMap.Add(FloorData.ID, FloorActor);
 
 			if (FloorData.ParentActorId != -1) {
@@ -355,7 +355,7 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			RoofActor->SetStartLocation(RoofData.StartLocation);
 			RoofActor->SetEndLocation(RoofData.EndLocation);
 			// FloorActor->SynchronizePropertyPanel();
-			RoofActor->GenerateRoof(RoofData.Dimensions, RoofData.Offset);
+			RoofActor->GenerateRoof();
 			IDToActorMap.Add(RoofData.ID, RoofActor);
 
 			if (RoofData.ParentActorId != -1) {

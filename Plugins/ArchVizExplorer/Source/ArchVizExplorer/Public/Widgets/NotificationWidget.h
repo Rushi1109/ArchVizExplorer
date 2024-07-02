@@ -28,4 +28,8 @@ public:
 
 	void ShowTextBox();
 	void HideTextBox();
+
+	void HideNotificationAfter(float Seconds);
+
+	FTimerHandle TimerHandle;
 };

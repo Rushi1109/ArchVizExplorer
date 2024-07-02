@@ -53,11 +53,12 @@ private:
 	FVector Dimensions;
 	FVector Offset;
 
-	void GenerateRoof(const FVector& Dimensions, const FVector& Offset);
+	void GenerateRoof();
 	void DestroyRoof();
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
 
+	void AdjustDirection();
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 };
