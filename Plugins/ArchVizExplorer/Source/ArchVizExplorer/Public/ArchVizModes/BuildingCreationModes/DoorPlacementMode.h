@@ -24,6 +24,9 @@ public:
 	virtual void ExitSubMode() override;
 
 	void SetCurrentDoorActor(ADoorActor* Actor);
+
+	void SetDoorActor(ADoorActor* InDoorActor);
+	void BindWidgetDelegates();
 protected:
 	virtual void HandleFreeState() override;
 	virtual void HandleOldEntityState() override;
@@ -38,8 +41,6 @@ private:
 	void HandleMKeyPressAction();
 	void HandleOKeyPressAction();
 	void HandleDeleteKeyPressAction();
-
-	void BindWidgetDelegates();
 
 	UFUNCTION()
 	void HandleNewButtonClick();

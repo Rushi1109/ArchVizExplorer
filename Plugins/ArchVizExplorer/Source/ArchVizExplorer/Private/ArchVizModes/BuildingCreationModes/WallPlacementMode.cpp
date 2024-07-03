@@ -208,6 +208,10 @@ void UWallPlacementMode::HandleDeleteKeyPressAction() {
 	}
 }
 
+void UWallPlacementMode::SetWallActor(AWallActor* InWallActor) {
+	WallActor = InWallActor;
+}
+
 void UWallPlacementMode::BindWidgetDelegates() {
 	if (IsValid(WallActor) && IsValid(WallActor->PropertyPanel)) {
 		WallActor->PropertyPanel->NewWallButton->OnClicked.AddDynamic(this, &UWallPlacementMode::HandleNewButtonClick);

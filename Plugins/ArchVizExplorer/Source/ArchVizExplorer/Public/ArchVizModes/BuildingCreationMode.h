@@ -34,6 +34,8 @@ public:
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
+	void BindPropertyPanelForSpawnedActor(ABuildingCreationActor* InBuildingActor);
+
 	void SetSubMode(UBuildingCreationSubMode* NewSubMode);
 
 	void HandleBuildingSubModeChange(EBuildingModeEntity NewBuildingModeEntity);

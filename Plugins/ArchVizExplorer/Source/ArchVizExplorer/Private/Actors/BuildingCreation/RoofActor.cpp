@@ -148,6 +148,14 @@ void ARoofActor::UpdateRoofDimensionSlider() {
 	}
 }
 
+void ARoofActor::UpdateRoofProperties() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->RoofLengthSpinBox->SetValue(FMath::Abs(Dimensions.X));
+		PropertyPanel->RoofWidthSpinBox->SetValue(FMath::Abs(Dimensions.Y));
+		PropertyPanel->RoofHeightSpinBox->SetValue(FMath::Abs(Dimensions.Z));
+	}
+}
+
 void ARoofActor::SetStartLocation(const FVector& NewStartLocation) {
 	StartLocation = NewStartLocation;
 }

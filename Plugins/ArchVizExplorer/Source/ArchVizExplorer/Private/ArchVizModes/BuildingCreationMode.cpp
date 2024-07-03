@@ -166,3 +166,28 @@ void UBuildingCreationMode::ExitMode() {
 		CurrentBuildingCreationSubMode->ExitSubMode();
 	}
 }
+
+void UBuildingCreationMode::BindPropertyPanelForSpawnedActor(ABuildingCreationActor* InBuildingActor) {
+	if (IsValid(InBuildingActor)) {
+		if (InBuildingActor->IsA(AWallActor::StaticClass())) {
+			AWallActor* WallActor = Cast<AWallActor>(InBuildingActor);
+			WallPlacementMode->SetWallActor(WallActor);
+			WallPlacementMode->BindWidgetDelegates();
+		}
+		else if (InBuildingActor->IsA(ADoorActor::StaticClass())) {
+			ADoorActor* DoorActor = Cast<ADoorActor>(InBuildingActor);
+			DoorPlacementMode->SetDoorActor(DoorActor);
+			DoorPlacementMode->BindWidgetDelegates();
+		}
+		else if (InBuildingActor->IsA(ARoofActor::StaticClass())) {
+			ARoofActor* RoofActor = Cast<ARoofActor>(InBuildingActor);
+			RoofPlacementMode->SetRoofActor(RoofActor);
+			RoofPlacementMode->BindWidgetDelegates();
+		}
+		else if (InBuildingActor->IsA(AFloorActor::StaticClass())) {
+			AFloorActor* FloorActor = Cast<AFloorActor>(InBuildingActor);
+			FloorPlacementMode->SetFloorActor(FloorActor);
+			FloorPlacementMode->BindWidgetDelegates();
+		}
+	}
+}

@@ -198,6 +198,12 @@ void AWallActor::UpdateWallLenghSlider() {
 	}
 }
 
+void AWallActor::UpdateWallProperties() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->WallLengthSpinBox->SetValue(Length);
+	}
+}
+
 void AWallActor::AttachDoorComponent(UPrimitiveComponent* ComponentToReplace, ADoorActor* DoorActor) {
 	if (UStaticMeshComponent* SegmentStaticMesh = Cast<UStaticMeshComponent>(ComponentToReplace)) {
 		int32 SegmentIndex = WallSegments.Find(SegmentStaticMesh);

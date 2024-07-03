@@ -7,7 +7,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ARoadActor::ARoadActor() : RoadActorState{ERoadActorState::None}, RoadPointType{ERoadPointType::Sharp}, RoadMesh{ nullptr }, Width{200.f} {
+ARoadActor::ARoadActor() : RoadMesh{ nullptr }, Width{200.f}, RoadActorState{ ERoadActorState::None }, RoadPointType{ ERoadPointType::Sharp } {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -180,6 +180,19 @@ void ARoadActor::UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, 
 void ARoadActor::HideUnusedSegments(int32 StartIndex) {
 	for (int32 i = StartIndex; i < RoadComponents.Num(); ++i) {
 		RoadComponents[i]->SetVisibility(false);
+	}
+}
+
+void ARoadActor::UpdateRoadProperties() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->RoadWidthSpinBox->SetValue(Width);
+
+		if (RoadPointType == ERoadPointType::Sharp) {
+			PropertyPanel->RoadTypeComboBox->SetSelectedIndex(0);
+		}
+		else {
+			PropertyPanel->RoadTypeComboBox->SetSelectedIndex(1);
+		}
 	}
 }
 

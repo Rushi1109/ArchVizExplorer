@@ -66,6 +66,8 @@ private:
 	void AdjustEdgeOffset();
 	void UpdateWallLenghSlider();
 
+	void UpdateWallProperties();
+
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 	void ApplyMaterial();
 };

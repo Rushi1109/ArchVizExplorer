@@ -107,3 +107,23 @@ void AArchVizController::SetError(FText ErrorText) {
 		NotificationWidget->SetError(ErrorText);
 	}
 }
+
+void AArchVizController::BindPropertyPanelForSpawnedActor(AArchVizActor* ArchVizActor) {
+	if (IsValid(ArchVizActor)) {
+		if (ArchVizActor->IsA(ARoadActor::StaticClass())) {
+			ARoadActor* RoadActor = Cast<ARoadActor>(ArchVizActor);
+			RoadConstructionMode->SetCurrentRoadActor(RoadActor);
+			RoadConstructionMode->BindWidgetDelegates();
+		}
+		else if (ArchVizActor->IsA(AInteriorActor::StaticClass())) {
+			AInteriorActor* InteriorActor = Cast<AInteriorActor>(ArchVizActor);
+			InteriorDesignMode->SetCurrentInteriorActor(InteriorActor);
+			InteriorDesignMode->BindWidgetDelegates();
+		}
+		else if (ArchVizActor->IsA(ABuildingCreationActor::StaticClass())) {
+			ABuildingCreationActor* BuildingActor = Cast<ABuildingCreationActor>(ArchVizActor);
+
+			BuildingCreationMode->BindPropertyPanelForSpawnedActor(BuildingActor);
+		}
+	}
+}

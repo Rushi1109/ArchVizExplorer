@@ -304,9 +304,11 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			RoadActor->SetPointType(RoadData.PointType);
 			RoadActor->SetWidth(RoadData.Width);
 			RoadActor->SetMaterial(RoadData.Material);
-			//RoadActor->SynchronizePropertyPanel();
 			RoadActor->UpdateRoad();
-			//RoadActor->UnHighLightBorder();
+
+			PlayerController->BindPropertyPanelForSpawnedActor(RoadActor);
+			RoadActor->UpdateRoadProperties();
+
 			IDToActorMap.Add(RoadData.ID, RoadActor);
 
 			if (RoadData.ParentActorId != -1) {
@@ -314,14 +316,16 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			}
 		}
 
-
 		for (const FWallData& WallData : LoadGameInstance->WallActorArray) {
 			AWallActor* WallActor = GetWorld()->SpawnActor<AWallActor>(WallActorRef, WallData.Transform, SpawnParams);
 			WallActor->SetActorTransform(WallData.Transform);
 			WallActor->SetLength(WallData.Length);
 			WallActor->SetMaterial(WallData.Material);
 			WallActor->GenerateSegments(WallActor->GetLength());
-			//WallActor->SynchronizePropertyPanel();
+
+			PlayerController->BindPropertyPanelForSpawnedActor(WallActor);
+			WallActor->UpdateWallProperties();
+
 			IDToActorMap.Add(WallData.ID, WallActor);
 
 			if (WallData.ParentActorId != -1) {
@@ -339,6 +343,10 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			FloorActor->SetStartLocation(FloorData.StartLocation);
 			FloorActor->SetEndLocation(FloorData.EndLocation);
 			FloorActor->GenerateFloor();
+
+			PlayerController->BindPropertyPanelForSpawnedActor(FloorActor);
+			FloorActor->UpdateFloorProperties();
+
 			IDToActorMap.Add(FloorData.ID, FloorActor);
 
 			if (FloorData.ParentActorId != -1) {
@@ -356,6 +364,10 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			RoofActor->SetEndLocation(RoofData.EndLocation);
 			// FloorActor->SynchronizePropertyPanel();
 			RoofActor->GenerateRoof();
+
+			PlayerController->BindPropertyPanelForSpawnedActor(RoofActor);
+			RoofActor->UpdateRoofProperties();
+
 			IDToActorMap.Add(RoofData.ID, RoofActor);
 
 			if (RoofData.ParentActorId != -1) {
@@ -363,13 +375,15 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			}
 		}
 
-
 		for (const FDoorData& DoorData : LoadGameInstance->DoorActorArray) {
 			ADoorActor* DoorActor = GetWorld()->SpawnActor<ADoorActor>(DoorActorRef, DoorData.Transform, SpawnParams);
 			DoorActor->SetActorTransform(DoorData.Transform);
 			DoorActor->ParentWallComponentIndex = DoorData.ParentComponentIndex;
 			DoorActor->bIsOpen = DoorData.bIsOpen;
 			//DoorActor->SynchronizePropertyPanel();
+
+			PlayerController->BindPropertyPanelForSpawnedActor(DoorActor);
+
 			IDToActorMap.Add(DoorData.ID, DoorActor);
 
 			if (DoorData.ParentActorId != -1) {
@@ -377,12 +391,13 @@ void USaveAndLoadMode::LoadGame(const FString& SlotName) {
 			}
 		}
 
-
-
 		for (const FInteriorData& InteriorData : LoadGameInstance->InteriorActorArray) {
 			AInteriorActor* InteriorActor = GetWorld()->SpawnActor<AInteriorActor>(InteriorActorRef, InteriorData.Transform, SpawnParams);
 			InteriorActor->SetActorTransform(InteriorData.Transform);
 			InteriorActor->SetStaticMesh(InteriorData.StaticMesh);
+
+			PlayerController->BindPropertyPanelForSpawnedActor(InteriorActor);
+
 			IDToActorMap.Add(InteriorData.ID, InteriorActor);
 
 			if (InteriorData.ParentActorId != -1) {

@@ -40,6 +40,7 @@ public:
 	void SetSuccess(FText SuccessText);
 	void SetError(FText ErrorText);
 
+	void BindPropertyPanelForSpawnedActor(AArchVizActor*);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

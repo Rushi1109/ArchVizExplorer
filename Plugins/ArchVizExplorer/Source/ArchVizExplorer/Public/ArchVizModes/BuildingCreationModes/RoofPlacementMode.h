@@ -27,6 +27,9 @@ public:
 	virtual void ExitSubMode() override;
 
 	void SetCurrentRoofActor(ARoofActor* Actor);
+
+	void SetRoofActor(ARoofActor* InRoofActor);
+	void BindWidgetDelegates();
 protected:
 	virtual void HandleFreeState() override;
 	virtual void HandleOldEntityState() override;
@@ -40,8 +43,6 @@ private:
 	void HandleRKeyPressAction();
 	void HandleMKeyPressAction();
 	void HandleDeleteKeyPressAction();
-
-	void BindWidgetDelegates();
 
 	UFUNCTION()
 	void HandleNewButtonClick();

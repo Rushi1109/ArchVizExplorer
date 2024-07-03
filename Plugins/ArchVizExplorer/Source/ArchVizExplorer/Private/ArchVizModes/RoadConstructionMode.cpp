@@ -197,6 +197,10 @@ void URoadConstructionMode::BindWidgetDelegates() {
 	}
 }
 
+void URoadConstructionMode::SetCurrentRoadActor(ARoadActor* InRoadActor) {
+	RoadActor = InRoadActor;
+}
+
 void URoadConstructionMode::HandleNewButtonClick() {
 	HandleNKeyPressAction();
 }

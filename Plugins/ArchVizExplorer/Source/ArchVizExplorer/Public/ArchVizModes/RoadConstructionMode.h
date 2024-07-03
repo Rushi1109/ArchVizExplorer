@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RoadConstrcution | Actor")
 	TSubclassOf<ARoadActor> RoadActorRef;
 
+	void BindWidgetDelegates();
+	void SetCurrentRoadActor(ARoadActor* InRoadActor);
+
 private:
 	UFUNCTION()
 	void HandleNewSegmentButtonClick();
@@ -57,7 +60,6 @@ private:
 	void HandleNKeyPressAction();
 	void HandleDeleteKeyPressAction();
 	void HandleZKeyPressAction();
-	void BindWidgetDelegates();
 
 	UFUNCTION()
 	void HandleNewButtonClick();

@@ -137,6 +137,14 @@ void AFloorActor::UpdateFloorDimensionSlider() {
 	}
 }
 
+void AFloorActor::UpdateFloorProperties() {
+	if (IsValid(PropertyPanel)) {
+		PropertyPanel->FloorLengthSpinBox->SetValue(FMath::Abs(Dimensions.X));
+		PropertyPanel->FloorWidthSpinBox->SetValue(FMath::Abs(Dimensions.Y));
+		PropertyPanel->FloorHeightSpinBox->SetValue(FMath::Abs(Dimensions.Z));
+	}
+}
+
 void AFloorActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
 	if (IsValid(MaterialAsset.Material)) {
 		Material = MaterialAsset.Material;

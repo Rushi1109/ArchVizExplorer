@@ -32,6 +32,9 @@ public:
 	virtual void EnterMode() override;
 	virtual void ExitMode() override;
 
+    void BindWidgetDelegates();
+    void SetCurrentInteriorActor(AInteriorActor* InInteriorActor);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<AInteriorActor> InteriorActorRef;
@@ -53,8 +56,6 @@ private:
     void HandleRKeyPressAction();
     void HandleMKeyPressAction();
     void HandleDeleteKeyPressAction();
-
-    void BindWidgetDelegates();
 
     UFUNCTION()
     void HandleNewButtonClick();

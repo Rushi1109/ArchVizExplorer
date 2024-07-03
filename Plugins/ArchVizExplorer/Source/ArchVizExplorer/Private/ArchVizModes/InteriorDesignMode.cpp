@@ -203,6 +203,10 @@ void UInteriorDesignMode::BindWidgetDelegates() {
 	}
 }
 
+void UInteriorDesignMode::SetCurrentInteriorActor(AInteriorActor* InInteriorActor) {
+	InteriorActor = InInteriorActor;
+}
+
 void UInteriorDesignMode::HandleNewButtonClick() {
 	if (IsValid(InteriorActor)) {
 		EInteriorAssetType AssetType = InteriorActor->GetAssetType();

@@ -70,6 +70,8 @@ public:
 	void UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, float SegmentLength, float MeshLength, float ScaleFactor, int32 SegmentPartIndex, int32 NumberOfSegments);
 	void HideUnusedSegments(int32 StartIndex);
 
+	void UpdateRoadProperties();
+
 	void SetState(ERoadActorState NewRoadActorState);
 	ERoadActorState GetState() const;
 

@@ -204,6 +204,10 @@ void URoofPlacementMode::HandleDeleteKeyPressAction() {
 	}
 }
 
+void URoofPlacementMode::SetRoofActor(ARoofActor* InRoofActor) {
+	RoofActor = InRoofActor;
+}
+
 void URoofPlacementMode::BindWidgetDelegates() {
 	if (IsValid(RoofActor) && IsValid(RoofActor->PropertyPanel)) {
 		RoofActor->PropertyPanel->NewRoofButton->OnClicked.AddDynamic(this, &URoofPlacementMode::HandleNewButtonClick);

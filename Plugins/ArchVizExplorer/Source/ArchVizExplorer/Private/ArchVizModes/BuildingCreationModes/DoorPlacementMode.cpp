@@ -211,6 +211,11 @@ void UDoorPlacementMode::HandleDeleteKeyPressAction() {
 	}
 }
 
+
+void UDoorPlacementMode::SetDoorActor(ADoorActor* InDoorActor) {
+	DoorActor = InDoorActor;
+}
+
 void UDoorPlacementMode::BindWidgetDelegates() {
 	if (IsValid(DoorActor) && IsValid(DoorActor->PropertyPanel)) {
 		DoorActor->PropertyPanel->NewDoorButton->OnClicked.AddDynamic(this, &UDoorPlacementMode::HandleNewButtonClick);

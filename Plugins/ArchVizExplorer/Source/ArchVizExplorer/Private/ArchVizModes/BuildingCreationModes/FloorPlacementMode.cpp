@@ -125,8 +125,6 @@ void UFloorPlacementMode::HandleFreeState() {
 		FloorActor->GenerateFloor();
 		FloorActor->SetState(EBuildingActorState::Previewing);
 		SubModeState = EBuildingSubModeState::NewEntity;
-
-		// TODO:: Material
 	}
 }
 
@@ -199,6 +197,10 @@ void UFloorPlacementMode::HandleDeleteKeyPressAction() {
 
 		PlayerController->SetSuccess(FText::FromString("Deleted The Floor Segment."));
 	}
+}
+
+void UFloorPlacementMode::SetFloorActor(AFloorActor* InFloorActor) {
+	FloorActor = InFloorActor;
 }
 
 void UFloorPlacementMode::BindWidgetDelegates() {

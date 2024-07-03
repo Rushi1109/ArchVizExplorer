@@ -60,6 +60,8 @@ private:
 	void HandleGeneratingState();
 
 	void AdjustDirection();
+
+	void UpdateRoofProperties();
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
 	void ApplyMaterial();
 };
