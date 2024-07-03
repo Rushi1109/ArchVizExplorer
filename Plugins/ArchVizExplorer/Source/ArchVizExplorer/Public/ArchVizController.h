@@ -37,8 +37,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 
-	void SetSuccess(FText SuccessText);
-	void SetError(FText ErrorText);
+	void SetSuccess(FText SuccessText, float Time  = 2.5);
+	void SetError(FText ErrorText, float Time = 2.5);
 
 	void BindPropertyPanelForSpawnedActor(AArchVizActor*);
 protected:

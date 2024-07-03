@@ -90,14 +90,9 @@ void USaveAndLoadMode::HandleSaveProjectMenuButtonClick() {
 		}
 	}
 	else {
-		if (UGameplayStatics::DoesSaveGameExist(CurrentSlotName, 0)) {
-			if (UGameplayStatics::DeleteGameInSlot(CurrentSlotName, 0)) {
-				SaveGame(CurrentSlotName);
+		SaveGame(CurrentSlotName);
 
-				PlayerController->SetSuccess(FText::FromString("Successfully Saved The Current Project."));
-			}
-		}
-
+		PlayerController->SetSuccess(FText::FromString("Successfully Saved The Current Project."));
 	}
 }
 
@@ -113,17 +108,16 @@ void USaveAndLoadMode::HandleSaveButtonClick() {
 		FString SlotName = SaveAndLoadWidget->SaveSlotName->GetText().ToString();
 
 		if (SlotName.IsEmpty()) {
-			PlayerController->SetError(FText::FromString("Project Name Can't Be Empty."));
+			PlayerController->SetError(FText::FromString("Project Name Can't Be Empty."), 3.0);
 			return;
 		}
 
 		if (GetSaveSlots().Contains(SlotName)) {
-			PlayerController->SetError(FText::FromString("This Name Already Exists. Please Choose Different Name"));
+			PlayerController->SetError(FText::FromString("This Name Already Exists. Please Choose Different Name"), 3.5);
 			return;
 		}
 
 		SaveGame(SlotName);
-		CurrentSlotName = SlotName;
 
 		PlayerController->SetSuccess(FText::FromString("Successfully Saved The Project."));
 
@@ -134,7 +128,7 @@ void USaveAndLoadMode::HandleSaveButtonClick() {
 void USaveAndLoadMode::HandleSlotLoadClick(const FString& SlotName) {
 	if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
 		if (CurrentSlotName == SlotName) {
-			PlayerController->SetError(FText::FromString("Project " + SlotName + " is Currently Opened."));
+			PlayerController->SetError(FText::FromString("Project " + SlotName + " is Currently Opened."), 3.5);
 			return;
 		}
 
@@ -153,7 +147,7 @@ void USaveAndLoadMode::HandleSlotLoadClick(const FString& SlotName) {
 
 void USaveAndLoadMode::HandleSlotDeleteClick(const FString& SlotName) {
 	if (SlotName == CurrentSlotName) {
-		PlayerController->SetError(FText::FromString("Can Not Delete Currently Loaded Project."));
+		PlayerController->SetError(FText::FromString("Can Not Delete Currently Loaded Project."), 3.0);
 		return;
 	}
 
@@ -161,7 +155,7 @@ void USaveAndLoadMode::HandleSlotDeleteClick(const FString& SlotName) {
 		if (UGameplayStatics::DeleteGameInSlot(SlotName, 0)) {
 			DeleteSlotData(SlotName);
 
-			PlayerController->SetSuccess(FText::FromString("Project " + SlotName + " Deleted."));
+			PlayerController->SetSuccess(FText::FromString("Project " + SlotName + " Deleted."), 3.0);
 		}
 	}
 }
@@ -510,5 +504,4 @@ void USaveAndLoadMode::ClearWholeWorld() {
 			Actor->Destroy();
 		}
 	}
-
 }

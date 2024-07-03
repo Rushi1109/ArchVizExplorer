@@ -23,8 +23,8 @@ public:
 	UTextBlock*	NotificationText;
 
 	virtual void NativeConstruct() override;
-	void SetError(FText ErrorText);
-	void SetSuccess(FText SuccessText);
+	void SetError(FText ErrorText, float Time);
+	void SetSuccess(FText SuccessText, float Time);
 
 	void ShowTextBox();
 	void HideTextBox();

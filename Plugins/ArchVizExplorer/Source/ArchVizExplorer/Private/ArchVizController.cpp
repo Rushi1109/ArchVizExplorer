@@ -96,15 +96,15 @@ void AArchVizController::SetArchVizMode(UArchVizMode* NewArchVizMode) {
 	}
 }
 
-void AArchVizController::SetSuccess(FText SuccessText) {
+void AArchVizController::SetSuccess(FText SuccessText, float Time) {
 	if (IsValid(NotificationWidget)) {
-		NotificationWidget->SetSuccess(SuccessText);
+		NotificationWidget->SetSuccess(SuccessText, Time);
 	}
 }
 
-void AArchVizController::SetError(FText ErrorText) {
+void AArchVizController::SetError(FText ErrorText, float Time) {
 	if (IsValid(NotificationWidget)) {
-		NotificationWidget->SetError(ErrorText);
+		NotificationWidget->SetError(ErrorText, Time);
 	}
 }
 

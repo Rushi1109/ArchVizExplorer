@@ -7,22 +7,22 @@ void UNotificationWidget::NativeConstruct() {
 	Super::NativeConstruct();
 }
 
-void UNotificationWidget::SetError(FText ErrorText) {
+void UNotificationWidget::SetError(FText ErrorText, float Time) {
 	ShowTextBox();
 
 	NotificationText->SetText(ErrorText);
 	NotificationText->SetColorAndOpacity(FSlateColor{FLinearColor{1.f, 0.f, 0.f, 1.f}});
 
-	HideNotificationAfter(2.5);
+	HideNotificationAfter(Time);
 }
 
-void UNotificationWidget::SetSuccess(FText SuccessText) {
+void UNotificationWidget::SetSuccess(FText SuccessText, float Time) {
 	ShowTextBox();
 
 	NotificationText->SetText(SuccessText);
 	NotificationText->SetColorAndOpacity(FSlateColor{ FLinearColor{0.f, 1.f, 0.f, 1.f} });
 
-	HideNotificationAfter(2.5);
+	HideNotificationAfter(Time);
 }
 
 

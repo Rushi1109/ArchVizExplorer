@@ -148,9 +148,6 @@ void ARoadActor::UpdateOrCreateSegment(int32 SegmentIndex, float StartDistance, 
 		SplineMeshComponent->SetStaticMesh(RoadMesh);
 		SplineMeshComponent->RegisterComponent();
 
-		SplineMeshComponent->SetRenderCustomDepth(true);
-		SplineMeshComponent->CustomDepthStencilValue = 2;
-
 		RoadComponents.Add(SplineMeshComponent);
 	}
 

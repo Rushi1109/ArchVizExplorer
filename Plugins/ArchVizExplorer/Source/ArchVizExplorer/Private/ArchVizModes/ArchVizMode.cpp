@@ -10,13 +10,16 @@ void UArchVizMode::InitParam(AArchVizController* Controller) {
 
 void UArchVizMode::ShowWidget() {
 	if (IsValid(Widget)) {
-		Widget->AddToViewport();
+		if (!Widget->IsInViewport()) {
+			Widget->AddToViewport();
+		}
+		Widget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
 void UArchVizMode::HideWidget() {
 	if (IsValid(Widget)) {
-		Widget->RemoveFromParent();
+		Widget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
