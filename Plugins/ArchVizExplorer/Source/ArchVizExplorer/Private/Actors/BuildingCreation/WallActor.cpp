@@ -76,11 +76,8 @@ void AWallActor::GenerateSegments(double InLength /*= 0.0*/) {
 			WallSegments.Add(StaticMeshComponent);
 		}
 
-		if (IsValid(Material)) {
-			StaticMeshComponent->SetMaterial(0, Material);
-		}
 	}
-
+	ApplyMaterial();
 	UpdateSegments();
 }
 
@@ -265,6 +262,18 @@ const FVector& AWallActor::GetEndLocation() const {
 void AWallActor::HandleMaterialChange(FMaterialAsset MaterialAsset) {
 	if (IsValid(MaterialAsset.Material)) {
 		Material = MaterialAsset.Material;
-		GenerateSegments(Length);
+		ApplyMaterial();
+	}
+}
+
+void AWallActor::ApplyMaterial() {
+	if (IsValid(Material)) {
+		if (auto* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this)) {
+			DynamicMaterial->SetVectorParameterValue(FName{ "Tiling/Offset" }, FLinearColor{ 0.33, 0.33, 0, 0 });
+
+			for (const auto& Segment : WallSegments) {
+				Segment->SetMaterial(0, DynamicMaterial);
+			}
+		}
 	}
 }

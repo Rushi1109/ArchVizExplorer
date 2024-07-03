@@ -57,4 +57,5 @@ private:
 	void UpdateFloorDimensionSlider();
 
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
+	void ApplyMaterial();
 };

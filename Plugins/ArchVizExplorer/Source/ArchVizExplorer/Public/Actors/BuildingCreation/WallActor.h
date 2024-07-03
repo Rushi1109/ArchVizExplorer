@@ -67,4 +67,5 @@ private:
 	void UpdateWallLenghSlider();
 
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
+	void ApplyMaterial();
 };

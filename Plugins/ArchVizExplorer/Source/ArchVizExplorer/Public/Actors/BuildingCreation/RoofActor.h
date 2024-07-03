@@ -61,4 +61,5 @@ private:
 
 	void AdjustDirection();
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
+	void ApplyMaterial();
 };
