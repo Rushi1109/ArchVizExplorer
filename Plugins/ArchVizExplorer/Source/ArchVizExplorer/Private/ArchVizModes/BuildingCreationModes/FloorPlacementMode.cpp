@@ -260,13 +260,6 @@ void UFloorPlacementMode::HandleDimensionSliderValueChange(float InValue) {
 		FloorActor->Dimensions = FVector{ FloorLength + (2 * EdgeOffset), FloorWidth + (2 * EdgeOffset), FloorHeight };
 		FloorActor->Offset = FVector{ FloorLength / 2, FloorWidth / 2, FloorHeight / 2 };
 
-		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
-			FloorActor->Offset.Z *= -1.0;
-		}
-		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
-			FloorActor->Offset.Z *= -1.0;
-		}
-
 		FloorActor->GenerateFloor();
 	}
 }

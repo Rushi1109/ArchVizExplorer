@@ -62,9 +62,12 @@ void AFloorActor::Tick(float DeltaTime) {
 void AFloorActor::GenerateFloor() {
 	DestroyFloor();
 
-	AdjustDirection();
+	FVector FloorDimension;
+	FVector FloorOffset;
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
+	AdjustDirection(FloorDimension, FloorOffset);
+
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, FloorDimension, FloorOffset);
 
 	ApplyMaterial();
 }
@@ -107,9 +110,12 @@ void AFloorActor::HandleGeneratingState() {
 	GenerateFloor();
 }
 
-void AFloorActor::AdjustDirection() {
+void AFloorActor::AdjustDirection(FVector& FloorDimensions, FVector& FloorOffset) {
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
+
+	FloorDimensions = Dimensions;
+	FloorOffset = Offset;
 
 	double EdgeOffset{ 10.0 };
 
@@ -118,11 +124,11 @@ void AFloorActor::AdjustDirection() {
 	}
 	else if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0,0.0,180.0 });
-		Offset.Z *= -1.0;
+		FloorOffset.Z *= -1.0;
 	}
 	else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0,0.0 });
-		Offset.Z *= -1.0;
+		FloorOffset.Z *= -1.0;
 	}
 	else {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });

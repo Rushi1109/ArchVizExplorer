@@ -35,15 +35,6 @@ void USaveAndLoadWidget::PopulateSavedSlots(TArray<FString> SaveSlots) {
 void USaveAndLoadWidget::NativeConstruct() {
 	Super::NativeConstruct();
 
-
-	if (IsValid(LoadProjectMenuButton)) {
-		LoadProjectMenuButton->OnClicked.AddDynamic(this, &USaveAndLoadWidget::HandleLoadMenuButtonClick);
-	}
-
-	if (IsValid(SaveProjectMenuButton)) {
-		SaveProjectMenuButton->OnClicked.AddDynamic(this, &USaveAndLoadWidget::HandleSaveMenuButtonClick);
-	}
-
 	if (IsValid(CancelSaveButton)) {
 		CancelSaveButton->OnClicked.AddDynamic(this, &USaveAndLoadWidget::HandleCancelSaveButtonClick);
 	}
@@ -51,15 +42,6 @@ void USaveAndLoadWidget::NativeConstruct() {
 	if (IsValid(CancelLoadButton)) {
 		CancelLoadButton->OnClicked.AddDynamic(this, &USaveAndLoadWidget::HandleCancelLoadButtonClick);
 	}
-}
-
-
-void USaveAndLoadWidget::HandleLoadMenuButtonClick() {
-	ShowLoadPopup();
-}
-
-void USaveAndLoadWidget::HandleSaveMenuButtonClick() {
-	ShowSavePopup();
 }
 
 void USaveAndLoadWidget::HandleCancelSaveButtonClick() {
@@ -92,4 +74,9 @@ void USaveAndLoadWidget::HideSavePopup() {
 	SavePopup->SetVisibility(ESlateVisibility::Hidden);
 	BgBlur->SetIsEnabled(false);
 	BgBlur->SetBlurStrength(0.0f);
+}
+
+void USaveAndLoadWidget::HideAllPopup() {
+	HideSavePopup();
+	HideLoadPopup();
 }

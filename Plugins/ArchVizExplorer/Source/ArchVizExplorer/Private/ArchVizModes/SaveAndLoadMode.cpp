@@ -26,7 +26,13 @@ void USaveAndLoadMode::Setup() {
 
 		if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
 			SaveAndLoadWidget->PopulateSavedSlots(SlotsList);
+			SaveAndLoadWidget->NewProjectMenuButton->OnClicked.AddDynamic(this, &USaveAndLoadMode::HandleNewProjectMenuButtonClick);
+			SaveAndLoadWidget->SaveProjectMenuButton->OnClicked.AddDynamic(this, &USaveAndLoadMode::HandleSaveProjectMenuButtonClick);
+			SaveAndLoadWidget->LoadProjectMenuButton->OnClicked.AddDynamic(this, &USaveAndLoadMode::HandleLoadProjectMenuButtonClick);
+
 			SaveAndLoadWidget->SaveButton->OnClicked.AddDynamic(this, &USaveAndLoadMode::HandleSaveButtonClick);
+
+
 			SaveAndLoadWidget->OnSaveSlotReceived.BindUObject(this, &USaveAndLoadMode::HandleSlotLoadClick);
 			SaveAndLoadWidget->OnSaveSlotDeleteReceived.BindUObject(this, &USaveAndLoadMode::HandleSlotDeleteClick);
 		}
@@ -51,12 +57,63 @@ void USaveAndLoadMode::ExitMode() {
 	HideWidget();
 }
 
+void USaveAndLoadMode::HandleNewProjectMenuButtonClick() {
+	if (CurrentSlotName.IsEmpty()) {
+		PlayerController->SetError(FText::FromString("Enter Name Of Current Project To Save First."));
+		if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
+			SaveAndLoadWidget->HideAllPopup();
+			SaveAndLoadWidget->ShowSavePopup();
+		}
+		
+		return;
+	}
+	else {
+		SaveGame(CurrentSlotName);
+	}
+
+	ClearWholeWorld();
+	CurrentSlotName = TEXT("");
+	if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
+		SaveAndLoadWidget->SaveSlotName->SetText(FText::FromString(""));
+	}
+
+	PlayerController->SetSuccess(FText::FromString("Successfully Opened New Project."));
+}
+
+void USaveAndLoadMode::HandleSaveProjectMenuButtonClick() {
+	if (CurrentSlotName.IsEmpty()) {
+		PlayerController->SetError(FText::FromString("Enter Name Of The Project To Save."));
+
+		if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
+			SaveAndLoadWidget->HideAllPopup();
+			SaveAndLoadWidget->ShowSavePopup();
+		}
+	}
+	else {
+		if (UGameplayStatics::DoesSaveGameExist(CurrentSlotName, 0)) {
+			if (UGameplayStatics::DeleteGameInSlot(CurrentSlotName, 0)) {
+				SaveGame(CurrentSlotName);
+
+				PlayerController->SetSuccess(FText::FromString("Successfully Saved The Current Project."));
+			}
+		}
+
+	}
+}
+
+void USaveAndLoadMode::HandleLoadProjectMenuButtonClick() {
+	if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
+		SaveAndLoadWidget->HideAllPopup();
+		SaveAndLoadWidget->ShowLoadPopup();
+	}
+}
+
 void USaveAndLoadMode::HandleSaveButtonClick() {
 	if (USaveAndLoadWidget* SaveAndLoadWidget = Cast<USaveAndLoadWidget>(Widget)) {
 		FString SlotName = SaveAndLoadWidget->SaveSlotName->GetText().ToString();
 
 		if (SlotName.IsEmpty()) {
-			PlayerController->SetError(FText::FromString("Project Name is Empty."));
+			PlayerController->SetError(FText::FromString("Project Name Can't Be Empty."));
 			return;
 		}
 
@@ -65,13 +122,12 @@ void USaveAndLoadMode::HandleSaveButtonClick() {
 			return;
 		}
 
+		SaveGame(SlotName);
 		CurrentSlotName = SlotName;
-		SaveGame(CurrentSlotName);
 
-		PlayerController->SetSuccess(FText::FromString("Successfully Saved the Project."));
+		PlayerController->SetSuccess(FText::FromString("Successfully Saved The Project."));
 
-		SaveAndLoadWidget->HideSavePopup();
-		SaveAndLoadWidget->SaveSlotName->SetText(FText{});
+		SaveAndLoadWidget->HideAllPopup();
 	}
 }
 
@@ -82,12 +138,16 @@ void USaveAndLoadMode::HandleSlotLoadClick(const FString& SlotName) {
 			return;
 		}
 
+		if (!CurrentSlotName.IsEmpty()) {
+			SaveGame(CurrentSlotName);
+		}
+
+		LoadGame(SlotName);
 		CurrentSlotName = SlotName;
-		LoadGame(CurrentSlotName);
 
 		PlayerController->SetSuccess(FText::FromString("Project " + SlotName + " Loaded."));
 
-		SaveAndLoadWidget->HideLoadPopup();
+		SaveAndLoadWidget->HideAllPopup();
 	}
 }
 
@@ -246,7 +306,6 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		SaveGameInstance->DoorActorArray.Add(DoorData);
 	}
 
-
 	for (TActorIterator<AInteriorActor> It(GetWorld()); It; ++It) {
 		AInteriorActor* InteriorActor = *It;
 
@@ -269,18 +328,18 @@ void USaveAndLoadMode::SaveGame(const FString& SlotName) {
 		UArchVizSaveSlotName* SaveSlotNameInstance = Cast<UArchVizSaveSlotName>(UGameplayStatics::CreateSaveGameObject(UArchVizSaveSlotName::StaticClass()));
 
 		UArchVizSaveSlotName* LoadSavedSlotNames = Cast<UArchVizSaveSlotName>(UGameplayStatics::LoadGameFromSlot(TEXT("SavedSlotNames"), 0));
-		if (IsValid(LoadSavedSlotNames)) {
+		if (IsValid(LoadSavedSlotNames) && !LoadSavedSlotNames->SlotsName.Contains(SlotName)) {
 			SaveSlotNameInstance->SlotsName = LoadSavedSlotNames->SlotsName;
+
+			FString NewSlotName;
+			NewSlotName = SlotName;
+			SaveSlotNameInstance->SlotsName.Add(NewSlotName);
+
+			SlotsList = SaveSlotNameInstance->SlotsName;
+			UpdateWidgetWithNewSlots();
+
+			UGameplayStatics::SaveGameToSlot(SaveSlotNameInstance, "SavedSlotNames", 0);
 		}
-
-		FString NewSlotName;
-		NewSlotName = SlotName;
-		SaveSlotNameInstance->SlotsName.Add(NewSlotName);
-
-		SlotsList = SaveSlotNameInstance->SlotsName;
-		UpdateWidgetWithNewSlots();
-
-		UGameplayStatics::SaveGameToSlot(SaveSlotNameInstance, "SavedSlotNames", 0);
 	}
 }
 

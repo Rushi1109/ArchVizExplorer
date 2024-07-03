@@ -59,7 +59,7 @@ private:
 	void HandleMovingState();
 	void HandleGeneratingState();
 
-	void AdjustDirection();
+	void AdjustDirection(FVector& RoofDimension, FVector& RoofOffset);
 
 	void UpdateRoofProperties();
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);

@@ -53,7 +53,7 @@ private:
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
-	void AdjustDirection();
+	void AdjustDirection(FVector& FloorDimensions, FVector& FloorOffset);
 	void UpdateFloorDimensionSlider();
 
 	void UpdateFloorProperties();

@@ -55,6 +55,15 @@ private:
 	FString CurrentSlotName;
 
 	UFUNCTION()
+	void HandleNewProjectMenuButtonClick();
+
+	UFUNCTION()
+	void HandleSaveProjectMenuButtonClick();
+
+	UFUNCTION()
+	void HandleLoadProjectMenuButtonClick();
+
+	UFUNCTION()
 	void HandleSaveButtonClick();
 
 	UFUNCTION()

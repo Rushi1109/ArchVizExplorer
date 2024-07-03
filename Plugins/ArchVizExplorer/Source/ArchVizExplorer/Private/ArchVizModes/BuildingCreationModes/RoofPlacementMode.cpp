@@ -265,13 +265,6 @@ void URoofPlacementMode::HandleDimensionSliderValueChange(float InValue) {
 		RoofActor->Dimensions = FVector{ RoofLength + (2 * EdgeOffset), RoofWidth + (2 * EdgeOffset), RoofHeight };
 		RoofActor->Offset = FVector{ RoofLength / 2, RoofWidth / 2, RoofHeight / 2 };
 
-		if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
-			RoofActor->Offset.Z *= -1.0;
-		}
-		else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
-			RoofActor->Offset.Z *= -1.0;
-		}
-
 		RoofActor->GenerateRoof();
 	}
 }

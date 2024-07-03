@@ -44,12 +44,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UButton* SaveProjectMenuButton;
 
-	UFUNCTION()
-	void HandleLoadMenuButtonClick();
-
-	UFUNCTION()
-	void HandleSaveMenuButtonClick();
-
 	// Save Popup
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UBorder* SavePopup;
@@ -78,6 +72,7 @@ public:
 
 	UFUNCTION()
 	void HandleCancelLoadButtonClick();
+
 	// BackGround Blur
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UBackgroundBlur* BgBlur;
@@ -86,4 +81,5 @@ public:
 	void HideLoadPopup();
 	void ShowSavePopup();
 	void HideSavePopup();
+	void HideAllPopup();
 };

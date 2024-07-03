@@ -56,7 +56,10 @@ void ARoofActor::Tick(float DeltaTime) {
 void ARoofActor::GenerateRoof() {
 	DestroyRoof();
 
-	AdjustDirection();
+	FVector RoofDimensions;
+	FVector RoofOffset;
+
+	AdjustDirection(RoofDimensions, RoofOffset);
 
 	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
 
@@ -101,22 +104,25 @@ void ARoofActor::HandleGeneratingState() {
 	GenerateRoof();
 }
 
-void ARoofActor::AdjustDirection() {
+void ARoofActor::AdjustDirection(FVector& RoofDimension, FVector& RoofOffset) {
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
 
 	double EdgeOffset{ 10.0 };
+
+	RoofDimension = Dimensions;
+	RoofOffset = Offset;
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0 });
 	}
 	else if (XFloorLength >= 0.0 && YFloorLength < 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 0.0,0.0,180.0 });
-		Offset.Z *= -1.0;
+		RoofOffset.Z *= -1.0;
 	}
 	else if (XFloorLength < 0.0 && YFloorLength >= 0.0) {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0,0.0 });
-		Offset.Z *= -1.0;
+		RoofOffset.Z *= -1.0;
 	}
 	else {
 		ProceduralMeshComponent->SetWorldRotation(FRotator{ 180.0,0.0, 180.0 });
