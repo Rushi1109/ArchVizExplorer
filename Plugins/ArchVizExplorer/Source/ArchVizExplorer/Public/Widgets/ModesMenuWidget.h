@@ -24,7 +24,7 @@ public:
 	FOnArchVizModeChanged OnModeChanged;
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 	UFUNCTION()
 	void HandleShowModesButtonClick();

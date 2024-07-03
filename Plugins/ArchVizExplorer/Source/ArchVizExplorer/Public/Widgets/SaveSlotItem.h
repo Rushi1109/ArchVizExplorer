@@ -41,7 +41,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* SlotNameTextBox;
 
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 private:
 	FString SlotName;

@@ -32,7 +32,7 @@ public:
 
 	void PopulateSavedSlots(TArray<FString> SaveSlots);
 
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 	// Save and Load Menu
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))

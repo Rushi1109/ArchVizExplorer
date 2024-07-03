@@ -32,8 +32,8 @@ void USaveAndLoadWidget::PopulateSavedSlots(TArray<FString> SaveSlots) {
 	}
 }
 
-void USaveAndLoadWidget::NativeConstruct() {
-	Super::NativeConstruct();
+void USaveAndLoadWidget::NativeOnInitialized() {
+	Super::NativeOnInitialized();
 
 	if (IsValid(CancelSaveButton)) {
 		CancelSaveButton->OnClicked.AddDynamic(this, &USaveAndLoadWidget::HandleCancelSaveButtonClick);

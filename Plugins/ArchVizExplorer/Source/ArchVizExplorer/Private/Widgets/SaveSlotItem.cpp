@@ -3,8 +3,8 @@
 
 #include "Widgets/SaveSlotItem.h"
 
-void USaveSlotItem::NativeConstruct() {
-	Super::NativeConstruct();
+void USaveSlotItem::NativeOnInitialized() {
+	Super::NativeOnInitialized();
 
 	if (IsValid(ItemDeleteButton)) {
 		ItemDeleteButton->OnClicked.AddDynamic(this, &USaveSlotItem::HandleItemDeleteButtonClick);

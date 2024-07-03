@@ -3,8 +3,8 @@
 
 #include "Widgets/ModesMenuWidget.h"
 
-void UModesMenuWidget::NativeConstruct() {
-	Super::NativeConstruct();
+void UModesMenuWidget::NativeOnInitialized() {
+	Super::NativeOnInitialized();
 
 	bToggleModeMenu = true;
 
