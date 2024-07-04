@@ -46,8 +46,11 @@ protected:
 	UPROPERTY()
 	UMaterialWidget* MaterialWidget;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | Material")
 	UMaterialInterface* Material;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArchVizActor | Material")
+	UMaterialInterface* PreviewMaterial;
 
 	int32 ActorID;
 

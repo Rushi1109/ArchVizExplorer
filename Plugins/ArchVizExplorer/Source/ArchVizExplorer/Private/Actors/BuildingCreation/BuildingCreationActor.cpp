@@ -25,10 +25,35 @@ void ABuildingCreationActor::HandleStateChange() {
 		HighlightSelectedActor();
 	}
 	else if (State == EBuildingActorState::Moving) {
+		HidePropertyPanel();
 		HighlightSelectedActor();
 	}
 	else {
 		HidePropertyPanel();
 		UnHighlightDeselectedActor();
 	}
+
+
+	if (State == EBuildingActorState::Generating || State == EBuildingActorState::Previewing){
+		ApplyPreviewMaterial();
+	}
+	else {
+		ApplyMaterial();
+	}
+}
+
+void ABuildingCreationActor::ApplyPreviewMaterial() {
+	if (IsValid(PreviewMaterial)) {
+		TSet<UActorComponent*> ActorComponents = GetComponents();
+
+		for (auto& ActorComponent : ActorComponents) {
+			if (UMeshComponent* Component = Cast<UMeshComponent>(ActorComponent)) {
+				Component->SetMaterial(0, PreviewMaterial);
+			}
+		}
+	}
+}
+
+void ABuildingCreationActor::ApplyMaterial() {
+
 }

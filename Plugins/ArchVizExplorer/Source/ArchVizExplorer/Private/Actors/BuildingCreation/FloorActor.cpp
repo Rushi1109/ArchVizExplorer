@@ -62,14 +62,13 @@ void AFloorActor::Tick(float DeltaTime) {
 void AFloorActor::GenerateFloor() {
 	DestroyFloor();
 
-	FVector FloorDimension;
 	FVector FloorOffset;
 
-	AdjustDirection(FloorDimension, FloorOffset);
+	AdjustDirection(FloorOffset);
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, FloorDimension, FloorOffset);
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, FloorOffset);
 
-	ApplyMaterial();
+	ApplyPreviewMaterial();
 }
 
 void AFloorActor::DestroyFloor() {
@@ -110,11 +109,10 @@ void AFloorActor::HandleGeneratingState() {
 	GenerateFloor();
 }
 
-void AFloorActor::AdjustDirection(FVector& FloorDimensions, FVector& FloorOffset) {
+void AFloorActor::AdjustDirection(FVector& FloorOffset) {
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
 
-	FloorDimensions = Dimensions;
 	FloorOffset = Offset;
 
 	double EdgeOffset{ 10.0 };

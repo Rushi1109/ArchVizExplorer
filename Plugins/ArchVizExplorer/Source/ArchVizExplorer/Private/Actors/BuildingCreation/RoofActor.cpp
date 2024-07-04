@@ -56,14 +56,13 @@ void ARoofActor::Tick(float DeltaTime) {
 void ARoofActor::GenerateRoof() {
 	DestroyRoof();
 
-	FVector RoofDimensions;
 	FVector RoofOffset;
 
-	AdjustDirection(RoofDimensions, RoofOffset);
+	AdjustDirection(RoofOffset);
 
-	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, Offset);
+	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, RoofOffset);
 
-	ApplyMaterial();
+	ApplyPreviewMaterial();
 }
 
 void ARoofActor::DestroyRoof() {
@@ -104,13 +103,12 @@ void ARoofActor::HandleGeneratingState() {
 	GenerateRoof();
 }
 
-void ARoofActor::AdjustDirection(FVector& RoofDimension, FVector& RoofOffset) {
+void ARoofActor::AdjustDirection(FVector& RoofOffset) {
 	double XFloorLength = EndLocation.X - StartLocation.X;
 	double YFloorLength = EndLocation.Y - StartLocation.Y;
 
 	double EdgeOffset{ 10.0 };
 
-	RoofDimension = Dimensions;
 	RoofOffset = Offset;
 
 	if (XFloorLength >= 0.0 && YFloorLength >= 0.0) {

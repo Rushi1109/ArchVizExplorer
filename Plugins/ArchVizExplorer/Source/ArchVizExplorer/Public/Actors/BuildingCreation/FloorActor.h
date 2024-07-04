@@ -53,10 +53,10 @@ private:
 	void HandlePreviewingState();
 	void HandleMovingState();
 	void HandleGeneratingState();
-	void AdjustDirection(FVector& FloorDimensions, FVector& FloorOffset);
+	void AdjustDirection(FVector& FloorOffset);
 	void UpdateFloorDimensionSlider();
 
 	void UpdateFloorProperties();
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
-	void ApplyMaterial();
+	virtual void ApplyMaterial() override;
 };

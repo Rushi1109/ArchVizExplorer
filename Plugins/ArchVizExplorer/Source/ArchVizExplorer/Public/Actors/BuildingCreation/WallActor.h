@@ -69,5 +69,5 @@ private:
 	void UpdateWallProperties();
 
 	void HandleMaterialChange(FMaterialAsset MaterialAsset);
-	void ApplyMaterial();
+	virtual void ApplyMaterial() override;
 };

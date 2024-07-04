@@ -77,7 +77,7 @@ void AWallActor::GenerateSegments(double InLength /*= 0.0*/) {
 		}
 
 	}
-	ApplyMaterial();
+	ApplyPreviewMaterial();
 	UpdateSegments();
 }
 

@@ -31,6 +31,8 @@ public:
 	void SetState(EBuildingActorState NewState);
 	void HandleStateChange();
 
+	virtual void ApplyPreviewMaterial();
+	virtual void ApplyMaterial();
 
 protected:
 	EBuildingActorState State;
