@@ -118,6 +118,7 @@ void USaveAndLoadMode::HandleSaveButtonClick() {
 		}
 
 		SaveGame(SlotName);
+		CurrentSlotName = SlotName;
 
 		PlayerController->SetSuccess(FText::FromString("Successfully Saved The Project."));
 

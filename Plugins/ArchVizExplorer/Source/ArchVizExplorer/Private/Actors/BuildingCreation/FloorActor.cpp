@@ -68,7 +68,12 @@ void AFloorActor::GenerateFloor() {
 
 	ProceduralMeshGenerator::GenerateCube(ProceduralMeshComponent, 0, Dimensions, FloorOffset);
 
-	ApplyPreviewMaterial();
+	if (State == EBuildingActorState::Generating || State == EBuildingActorState::Previewing) {
+		ApplyPreviewMaterial();
+	}
+	else {
+		ApplyMaterial();
+	}
 }
 
 void AFloorActor::DestroyFloor() {

@@ -77,7 +77,12 @@ void AWallActor::GenerateSegments(double InLength /*= 0.0*/) {
 		}
 
 	}
-	ApplyPreviewMaterial();
+	if (State == EBuildingActorState::Generating || State == EBuildingActorState::Previewing) {
+		ApplyPreviewMaterial();
+	}
+	else {
+		ApplyMaterial();
+	}
 	UpdateSegments();
 }
 
