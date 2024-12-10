@@ -81,17 +81,16 @@ void UDoorPlacementMode::SetupInputMapping() {
 }
 
 void UDoorPlacementMode::SetCurrentDoorActor(ADoorActor* Actor) {
-		if (IsValid(DoorActor)) {
-			DoorActor->SetState(EBuildingActorState::None);
-			DoorActor = nullptr;
-		}
+	if (IsValid(DoorActor)) {
+		DoorActor->SetState(EBuildingActorState::None);
+		DoorActor = nullptr;
+	}
 
-		DoorActor = Actor;
+	DoorActor = Actor;
 
-		if (IsValid(DoorActor)) {
-			DoorActor->SetState(EBuildingActorState::Selected);
-		}
-
+	if (IsValid(DoorActor)) {
+		DoorActor->SetState(EBuildingActorState::Selected);
+	}
 }
 
 void UDoorPlacementMode::HandleFreeState() {
